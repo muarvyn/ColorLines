@@ -1,0 +1,10 @@
+<RCC>
+    <qresource lang="en" prefix="/balls"/>
+    <qresource prefix="/">
+        <file>images/ball0.gif</file>
+        <file>images/ball1.gif</file>
+        <file>images/ball2.gif</file>
+        <file>images/ball3.gif</file>
+        <file>images/ball4.gif</file>
+    </qresource>
+</RCC>

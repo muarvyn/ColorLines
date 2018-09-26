@@ -4,9 +4,12 @@ AnimatedIconButton::AnimatedIconButton(int r, int c, QIcon *i)
     : IconCellButton(r,c,i)
     , label(this)
     , effect(this)
+    , animation(nullptr)//&this->effect, "opacity")
+    , animation_state(UNOCCUPIED)
 
 {
     label.setGraphicsEffect(&this->effect);
+    //QPropertyAnimation *a = new QPropertyAnimation(&this->effect, "opacity");
 }
 /*
 void AnimatedIconButton::setState(int s) {
@@ -19,10 +22,29 @@ void AnimatedIconButton::setState(int s) {
     }
 }
 */
-void AnimatedIconButton::startDelayed(int delay)
+void AnimatedIconButton::startDelayed(int state, int delay)
 {
+    animation_state = state;
+    if (animation_state < 0) return;
+    this->animation = new QPropertyAnimation(&this->effect, "opacity");
+    this->animation->setDuration(2000);
+    this->animation->setStartValue(1);
+    this->animation->setEndValue(0);
+    this->animation->setEasingCurve(QEasingCurve::OutBack);
+    QTimer::singleShot(delay, this, SLOT(start()));
+}
+
+void AnimatedIconButton::finalizeAnimation()
+{
+    this->label.hide();
+    delete this->animation;
+    this->animation = nullptr;
+}
+
+void AnimatedIconButton::start()
+{
+    this->setState(animation_state);
     const QIcon icon = this->icon();
-    this->setState(UNOCCUPIED);
     QLabel *label = &this->label;
     label->setAlignment(Qt::AlignCenter);
     label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -32,18 +54,13 @@ void AnimatedIconButton::startDelayed(int delay)
     label->setAutoFillBackground(false);
     label->setPixmap(icon.pixmap(this->size()));
 //    label->setGraphicsEffect(&this->effect);
-    QPropertyAnimation *a = new QPropertyAnimation(&this->effect, "opacity");
-    a->setDuration(1000);
-    a->setStartValue(1);
-    a->setEndValue(0);
-    a->setEasingCurve(QEasingCurve::OutBack);
-    QTimer::singleShot(delay, a, SLOT(start()));
-    //a->start(QPropertyAnimation::DeleteWhenStopped);
-    connect(a,SIGNAL(finished()),this,SLOT(hideLabel()));
-    label->show();
-}
-
-void AnimatedIconButton::hideLabel()
-{
-    label.hide();
+    this->setState(UNOCCUPIED);
+    this->label.show();
+//    this->animation.setDuration(2000);
+//    this->animation.setStartValue(1);
+//    this->animation.setEndValue(0);
+//    this->animation.setEasingCurve(QEasingCurve::OutBack);
+//    this->animation.start();
+    connect(this->animation, SIGNAL(finished()),this,SLOT(finalizeAnimation()));
+    this->animation->start();
 }

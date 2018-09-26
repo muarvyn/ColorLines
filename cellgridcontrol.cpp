@@ -63,8 +63,8 @@ void CellGridControl::handleCellClicked()
     if (clickedButton==selectedCell) {
         selectedCell=nullptr;
         hideAnimation();
-        //clickedButton->setState(CellButton::UNOCCUPIED);
-        clickedButton->startDelayed(500);
+        clickedButton->setState(CellButton::UNOCCUPIED);
+        //clickedButton->startDelayed(500);
     }
     else {
         if (selectedCell != nullptr) {
@@ -85,18 +85,22 @@ void CellGridControl::handleCellClicked()
                     clickedButton->getColumn(),
                     path);
 
-                if (true /*dist < OCCUPATION_THRESHOLD*/) {
+                if (dist < OCCUPATION_THRESHOLD) {
                     hideAnimation();
-                    /*
-                    int delay = 0;
-                    for (std::vector<std::pair<int,int>>::iterator i = path.begin();
-                        i != path.end();
-                        ++i) {
-                        //boardCells[i->first][i->second]->setState(selectedCell->getState());
-                        boardCells[i->first][i->second]->startDelayed(delay);
+                    int st = selectedCell->getState();
+                    int delay = 1;
+//                    for (std::vector<std::pair<int,int>>::iterator ri = path.begin();
+//                        ri != path.end();
+//                        ++ri) {
+                    for (std::vector<std::pair<int,int>>::reverse_iterator ri = path.rbegin();
+                        ri != path.rend();
+                        ++ri) {
+                        AnimatedIconButton *path_button = boardCells[ri->first][ri->second];
+                        //path_button->setState(st);
+                        path_button->startDelayed(st, delay);
                         delay+=100;
-                    }*/
-                    clickedButton->setState(selectedCell->getState());
+                    }
+                    clickedButton->setState(st);
 
                     selectedCell->setState(CellButton::UNOCCUPIED);
                     selectedCell = nullptr;

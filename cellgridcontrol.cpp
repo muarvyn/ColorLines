@@ -13,11 +13,7 @@ CellGridControl::CellGridControl(QGridLayout *gridLayout, QObject *parent)
     movieLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     movieLabel->setBackgroundRole(QPalette::Dark);
     movieLabel->setAutoFillBackground(true);
-    //QString fn = QString("/home/vlad/images/green-anim.gif");
-    //movie->stop();
     movieLabel->setMovie(movie);
-    //movie->setFileName(fn);
-    //movie->isValid();
     for (BallColor::type c=BallColor::brown; c<=BallColor::yellow; c=static_cast<BallColor::type>(c+1))
     {
         ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
@@ -41,7 +37,7 @@ AnimatedIconButton *CellGridControl::createCell(int r, int c)
 void CellGridControl::setButtonAnimation(CellButton &btn)
 {
     movie->stop();
-    if (btn.getState() == -1) return;
+    if (btn.getState() == CellButton::UNOCCUPIED) return;
     movie->setFileName(QString(":/images/ball")+QString::number(btn.getState())+".gif");
     movieLabel->setParent(&btn);
     movieLabel->show();
@@ -63,11 +59,12 @@ void CellGridControl::fitAnimationSize(QSize size)
 
 void CellGridControl::handleCellClicked()
 {
-    CellButton *clickedButton = qobject_cast<CellButton *>(sender());
+    AnimatedIconButton *clickedButton = qobject_cast<AnimatedIconButton *>(sender());
     if (clickedButton==selectedCell) {
         selectedCell=nullptr;
         hideAnimation();
-        clickedButton->setState(CellButton::UNOCCUPIED);
+        //clickedButton->setState(CellButton::UNOCCUPIED);
+        clickedButton->startDelayed(500);
     }
     else {
         if (selectedCell != nullptr) {
@@ -88,8 +85,9 @@ void CellGridControl::handleCellClicked()
                     clickedButton->getColumn(),
                     path);
 
-                if (dist < OCCUPATION_THRESHOLD) {
+                if (true /*dist < OCCUPATION_THRESHOLD*/) {
                     hideAnimation();
+                    /*
                     int delay = 0;
                     for (std::vector<std::pair<int,int>>::iterator i = path.begin();
                         i != path.end();
@@ -97,7 +95,7 @@ void CellGridControl::handleCellClicked()
                         //boardCells[i->first][i->second]->setState(selectedCell->getState());
                         boardCells[i->first][i->second]->startDelayed(delay);
                         delay+=100;
-                    }
+                    }*/
                     clickedButton->setState(selectedCell->getState());
 
                     selectedCell->setState(CellButton::UNOCCUPIED);

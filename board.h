@@ -12,6 +12,7 @@ class DijkstraSearch;
 class Board : public QObject
 {
     Q_OBJECT
+
 public:
     typedef double distance_type;
 

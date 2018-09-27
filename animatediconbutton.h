@@ -10,14 +10,11 @@ class AnimatedIconButton : public IconCellButton
 public:
     AnimatedIconButton(int r, int c, QIcon *i = nullptr);
     void startDelayed(int state, int delay);
-//    virtual void setState(int s);
-
-//    static const int ANIMATED = -2;
+    void setDelayed(int state, int delay);
 
 public slots:
-//    void hideLabel();
     void finalizeAnimation();
-    void start();
+    void start(int state);
 
 signals:
 
@@ -25,7 +22,6 @@ private:
     QLabel label;
     QGraphicsOpacityEffect effect;
     QPropertyAnimation *animation;
-    int animation_state;
 
 };
 

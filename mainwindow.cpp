@@ -12,7 +12,6 @@ MainWindow::MainWindow(QWidget *parent)
     setLayout(gridLayout);
 
     CellGridControl *gridcontrol = new CellGridControl(gridLayout, this);
-    gridcontrol->fitAnimationSize(QSize(40,40)); // TODO: fix "magic numbers"
     setWindowTitle(tr("Color Lines"));
 }
 

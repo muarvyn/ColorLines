@@ -3,11 +3,11 @@
 
 #include <QObject>
 #include "cellbutton.h"
-//#include "board.h"
 
 QT_BEGIN_NAMESPACE
 class CellButton;
 class AnimatedIconButton;
+class GameBoard;
 QT_END_NAMESPACE
 
 
@@ -29,12 +29,13 @@ signals:
 
 public slots:
     void handleCellClicked();
+    void makeNextMove();
 
 protected:
     QMovie *movie;
     QLabel *movieLabel;
     CellButton *selectedCell;
-    Board *board;
+    GameBoard *board;
     QIcon ballIcons[BallColor::colors_num];
     AnimatedIconButton *boardCells[BoardDim::ROWS_NUM][BoardDim::COLUMNS_NUM];
 

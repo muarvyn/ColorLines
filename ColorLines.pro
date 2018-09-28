@@ -31,7 +31,8 @@ SOURCES += \
     dijkstra_search.cpp \
     cellgridcontrol.cpp \
     iconcellbutton.cpp \
-    animatediconbutton.cpp
+    animatediconbutton.cpp \
+    gameboard.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -41,7 +42,8 @@ HEADERS += \
     dijkstra_search.hpp \
     cellgridcontrol.h \
     iconcellbutton.h \
-    animatediconbutton.h
+    animatediconbutton.h \
+    gameboard.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

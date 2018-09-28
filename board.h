@@ -18,12 +18,13 @@ public:
 
     static BallColor::type getRandom();
 
-    bool isOccupied();
+//    bool isOccupied();
 
     explicit Board(AnimatedIconButton *(&board)[BoardDim::ROWS_NUM][BoardDim::COLUMNS_NUM]
         , QObject *parent = nullptr);
 
     void getOccupiedMap(distance_type wmap[BoardDim::ROWS_NUM*BoardDim::COLUMNS_NUM]);
+//    void getUnoccupied(std::vector<std::pair<int,int>> &unoccupied);
     void makeDijkstraSearch(int r, int c);
     double getReversePathTo(int dest_r, int dest_c, std::vector<std::pair<int,int>> &path);
     distance_type getDistance(int dest_r, int dest_c);
@@ -33,7 +34,7 @@ signals:
 
 public slots:
 
-private:
+protected:
     AnimatedIconButton *(&board)[BoardDim::ROWS_NUM][BoardDim::COLUMNS_NUM];
     std::shared_ptr<DijkstraSearch> dijkstra;
 };

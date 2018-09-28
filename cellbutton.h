@@ -13,9 +13,9 @@ public:
 
     QSize sizeHint() const override;
 
-    inline int getRow() { return row; }
-    inline int getColumn() { return column; }
-    inline int getState() { return state; }
+    inline int getRow() const { return row; }
+    inline int getColumn() const { return column; }
+    inline int getState() const { return state; }
     virtual void setState(int s) { state = s; }
     
     static const int UNOCCUPIED = -1;

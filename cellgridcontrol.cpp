@@ -1,5 +1,6 @@
 #include "animatediconbutton.h"
 #include "cellgridcontrol.h"
+#include "gameboard.h"
 
 CellGridControl::CellGridControl(QGridLayout *gridLayout, QObject *parent)
     : QObject(parent)
@@ -24,7 +25,10 @@ CellGridControl::CellGridControl(QGridLayout *gridLayout, QObject *parent)
             gridLayout->addWidget(boardCells[r][c], r, c);
         }
     }
-    board = new Board(boardCells, this);
+    this->fitAnimationSize(QSize(40,40)); // TODO: fix "magic numbers"
+
+    board = new GameBoard(boardCells, this);
+    this->makeNextMove();
 }
 
 AnimatedIconButton *CellGridControl::createCell(int r, int c)
@@ -55,6 +59,17 @@ void CellGridControl::fitAnimationSize(QSize size)
     movieLabel->resize(size);
     movieLabel->setAutoFillBackground(false);
     movie->setScaledSize( movieLabel->frameSize()/movieScale);
+}
+
+void CellGridControl::makeNextMove()
+{
+    const AnimatedIconButton *first_doze[GameBoard::doze_size];
+    if (board->getRandomVacantDoze(first_doze)) {
+        for (int i=0; i<GameBoard::doze_size; ++i) {
+            boardCells[first_doze[i]->getRow()][first_doze[i]->getColumn()]->
+                setDelayed(Board::getRandom(),i*200+1);
+        }
+    }
 }
 
 void CellGridControl::handleCellClicked()
@@ -96,8 +111,8 @@ void CellGridControl::handleCellClicked()
                         delay+=100;
                     }
                     clickedButton->setDelayed(st, delay);
-
-                    selectedCell->setState(CellButton::UNOCCUPIED);
+                    QTimer::singleShot(delay+100, this, SLOT(makeNextMove()));
+                    //selectedCell->setState(CellButton::UNOCCUPIED);
                     selectedCell = nullptr;
                 }
             } else {

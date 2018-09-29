@@ -4,6 +4,8 @@
 #include "gameboard.h"
 #include "animatediconbutton.h"
 
+constexpr GameBoard::Direction GameBoard::orig_dirs[];
+
 GameBoard::GameBoard(
     AnimatedIconButton *(&board)[BoardDim::ROWS_NUM][BoardDim::COLUMNS_NUM]
     , QObject *parent)
@@ -43,4 +45,59 @@ bool GameBoard::getRandomVacantDoze(const AnimatedIconButton* vacant[doze_size])
 
     return true;
 }
+/*
+void GameBoard::getRayConnection(int r, int c, std::vector<AnimatedIconButton*> connection)
+{
+    connection.empty();
+    int state = board[r][c]->getState();
+    if (state == CellButton::UNOCCUPIED) return;
 
+    for (const Direction *dir = &::dirs[0]; dir < &::dirs[DIRECTIONS_NUM]; ++dir) {
+        int row=r, column=c;
+
+        while (true) {
+            row += dir->first;
+            column += dir->second;
+            if (!isInRange(row,column)) break;
+            AnimatedIconButton *btn = board[row][column];
+            if (btn->getState() != state) break;
+            connection.push_back(btn);
+        }
+    }
+}
+*/
+void GameBoard::getElimination(int r, int c, std::vector<AnimatedIconButton*> connection)
+{
+    connection.empty();
+    int state = board[r][c]->getState();
+    if (state == CellButton::UNOCCUPIED) return;
+
+    for (const Direction *dir = &orig_dirs[0];
+        dir < &orig_dirs[ORIG_DIRECTIONS_NUM];
+        ++dir) {
+        int row=r, column=c;
+        std::vector<AnimatedIconButton*> line;
+
+        while (true) {
+            row += dir->first;
+            column += dir->second;
+            if (!isInRange(row,column)) break;
+            AnimatedIconButton *btn = board[row][column];
+            if (btn->getState() != state) break;
+            line.push_back(btn);
+        }
+        row=r; column=c;
+        while (true) {
+            row -= dir->first;
+            column -= dir->second;
+            if (!isInRange(row,column)) break;
+            AnimatedIconButton *btn = board[row][column];
+            if (btn->getState() != state) break;
+            line.push_back(btn);
+        }
+        if (line.size() >= MIN_LINE_ELIMINATION_SIZE-1) {
+            std::copy(line.begin(), line.end(), std::back_inserter(connection));
+        }
+        line.empty();
+    }
+}

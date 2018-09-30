@@ -66,7 +66,7 @@ void GameBoard::getRayConnection(int r, int c, std::vector<AnimatedIconButton*> 
     }
 }
 */
-void GameBoard::getElimination(int r, int c, std::vector<AnimatedIconButton*> connection)
+void GameBoard::getElimination(int r, int c, std::vector<AnimatedIconButton*> &connection)
 {
     connection.empty();
     int state = board[r][c]->getState();

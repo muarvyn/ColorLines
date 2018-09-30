@@ -30,6 +30,7 @@ signals:
 public slots:
     void handleCellClicked();
     void makeNextMove();
+    void handleMove(AnimatedIconButton *btn, int state);
 
 protected:
     QMovie *movie;

@@ -33,7 +33,7 @@ public:
     int getUnoccupied(std::vector<const AnimatedIconButton*> &unoccupied);
     bool getRandomVacantDoze(const AnimatedIconButton* vacant[doze_size]);
 //    void getRayConnection(int r, int c, std::vector<AnimatedIconButton*> connection);
-    void getElimination(int r, int c, std::vector<AnimatedIconButton*> connection);
+    void getElimination(int r, int c, std::vector<AnimatedIconButton*> &connection);
     virtual ~GameBoard() {}
 
 private:

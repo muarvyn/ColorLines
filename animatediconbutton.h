@@ -9,14 +9,19 @@ class AnimatedIconButton : public IconCellButton
 
 public:
     AnimatedIconButton(int r, int c, QIcon *i = nullptr);
-    void startDelayed(int state, int delay);
+
     void setDelayed(int state, int delay);
 
+    void setupAnimation(
+        const QByteArray &propertyName, const QVariant &startValue,
+        const QVariant &endValue, int duration, int final_state);
+
 public slots:
-    void finalizeAnimation();
-    void start(int state);
+    void finalizeAnimation(int final_state);
+    void startAnimation(int animated_state);
 
 signals:
+    void animation_finished();
 
 private:
     QLabel label;

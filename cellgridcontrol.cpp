@@ -28,7 +28,7 @@ CellGridControl::CellGridControl(QGridLayout *gridLayout, QObject *parent)
     this->fitAnimationSize(QSize(40,40)); // TODO: fix "magic numbers"
 
     board = new GameBoard(boardCells, this);
-    this->makeNextMove();
+    makeNextMove();
 }
 
 AnimatedIconButton *CellGridControl::createCell(int r, int c)
@@ -66,27 +66,39 @@ void CellGridControl::makeNextMove()
     const AnimatedIconButton *first_doze[GameBoard::doze_size];
     if (board->getRandomVacantDoze(first_doze)) {
         for (int i=0; i<GameBoard::doze_size; ++i) {
-            boardCells[first_doze[i]->getRow()][first_doze[i]->getColumn()]->
-                setDelayed(Board::getRandom(),i*200+1);
+            AnimatedIconButton *btn =
+                boardCells[first_doze[i]->getRow()][first_doze[i]->getColumn()];
+            int state = Board::getRandom();
+            btn->setupAnimation("opacity", 0, 1, (i+1)*600, state);
+            btn->startAnimation(state);
         }
     }
 }
 
-void CellGridControl::handleMove(AnimatedIconButton *btn, int state)
+void CellGridControl::handleMove(AnimatedIconButton *btn)
 {
-    btn->setState(state);
     std::vector<AnimatedIconButton*> connection;
-    this->board->getElimination(btn->getRow(), btn->getColumn(), connection);
+    board->getElimination(btn->getRow(), btn->getColumn(), connection);
 
     if (connection.size() > 0) {
         for (std::vector<AnimatedIconButton*>::iterator i = connection.begin();
             i < connection.end();
             ++i) {
-            (*i)->setDelayed(CellButton::UNOCCUPIED,400);
+            startEliminationAnimation(*i);
         }
-        btn->setDelayed(CellButton::UNOCCUPIED, 400);
+        connect(btn, &AnimatedIconButton::animation_finished, this,
+            [this, btn]{ btn->disconnect(this); this->makeNextMove();});
+        startEliminationAnimation(btn);
+    } else {
+        this->makeNextMove();
     }
-    this->makeNextMove();
+}
+
+void CellGridControl::startEliminationAnimation(AnimatedIconButton *btn)
+{
+    btn->setupAnimation("iconSize", btn->size(), QSize(5,5),
+        600, AnimatedIconButton::UNOCCUPIED);
+    btn->startAnimation(btn->getState());
 }
 
 void CellGridControl::handleCellClicked()
@@ -108,9 +120,6 @@ void CellGridControl::handleCellClicked()
                     selectedCell->getColumn());
 
                 std::vector<std::pair<int,int>> path;
-                /*Board::distance_type dist = board->getDistance(
-                    clickedButton->getRow(),
-                    clickedButton->getColumn());*/
                 Board::distance_type dist = board->getReversePathTo(
                     clickedButton->getRow(),
                     clickedButton->getColumn(),
@@ -120,19 +129,27 @@ void CellGridControl::handleCellClicked()
                     hideAnimation();
                     int st = selectedCell->getState();
                     int delay = 0;
+                    path.push_back(std::make_pair(
+                        selectedCell->getRow(), selectedCell->getColumn()));
+                    AnimatedIconButton *path_button = nullptr;
                     for (std::vector<std::pair<int,int>>::reverse_iterator ri = path.rbegin();
                         ri != path.rend();
                         ++ri) {
-                        AnimatedIconButton *path_button = boardCells[ri->first][ri->second];
-                        path_button->startDelayed(st, delay);
+                        path_button = boardCells[ri->first][ri->second];
+                        path_button->setupAnimation("opacity", 1, 0, 1000,
+                            AnimatedIconButton::UNOCCUPIED);
+                        startDelayedAnimation(path_button, st, delay);
                         delay+=100;
                     }
-                    //clickedButton->setDelayed(st, delay);
+                    connect(path_button, &AnimatedIconButton::animation_finished,
+                        this,
+                        [this, clickedButton, path_button]
+                        { path_button->disconnect(this);
+                          this->handleMove(clickedButton);});
                     QTimer::singleShot(
                         delay,
-                        this,
-                        [this, clickedButton, st] () { handleMove(clickedButton, st); });
-                    //selectedCell->setState(CellButton::UNOCCUPIED);
+                        clickedButton,
+                        [clickedButton, st]{ clickedButton->setState(st); });
                     selectedCell = nullptr;
                 }
             } else {
@@ -143,4 +160,11 @@ void CellGridControl::handleCellClicked()
             selectedCell=clickedButton;
         }
     }
+}
+
+void CellGridControl::startDelayedAnimation(
+    AnimatedIconButton *btn, int animated_state, int delay)
+{
+    QTimer::singleShot(delay, btn,
+        [btn, animated_state]{ btn->startAnimation(animated_state); });
 }

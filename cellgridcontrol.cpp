@@ -28,6 +28,7 @@ CellGridControl::CellGridControl(QGridLayout *gridLayout, QObject *parent)
     this->fitAnimationSize(QSize(40,40)); // TODO: fix "magic numbers"
 
     board = new GameBoard(boardCells, this);
+    gridLayout->update();
     makeNextMove();
 }
 
@@ -87,7 +88,10 @@ void CellGridControl::handleMove(AnimatedIconButton *btn)
             startEliminationAnimation(*i);
         }
         connect(btn, &AnimatedIconButton::animation_finished, this,
-            [this, btn]{ btn->disconnect(this); this->makeNextMove();});
+            [this, btn] {
+                disconnect(btn, &AnimatedIconButton::animation_finished, nullptr, nullptr);
+                this->makeNextMove();
+            });
         startEliminationAnimation(btn);
     } else {
         this->makeNextMove();
@@ -107,7 +111,7 @@ void CellGridControl::handleCellClicked()
     if (clickedButton==selectedCell) {
         selectedCell=nullptr;
         hideAnimation();
-        clickedButton->setState(CellButton::UNOCCUPIED);
+//        clickedButton->setState(CellButton::UNOCCUPIED);
     }
     else {
         if (selectedCell != nullptr) {
@@ -143,20 +147,22 @@ void CellGridControl::handleCellClicked()
                     }
                     connect(path_button, &AnimatedIconButton::animation_finished,
                         this,
-                        [this, clickedButton, path_button]
-                        { path_button->disconnect(this);
-                          this->handleMove(clickedButton);});
+                        [this, clickedButton, path_button] {
+                            disconnect(path_button, &AnimatedIconButton::animation_finished,
+                                nullptr, nullptr);
+                            this->handleMove(clickedButton);
+                        });
                     QTimer::singleShot(
                         delay,
                         clickedButton,
                         [clickedButton, st]{ clickedButton->setState(st); });
                     selectedCell = nullptr;
                 }
-            } else {
-                clickedButton->setState(Board::getRandom());
+//            } else {
+//                clickedButton->setState(Board::getRandom());
             }
         } else {
-            setButtonAnimation(*clickedButton); // remove icon, if any?
+            setButtonAnimation(*clickedButton);
             selectedCell=clickedButton;
         }
     }

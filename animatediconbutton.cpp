@@ -43,6 +43,7 @@ void AnimatedIconButton::finalizeAnimation(int final_state)
     label.hide();
     setState(final_state);
     emit animation_finished();
+    disconnect(this, &AnimatedIconButton::animation_finished, nullptr, nullptr);
 }
 
 void AnimatedIconButton::startAnimation(int animated_state)

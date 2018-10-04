@@ -88,8 +88,10 @@ void CellGridControl::handleMove(AnimatedIconButton *btn)
             startEliminationAnimation(*i);
         }
         connect(btn, &AnimatedIconButton::animation_finished, this,
-            [this, btn] {
-                disconnect(btn, &AnimatedIconButton::animation_finished, nullptr, nullptr);
+            [this
+//            , btn
+            ] {
+//                disconnect(btn, &AnimatedIconButton::animation_finished, nullptr, nullptr);
                 this->makeNextMove();
             });
         startEliminationAnimation(btn);
@@ -147,9 +149,12 @@ void CellGridControl::handleCellClicked()
                     }
                     connect(path_button, &AnimatedIconButton::animation_finished,
                         this,
-                        [this, clickedButton, path_button] {
-                            disconnect(path_button, &AnimatedIconButton::animation_finished,
-                                nullptr, nullptr);
+                        [this
+                        , clickedButton
+//                        , path_button
+                        ] {
+//                            disconnect(path_button, &AnimatedIconButton::animation_finished,
+//                                nullptr, nullptr);
                             this->handleMove(clickedButton);
                         });
                     QTimer::singleShot(

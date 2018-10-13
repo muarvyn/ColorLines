@@ -21,14 +21,18 @@ public:
     static const int UNOCCUPIED = -1;
 
 signals:
-    void resized(QResizeEvent * event);
+//    void resized(QResizeEvent * event);
 
 protected:
-    void resizeEvent(QResizeEvent * event) override { emit resized(event); }
+//    void resizeEvent(QResizeEvent * event) override { emit resized(event); }
 
 protected:
     int row, column, state;
     BallColor::type color;
+
+private:
+    virtual int heightForWidth( int w ) const override;
+    virtual bool hasHeightForWidth() const override { return true; }
 };
 
 #endif // CELLBUTTON_H

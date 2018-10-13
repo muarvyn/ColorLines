@@ -70,7 +70,7 @@ void CellGridControl::makeNextMove()
             AnimatedIconButton *btn =
                 boardCells[first_doze[i]->getRow()][first_doze[i]->getColumn()];
             int state = Board::getRandom();
-            btn->setupAnimation("opacity", 0, 1, (i+1)*600, state);
+            btn->setupAnimation("opacity", 0, 1, 600, state);
             btn->startAnimation(state);
         }
     }

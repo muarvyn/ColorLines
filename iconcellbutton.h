@@ -10,9 +10,16 @@ public:
     IconCellButton(int r, int c, QIcon *i = nullptr);
 
     virtual void setState(int s);
+//    virtual void resize(const QSize &s) override;
     void setIcons(const QIcon *i) { icons = i; }
 
     static constexpr double iconScale = 1.0;
+
+signals:
+//    void resized(QResizeEvent * event);
+
+protected:
+    void resizeEvent(QResizeEvent * event) override;
 
 protected:
     const QIcon *icons;

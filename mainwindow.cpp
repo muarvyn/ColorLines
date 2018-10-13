@@ -1,21 +1,30 @@
 #include <QtWidgets>
 
 #include "mainwindow.h"
+#include "ui_mainwindow.h"
 #include "cellgridcontrol.h"
+#include "fixedaspectratioitem.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QWidget(parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
 {
-    QGridLayout *gridLayout = new QGridLayout(this);
-    gridLayout->setSizeConstraint(QLayout::SetFixedSize);
-    gridLayout->setSpacing(0);
-    setLayout(gridLayout);
+    ui->setupUi(this);
+    QGridLayout *grid_layout = new QGridLayout();
 
-    CellGridControl *gridcontrol = new CellGridControl(gridLayout, this);
-    setWindowTitle(tr("Color Lines"));
+    FixedAspectRatioLayout * square_layout = new FixedAspectRatioLayout();
+    QVBoxLayout * vbox = qobject_cast<QVBoxLayout*>(ui->centralwidget->layout());
+    vbox->addLayout(square_layout);
+    QWidget * dull_widget = new QWidget();
+    square_layout->addWidget(dull_widget);
+    dull_widget->setLayout(grid_layout);
+
+
+    CellGridControl *gridcontrol = new CellGridControl(grid_layout, this);
+    //setWindowTitle(tr("Color Lines"));
 }
 
 MainWindow::~MainWindow()
 {
-
+    delete ui;
 }

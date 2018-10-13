@@ -1,18 +1,25 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QWidget>
+#include <QMainWindow>
+//#include <QWidget>
 
+namespace Ui {
+class MainWindow;
+}
 
-class MainWindow : public QWidget
+class MainWindow : public QMainWindow //QWidget
 {
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
 private slots:
+
+private:
+    Ui::MainWindow *ui;
 
 };
 

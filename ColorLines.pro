@@ -32,7 +32,9 @@ SOURCES += \
     cellgridcontrol.cpp \
     iconcellbutton.cpp \
     animatediconbutton.cpp \
-    gameboard.cpp
+    gameboard.cpp \
+    gamecontrol.cpp \
+    fixedaspectratioitem.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -43,7 +45,9 @@ HEADERS += \
     cellgridcontrol.h \
     iconcellbutton.h \
     animatediconbutton.h \
-    gameboard.h
+    gameboard.h \
+    gamecontrol.h \
+    fixedaspectratioitem.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -52,3 +56,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     images.qrc
+
+FORMS += \
+    mainwindow.ui

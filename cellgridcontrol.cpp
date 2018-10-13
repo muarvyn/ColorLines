@@ -9,7 +9,7 @@ CellGridControl::CellGridControl(QGridLayout *gridLayout, QObject *parent)
     movie = new QMovie(this);
     movie->setCacheMode(QMovie::CacheAll);
 
-    movieLabel = new QLabel(tr("nothing"));
+    movieLabel = new QLabel();
     movieLabel->setAlignment(Qt::AlignCenter);
     movieLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     movieLabel->setBackgroundRole(QPalette::Dark);
@@ -25,7 +25,6 @@ CellGridControl::CellGridControl(QGridLayout *gridLayout, QObject *parent)
             gridLayout->addWidget(boardCells[r][c], r, c);
         }
     }
-    this->fitAnimationSize(QSize(40,40)); // TODO: fix "magic numbers"
 
     board = new GameBoard(boardCells, this);
     gridLayout->update();
@@ -45,8 +44,19 @@ void CellGridControl::setButtonAnimation(CellButton &btn)
     if (btn.getState() == CellButton::UNOCCUPIED) return;
     movie->setFileName(QString(":/images/ball")+QString::number(btn.getState())+".gif");
     movieLabel->setParent(&btn);
+    fitAnimationSize(btn.size());
+    connect(&btn, &CellButton::resized, this, [this,&btn] { this->movieResized(&btn);} );
     movieLabel->show();
     movie->start();
+}
+
+void CellGridControl::movieResized(CellButton *btn)
+{
+    // just drop selection
+    hideAnimation();
+    disconnect(btn, &CellButton::resized,nullptr, nullptr);
+    selectedCell=nullptr;
+    //fitAnimationSize(btn->size());
 }
 
 void CellGridControl::hideAnimation()

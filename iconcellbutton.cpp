@@ -15,7 +15,8 @@ void IconCellButton::setState(int s) {
     }
 }
 
-void IconCellButton::resizeEvent(QResizeEvent *)
+void IconCellButton::resizeEvent(QResizeEvent * e)
 {
+    CellButton::resizeEvent(e);
     setIconSize(size()/iconScale);
 }

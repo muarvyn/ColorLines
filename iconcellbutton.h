@@ -9,7 +9,7 @@ class IconCellButton : public CellButton
 public:
     IconCellButton(int r, int c, QIcon *i = nullptr);
 
-    virtual void setState(int s);
+    virtual void setState(int s) override;
 //    virtual void resize(const QSize &s) override;
     void setIcons(const QIcon *i) { icons = i; }
 

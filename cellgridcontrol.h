@@ -33,6 +33,7 @@ public slots:
     void handleCellClicked();
     void makeNextMove();
     void handleMove(AnimatedIconButton *btn);
+    void movieResized(CellButton *btn);
 
 protected:
     QMovie *movie;

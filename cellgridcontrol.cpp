@@ -1,10 +1,16 @@
+#include "gameboard.h"
+#include "gamecontrol.h"
 #include "animatediconbutton.h"
 #include "cellgridcontrol.h"
-#include "gameboard.h"
 
-CellGridControl::CellGridControl(QGridLayout *gridLayout, QObject *parent)
+CellGridControl::CellGridControl(
+    QGridLayout *gridLayout,
+    QLabel *nextLabels[SPAWN_BALLS_NUM],
+    QObject *parent
+    )
     : QObject(parent)
     , selectedCell(nullptr)
+    , gameControl(new GameControl(this, this))
 {
     movie = new QMovie(this);
     movie->setCacheMode(QMovie::CacheAll);
@@ -15,6 +21,9 @@ CellGridControl::CellGridControl(QGridLayout *gridLayout, QObject *parent)
     movieLabel->setBackgroundRole(QPalette::Dark);
     movieLabel->setAutoFillBackground(true);
     movieLabel->setMovie(movie);
+
+    std::copy(&nextLabels[0], &nextLabels[SPAWN_BALLS_NUM], nextMoveLabels);
+
     for (BallColor::type c=BallColor::brown; c<=BallColor::yellow; c=static_cast<BallColor::type>(c+1))
     {
         ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
@@ -25,10 +34,21 @@ CellGridControl::CellGridControl(QGridLayout *gridLayout, QObject *parent)
             gridLayout->addWidget(boardCells[r][c], r, c);
         }
     }
+    for (QLabel **nextLab=&nextMoveLabels[0];
+        nextLab < nextMoveLabels+SPAWN_BALLS_NUM;
+        ++nextLab) {
+        (*nextLab)->setMinimumSize(QSize(40,40)); //TOFIX: magic numbers
+    }
 
     board = new GameBoard(boardCells, this);
+
     gridLayout->update();
     makeNextMove();
+}
+
+BallColor::type CellGridControl::getColorAt(int r, int c) const
+{
+    return static_cast<BallColor::type>(boardCells[r][c]->getState());
 }
 
 AnimatedIconButton *CellGridControl::createCell(int r, int c)
@@ -74,16 +94,19 @@ void CellGridControl::fitAnimationSize(QSize size)
 
 void CellGridControl::makeNextMove()
 {
-    const AnimatedIconButton *first_doze[GameBoard::doze_size];
+    BallColor::type *spawn_begin, *spawn_end;
+    std::tie(spawn_begin, spawn_end) = gameControl->getNextSpawn();
+    const AnimatedIconButton *first_doze[SPAWN_BALLS_NUM];
     if (board->getRandomVacantDoze(first_doze)) {
-        for (int i=0; i<GameBoard::doze_size; ++i) {
+        for (int i=0; i<SPAWN_BALLS_NUM; ++i) {
             AnimatedIconButton *btn =
                 boardCells[first_doze[i]->getRow()][first_doze[i]->getColumn()];
-            int state = Board::getRandom();
+            int state = *spawn_begin++;
             btn->setupAnimation("opacity", 0, 1, 600, state);
             btn->startAnimation(state);
         }
     }
+    gameControl->makeNextMove();
 }
 
 void CellGridControl::handleMove(AnimatedIconButton *btn)
@@ -99,9 +122,7 @@ void CellGridControl::handleMove(AnimatedIconButton *btn)
         }
         connect(btn, &AnimatedIconButton::animation_finished, this,
             [this
-//            , btn
             ] {
-//                disconnect(btn, &AnimatedIconButton::animation_finished, nullptr, nullptr);
                 this->makeNextMove();
             });
         startEliminationAnimation(btn);
@@ -161,10 +182,7 @@ void CellGridControl::handleCellClicked()
                         this,
                         [this
                         , clickedButton
-//                        , path_button
                         ] {
-//                            disconnect(path_button, &AnimatedIconButton::animation_finished,
-//                                nullptr, nullptr);
                             this->handleMove(clickedButton);
                         });
                     QTimer::singleShot(

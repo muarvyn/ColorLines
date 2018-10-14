@@ -6,10 +6,19 @@
 #include "board.h"
 #include "dijkstra_search.hpp"
 
+ColorCell::~ColorCell() {}
+
+BoardInterface::~BoardInterface() {}
+
 Board::Board(AnimatedIconButton *(&board)[BoardDim::ROWS_NUM][BoardDim::COLUMNS_NUM],
     QObject *parent) : QObject(parent), board(board), dijkstra(nullptr)
 {
 
+}
+
+BallColor::type Board::getColorAt(int r, int c)
+{
+    return static_cast<BallColor::type>(board[r][c]->getState());
 }
 
 BallColor::type Board::getRandom()

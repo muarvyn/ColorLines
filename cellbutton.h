@@ -4,7 +4,7 @@
 #include <QtWidgets>
 #include "board.h"
 
-class CellButton : public QPushButton
+class CellButton : public QPushButton, public ColorCell
 {
     Q_OBJECT
 
@@ -17,6 +17,9 @@ public:
     inline int getColumn() const { return column; }
     inline int getState() const { return state; }
     virtual void setState(int s) { state = s; }
+    virtual void setColor(BallColor::type color) override { setState(color); }
+    virtual BallColor::type getColor() const override
+        { return static_cast<BallColor::type>(getState()); }
     
     static const int UNOCCUPIED = -1;
 

@@ -19,8 +19,12 @@ MainWindow::MainWindow(QWidget *parent)
     square_layout->addWidget(dull_widget);
     dull_widget->setLayout(grid_layout);
 
-
-    CellGridControl *gridcontrol = new CellGridControl(grid_layout, this);
+    QLabel *labs[] = {ui->nextColor1, ui->nextColor2, ui->nextColor3};
+    CellGridControl *gridcontrol = new CellGridControl(
+        grid_layout,
+        labs,
+        this
+        );
     //setWindowTitle(tr("Color Lines"));
 }
 

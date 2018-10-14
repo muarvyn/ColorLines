@@ -1,22 +1,28 @@
 #ifndef CELLGRIDCONTROL_H
 #define CELLGRIDCONTROL_H
 
-#include <QObject>
+//#include <QObject>
+#include <QtWidgets>
 #include "cellbutton.h"
 
 QT_BEGIN_NAMESPACE
 class CellButton;
 class AnimatedIconButton;
 class GameBoard;
+class GameControl;
 QT_END_NAMESPACE
 
 
-class CellGridControl : public QObject
+class CellGridControl : public QObject, public BoardInterface
 {
     Q_OBJECT
 public:
-    explicit CellGridControl(QGridLayout *gridLayout, QObject *parent = nullptr);
+    explicit CellGridControl(
+        QGridLayout *gridLayout,
+        QLabel *nextLabels[SPAWN_BALLS_NUM],
+        QObject *parent = nullptr);
 
+    BallColor::type getColorAt(int r, int c) const;
     AnimatedIconButton *createCell(int r, int c);
     void setButtonAnimation(CellButton &btn);
     void hideAnimation();
@@ -42,6 +48,8 @@ protected:
     GameBoard *board;
     QIcon ballIcons[BallColor::colors_num];
     AnimatedIconButton *boardCells[BoardDim::ROWS_NUM][BoardDim::COLUMNS_NUM];
+    QLabel *nextMoveLabels[SPAWN_BALLS_NUM];
+    GameControl *gameControl;
 
 };
 

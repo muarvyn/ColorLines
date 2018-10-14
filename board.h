@@ -29,6 +29,7 @@ public:
     double getReversePathTo(int dest_r, int dest_c, std::vector<std::pair<int,int>> &path);
     distance_type getDistance(int dest_r, int dest_c);
     virtual ~Board() {}
+    BallColor::type getColorAt(int r, int c);
 
 signals:
 

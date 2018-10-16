@@ -13,6 +13,8 @@ public:
     explicit GameControl(BoardInterface *bs, QObject *parent = nullptr);
     void updateNextSpawn();
     std::pair<BallColor::type *, BallColor::type *> getNextSpawn();
+    int getUnoccupied(std::vector<std::pair<int,int>> &unoccupied);
+    bool generateRandomSpawn(std::vector<std::pair<int,int>> &spawn);
 
 signals:
 

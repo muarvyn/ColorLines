@@ -1,4 +1,4 @@
-//#include <utility>
+#include <utility>
 #include <QRandomGenerator>
 
 #include "board.h"
@@ -9,6 +9,29 @@ GameControl::GameControl(BoardInterface *bs, QObject *parent)
     , board(bs)
 {
     updateNextSpawn();
+}
+
+int GameControl::getUnoccupied(std::vector<std::pair<int,int>> &unoccupied)
+{
+    for (int r = 0; r < BoardDim::ROWS_NUM; ++r) {
+        for (int c = 0; c < BoardDim::COLUMNS_NUM; ++c) {
+            if (board->getColorAt(r,c) == BallColor::none) {
+                unoccupied.push_back(std::make_pair(r,c));
+            }
+        }
+    }
+    return static_cast<int>(unoccupied.size());
+}
+
+bool GameControl::generateRandomSpawn(std::vector<std::pair<int,int>> &spawn)
+{
+    std::vector<std::pair<int,int>> unoccupied;
+    getUnoccupied(unoccupied);
+    std::random_shuffle(unoccupied.begin(), unoccupied.end());
+    std::copy(unoccupied.begin(),
+        std::min(unoccupied.end(), unoccupied.begin()+SPAWN_BALLS_NUM),
+        std::back_inserter(spawn));
+    return spawn.size()<SPAWN_BALLS_NUM;
 }
 
 void GameControl::makeNextMove()

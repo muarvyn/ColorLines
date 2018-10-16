@@ -96,15 +96,17 @@ void CellGridControl::makeNextMove()
 {
     BallColor::type *spawn_begin, *spawn_end;
     std::tie(spawn_begin, spawn_end) = gameControl->getNextSpawn();
-    const AnimatedIconButton *first_doze[SPAWN_BALLS_NUM];
-    if (board->getRandomVacantDoze(first_doze)) {
-        for (int i=0; i<SPAWN_BALLS_NUM; ++i) {
-            AnimatedIconButton *btn =
-                boardCells[first_doze[i]->getRow()][first_doze[i]->getColumn()];
-            int state = *spawn_begin++;
-            btn->setupAnimation("opacity", 0, 1, 600, state);
-            btn->startAnimation(state);
-        }
+
+    std::vector<std::pair<int,int>> spawn_pos;
+    gameControl->generateRandomSpawn(spawn_pos);
+
+    for (std::vector<std::pair<int,int>>::iterator i = spawn_pos.begin();
+        i < spawn_pos.end();
+        ++i) {
+        AnimatedIconButton *btn = boardCells[i->first][i->second];
+        int state = *spawn_begin++;
+        btn->setupAnimation("opacity", 0, 1, 600, state);
+        btn->startAnimation(state);
     }
     gameControl->makeNextMove();
 }

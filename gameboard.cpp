@@ -48,7 +48,7 @@ bool GameBoard::getRandomVacantDoze(const AnimatedIconButton* vacant[doze_size])
 
 void GameBoard::getElimination(int r, int c, std::vector<AnimatedIconButton*> &connection)
 {
-    connection.empty();
+    connection.clear();
     int state = board[r][c]->getState();
     if (state == CellButton::UNOCCUPIED) return;
 
@@ -78,6 +78,6 @@ void GameBoard::getElimination(int r, int c, std::vector<AnimatedIconButton*> &c
         if (line.size() >= MIN_LINE_ELIMINATION_SIZE-1) {
             std::copy(line.begin(), line.end(), std::back_inserter(connection));
         }
-        line.empty();
+        line.clear();
     }
 }

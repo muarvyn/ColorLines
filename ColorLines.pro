@@ -35,7 +35,8 @@ SOURCES += \
     animatediconbutton.cpp \
     gameboard.cpp \
     gamecontrol.cpp \
-    fixedaspectratioitem.cpp
+    fixedaspectratioitem.cpp \
+    boardinfo.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -48,7 +49,8 @@ HEADERS += \
     animatediconbutton.h \
     gameboard.h \
     gamecontrol.h \
-    fixedaspectratioitem.h
+    fixedaspectratioitem.h \
+    boardinfo.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

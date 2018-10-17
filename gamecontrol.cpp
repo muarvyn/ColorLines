@@ -1,4 +1,5 @@
 #include <utility>
+#include <qdebug.h>
 #include <QRandomGenerator>
 
 #include "board.h"
@@ -37,18 +38,6 @@ bool GameControl::generateRandomSpawn(std::vector<std::pair<int,int>> &spawn)
 void GameControl::makeNextMove()
 {
     updateNextSpawn();
-/*
-    const AnimatedIconButton *first_doze[GameBoard::doze_size];
-    if (board->getRandomVacantDoze(first_doze)) {
-        for (int i=0; i<GameBoard::doze_size; ++i) {
-            AnimatedIconButton *btn =
-                boardCells[first_doze[i]->getRow()][first_doze[i]->getColumn()];
-            int state = Board::getRandom();
-            btn->setupAnimation("opacity", 0, 1, 600, state);
-            btn->startAnimation(state);
-        }
-    }
-*/
 }
 
 BallColor::type GameControl::getRandomColor()
@@ -71,9 +60,11 @@ std::pair<BallColor::type *, BallColor::type *> GameControl::getNextSpawn()
     return std::make_pair(&next_spawn[0], &next_spawn[SPAWN_BALLS_NUM]);
 }
 
-/*
-void GameControl::handleMove(AnimatedIconButton *btn)
+void GameControl::handleMove(const BoardInfo::cell_location &loc)
 {
+    qDebug() << "GameControl::handleMove: cell location is " << loc << "\n";
+    //TODO: implement it
+/*
     std::vector<AnimatedIconButton*> connection;
     board->getElimination(btn->getRow(), btn->getColumn(), connection);
 
@@ -94,5 +85,6 @@ void GameControl::handleMove(AnimatedIconButton *btn)
     } else {
         this->makeNextMove();
     }
-}
 */
+}
+

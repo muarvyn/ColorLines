@@ -5,7 +5,6 @@
 
 CellGridControl::CellGridControl(
     QGridLayout *gridLayout,
-    QLabel *nextLabels[SPAWN_BALLS_NUM],
     QObject *parent
     )
     : QObject(parent)
@@ -22,8 +21,6 @@ CellGridControl::CellGridControl(
     movieLabel->setAutoFillBackground(true);
     movieLabel->setMovie(movie);
 
-    std::copy(&nextLabels[0], &nextLabels[SPAWN_BALLS_NUM], nextMoveLabels);
-
     for (BallColor::type c=BallColor::brown; c<=BallColor::yellow; c=static_cast<BallColor::type>(c+1))
     {
         ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
@@ -34,13 +31,11 @@ CellGridControl::CellGridControl(
             gridLayout->addWidget(boardCells[r][c], r, c);
         }
     }
-    for (QLabel **nextLab=&nextMoveLabels[0];
-        nextLab < nextMoveLabels+SPAWN_BALLS_NUM;
-        ++nextLab) {
-        (*nextLab)->setMinimumSize(QSize(40,40)); //TOFIX: magic numbers
-    }
-
     board = new GameBoard(boardCells, this);
+
+    connect(
+        this, &CellGridControl::userInput,
+        gameControl, &GameControl::handleMove); //TOFIX: temporary code
 
     gridLayout->update();
     makeNextMove();
@@ -113,14 +108,19 @@ void CellGridControl::makeNextMove()
 
 void CellGridControl::handleMove(AnimatedIconButton *btn)
 {
-    std::vector<AnimatedIconButton*> connection;
-    board->getElimination(btn->getRow(), btn->getColumn(), connection);
+    emit userInput(BoardInfo::cell_location(btn->getRow(),btn->getColumn()));
+
+    std::vector<BoardInfo::cell_location> connection;
+    BoardInfo bi(*this);
+    bi.getStraitConnection(
+        BoardInfo::cell_location(btn->getRow(), btn->getColumn()),
+        connection);
 
     if (connection.size() > 0) {
-        for (std::vector<AnimatedIconButton*>::iterator i = connection.begin();
+        for (std::vector<BoardInfo::cell_location>::iterator i = connection.begin();
             i < connection.end();
             ++i) {
-            startEliminationAnimation(*i);
+            startEliminationAnimation(boardCells[i->first][i->second]);
         }
         connect(btn, &AnimatedIconButton::animation_finished, this,
             [this

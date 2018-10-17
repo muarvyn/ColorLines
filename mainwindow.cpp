@@ -4,6 +4,7 @@
 #include "ui_mainwindow.h"
 #include "cellgridcontrol.h"
 #include "fixedaspectratioitem.h"
+#include "gamecontrol.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -20,12 +21,16 @@ MainWindow::MainWindow(QWidget *parent)
     dull_widget->setLayout(grid_layout);
 
     QLabel *labs[] = {ui->nextColor1, ui->nextColor2, ui->nextColor3};
-    CellGridControl *gridcontrol = new CellGridControl(
+    for (QLabel **nextLab=&labs[0];
+        nextLab < &labs[SPAWN_BALLS_NUM];
+        ++nextLab) {
+        (*nextLab)->setMinimumSize(QSize(40,40)); //TOFIX: magic numbers
+    }
+
+    CellGridControl *grid_control = new CellGridControl(
         grid_layout,
-        labs,
         this
         );
-    //setWindowTitle(tr("Color Lines"));
 }
 
 MainWindow::~MainWindow()

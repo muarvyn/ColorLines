@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "basic_defs.hpp"
+#include "boardinfo.h"
 
 class BoardState;
 
@@ -15,13 +16,14 @@ public:
     std::pair<BallColor::type *, BallColor::type *> getNextSpawn();
     int getUnoccupied(std::vector<std::pair<int,int>> &unoccupied);
     bool generateRandomSpawn(std::vector<std::pair<int,int>> &spawn);
+    static BallColor::type getRandomColor();
 
 signals:
 
 public slots:
     void makeNextMove();
 //    void handleMove(AnimatedIconButton *btn);
-    static BallColor::type getRandomColor();
+    void handleMove(const BoardInfo::cell_location &loc);
 
 private:
     BallColor::type next_spawn[SPAWN_BALLS_NUM];

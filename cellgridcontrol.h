@@ -1,8 +1,9 @@
 #ifndef CELLGRIDCONTROL_H
 #define CELLGRIDCONTROL_H
 
-//#include <QObject>
 #include <QtWidgets>
+
+#include "boardinfo.h"
 #include "cellbutton.h"
 
 QT_BEGIN_NAMESPACE
@@ -19,7 +20,6 @@ class CellGridControl : public QObject, public BoardInterface
 public:
     explicit CellGridControl(
         QGridLayout *gridLayout,
-        QLabel *nextLabels[SPAWN_BALLS_NUM],
         QObject *parent = nullptr);
 
     BallColor::type getColorAt(int r, int c) const;
@@ -34,6 +34,7 @@ public:
     static constexpr double OCCUPATION_THRESHOLD = 0.9;
 
 signals:
+    void userInput(const BoardInfo::cell_location &loc);
 
 public slots:
     void handleCellClicked();
@@ -48,7 +49,6 @@ protected:
     GameBoard *board;
     QIcon ballIcons[BallColor::colors_num];
     AnimatedIconButton *boardCells[BoardDim::ROWS_NUM][BoardDim::COLUMNS_NUM];
-    QLabel *nextMoveLabels[SPAWN_BALLS_NUM];
     GameControl *gameControl;
 
 };

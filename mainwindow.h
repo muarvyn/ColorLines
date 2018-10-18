@@ -5,6 +5,10 @@
 
 #include "boardinfo.h"
 
+QT_BEGIN_NAMESPACE
+class QLabel;
+QT_END_NAMESPACE
+
 class GameControl;
 class CellGridControl;
 
@@ -12,7 +16,7 @@ namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow //QWidget
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
@@ -26,9 +30,11 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    QLabel *spawnColorLabels[SPAWN_BALLS_NUM];
     CellGridControl *gridControl;
     GameControl *gameControl;
     std::vector<BallColor::type> cached_colors;
+    QIcon ballIcons[BallColor::colors_num];
 
 };
 

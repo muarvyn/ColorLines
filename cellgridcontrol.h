@@ -55,7 +55,7 @@ protected:
     GameBoard *board;
     QIcon ballIcons[BallColor::colors_num];
     AnimatedIconButton *boardCells[BoardDim::ROWS_NUM][BoardDim::COLUMNS_NUM];
-    GameControl *gameControl;
+    //GameControl *gameControl;
 
 };
 

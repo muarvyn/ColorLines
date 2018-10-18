@@ -35,7 +35,7 @@ bool GameControl::generateRandomSpawn(
         std::min(unoccupied.end(), unoccupied.begin()+SPAWN_BALLS_NUM),
         std::back_inserter(spawn));
 
-    for (int i=0; i<SPAWN_BALLS_NUM; ++i) {
+    for (size_t i=0; i<SPAWN_BALLS_NUM; ++i) {
         color.push_back(getRandomColor());
     }
     return spawn.size()<SPAWN_BALLS_NUM;

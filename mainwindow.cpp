@@ -30,14 +30,22 @@ MainWindow::MainWindow(QWidget *parent)
         cached_colors.push_back(GameControl::getRandomColor());
     }
 
-    QLabel *labs[] = {ui->nextColor1, ui->nextColor2, ui->nextColor3};
-    for (QLabel **nextLab=&labs[0];
-        nextLab < &labs[SPAWN_BALLS_NUM];
+    spawnColorLabels[0] = ui->nextColor1;
+    spawnColorLabels[1] = ui->nextColor2;
+    spawnColorLabels[2] = ui->nextColor3;
+    for (QLabel **nextLab=&spawnColorLabels[0];
+        nextLab < &spawnColorLabels[SPAWN_BALLS_NUM];
         ++nextLab) {
         (*nextLab)->setMinimumSize(QSize(40,40)); //TOFIX: magic numbers
     }
-    show();
-    makeMove();
+    //TOFIX: duplicate code
+    for (BallColor::type c=BallColor::first;
+        c<=BallColor::last;
+        c=static_cast<BallColor::type>(c+1)) //TOFIX: define operator++?
+    {
+        ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
+    }
+    QTimer::singleShot(600, this, &MainWindow::makeMove);
 }
 
 void MainWindow::handleMove(const BoardInfo::cell_location &loc)
@@ -64,10 +72,16 @@ void MainWindow::makeMove()
 
     gridControl->putWithAnimation(spawn_pos, cached_colors);
     std::copy(spawn_colors.begin(), spawn_colors.end(), cached_colors.begin());
+
+    for (size_t i=0; i<SPAWN_BALLS_NUM; ++i) {
+        const QIcon icon = ballIcons[cached_colors[i]];
+        QLabel *lab = spawnColorLabels[i];
+        lab->setPixmap(icon.pixmap(lab->size()/2));
+        lab->setAlignment(Qt::AlignCenter);
+    }
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
-

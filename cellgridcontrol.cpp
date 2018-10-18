@@ -9,7 +9,7 @@ CellGridControl::CellGridControl(
     )
     : QObject(parent)
     , selectedCell(nullptr)
-    , gameControl(new GameControl(this, this))
+    //, gameControl(new GameControl(this, this))
 {
     movie = new QMovie(this);
     movie->setCacheMode(QMovie::CacheAll);
@@ -21,7 +21,9 @@ CellGridControl::CellGridControl(
     movieLabel->setAutoFillBackground(true);
     movieLabel->setMovie(movie);
 
-    for (BallColor::type c=BallColor::brown; c<=BallColor::yellow; c=static_cast<BallColor::type>(c+1))
+    for (BallColor::type c=BallColor::first;
+        c<=BallColor::last;
+        c=static_cast<BallColor::type>(c+1)) //TOFIX: define operator++?
     {
         ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
     }

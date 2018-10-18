@@ -4,7 +4,7 @@
 #include <cstddef>
 struct BallColor
 {
-    enum type {brown, red, green, blue, yellow, pink, navy, first=brown, last=navy, none=-1};
+    enum type {brown, red, green, blue, yellow, pink, navy, first=brown, last=yellow, none=-1}; //TOFIX: last=navy
     static const std::size_t colors_num = static_cast<std::size_t>(last+1);
 };
 

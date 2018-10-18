@@ -2,7 +2,11 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-//#include <QWidget>
+
+#include "boardinfo.h"
+
+class GameControl;
+class CellGridControl;
 
 namespace Ui {
 class MainWindow;
@@ -17,9 +21,14 @@ public:
     ~MainWindow();
 
 private slots:
+    void handleMove(const BoardInfo::cell_location &loc);
+    void makeMove();
 
 private:
     Ui::MainWindow *ui;
+    CellGridControl *gridControl;
+    GameControl *gameControl;
+    std::vector<BallColor::type> cached_colors;
 
 };
 

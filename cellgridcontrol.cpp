@@ -33,12 +33,12 @@ CellGridControl::CellGridControl(
     }
     board = new GameBoard(boardCells, this);
 
-    connect(
-        this, &CellGridControl::userInput,
-        gameControl, &GameControl::handleMove); //TOFIX: temporary code
+//    connect(
+//        this, &CellGridControl::userInput,
+//        gameControl, &GameControl::handleMove); //TOFIX: temporary code
 
     gridLayout->update();
-    makeNextMove();
+//    makeNextMove();
 }
 
 BallColor::type CellGridControl::getColorAt(int r, int c) const
@@ -86,7 +86,7 @@ void CellGridControl::fitAnimationSize(QSize size)
     movieLabel->setAutoFillBackground(false);
     movie->setScaledSize( movieLabel->frameSize()/movieScale);
 }
-
+/*
 void CellGridControl::makeNextMove()
 {
     BallColor::type *spawn_begin, *spawn_end;
@@ -132,7 +132,7 @@ void CellGridControl::handleMove(AnimatedIconButton *btn)
         this->makeNextMove();
     }
 }
-
+*/
 void CellGridControl::startEliminationAnimation(AnimatedIconButton *btn)
 {
     btn->setupAnimation("iconSize", btn->size(), QSize(5,5),
@@ -185,7 +185,9 @@ void CellGridControl::handleCellClicked()
                         [this
                         , clickedButton
                         ] {
-                            this->handleMove(clickedButton);
+                            ///this->handleMove(clickedButton);
+                            emit userInput(BoardInfo::cell_location(
+                                clickedButton->getRow(), clickedButton->getColumn()));
                         });
                     QTimer::singleShot(
                         delay,
@@ -208,4 +210,56 @@ void CellGridControl::startDelayedAnimation(
 {
     QTimer::singleShot(delay, btn,
         [btn, animated_state]{ btn->startAnimation(animated_state); });
+}
+
+void CellGridControl::removeWithAnimation(
+    const std::vector<BoardInfo::cell_location> &locations)
+{
+    if (locations.size() > 0) {
+        hideAnimation();
+        AnimatedIconButton *btn;
+        for (std::vector<BoardInfo::cell_location>::const_iterator i = locations.begin();
+            i < locations.end();
+            ++i) {
+            btn = boardCells[i->first][i->second];
+            startEliminationAnimation(btn);
+        }
+        connect(
+            btn, &AnimatedIconButton::animation_finished,
+            this, [this] {
+                emit animationFinished();
+                disconnect(this, &CellGridControl::animationFinished, nullptr,nullptr);});
+    } else {
+        emit animationFinished();
+        disconnect(this, &CellGridControl::animationFinished, nullptr,nullptr);
+    }
+}
+
+void CellGridControl::putWithAnimation(
+    const std::vector<BoardInfo::cell_location> &locations,
+    const std::vector<BallColor::type> &colors)
+{
+    if (locations.size() > 0) {
+        hideAnimation();
+        AnimatedIconButton *btn;
+//        for (std::vector<BoardInfo::cell_location>::iterator i = locations.begin();
+//            i < locations.end();
+        for (size_t i = 0;
+            i < locations.size();
+            ++i) {
+            BoardInfo::cell_location loc = locations[i];
+            int state = colors[i];
+            btn = boardCells[loc.first][loc.second];
+            btn->setupAnimation("opacity", 0, 1, 600, state);
+            btn->startAnimation(state);
+        }
+        connect(
+            btn, &AnimatedIconButton::animation_finished,
+            this, [this] {
+                emit animationFinished();
+                disconnect(this, &CellGridControl::animationFinished, nullptr,nullptr);});
+    } else {
+        emit animationFinished();
+        disconnect(this, &CellGridControl::animationFinished, nullptr,nullptr);
+    }
 }

@@ -36,9 +36,10 @@ void BoardInfo::getStraitConnection( cell_location start,
             if (board.getColorAt(row,column) != state) break;
             line.push_back(cell_location(row,column));
         }
-        if (line.size() >= MIN_LINE_ELIMINATION_SIZE-1) { //TOFIX: it is not exactly expected behaviour
+        if (line.size() >= MIN_LINE_ELIMINATION_SIZE-1) { //TOFIX: isn't this exactly expected behaviour?
             std::copy(line.begin(), line.end(), std::back_inserter(connection));
         }
         line.clear();
     }
+    if (!connection.empty()) { connection.push_back(start); }
 }

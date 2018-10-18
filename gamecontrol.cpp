@@ -9,7 +9,7 @@ GameControl::GameControl(BoardInterface *bs, QObject *parent)
     : QObject(parent)
     , board(bs)
 {
-    updateNextSpawn();
+
 }
 
 int GameControl::getUnoccupied(std::vector<std::pair<int,int>> &unoccupied)
@@ -24,7 +24,9 @@ int GameControl::getUnoccupied(std::vector<std::pair<int,int>> &unoccupied)
     return static_cast<int>(unoccupied.size());
 }
 
-bool GameControl::generateRandomSpawn(std::vector<std::pair<int,int>> &spawn)
+bool GameControl::generateRandomSpawn(
+    std::vector<std::pair<int,int>> &spawn,
+    std::vector<BallColor::type> &color)
 {
     std::vector<std::pair<int,int>> unoccupied;
     getUnoccupied(unoccupied);
@@ -32,12 +34,16 @@ bool GameControl::generateRandomSpawn(std::vector<std::pair<int,int>> &spawn)
     std::copy(unoccupied.begin(),
         std::min(unoccupied.end(), unoccupied.begin()+SPAWN_BALLS_NUM),
         std::back_inserter(spawn));
+
+    for (int i=0; i<SPAWN_BALLS_NUM; ++i) {
+        color.push_back(getRandomColor());
+    }
     return spawn.size()<SPAWN_BALLS_NUM;
 }
 
 void GameControl::makeNextMove()
 {
-    updateNextSpawn();
+    //TOFIX: never called
 }
 
 BallColor::type GameControl::getRandomColor()
@@ -45,7 +51,7 @@ BallColor::type GameControl::getRandomColor()
     return static_cast<BallColor::type>(
         QRandomGenerator::global()->bounded(BallColor::yellow+1/*BallColor::last+1*/));
 }
-
+/*
 void GameControl::updateNextSpawn()
 {
     for (BallColor::type *sc = &next_spawn[0];
@@ -59,32 +65,26 @@ std::pair<BallColor::type *, BallColor::type *> GameControl::getNextSpawn()
 {
     return std::make_pair(&next_spawn[0], &next_spawn[SPAWN_BALLS_NUM]);
 }
+*/
+void GameControl::getStraitConnection(
+    const BoardInfo::cell_location &loc,
+    std::vector<BoardInfo::cell_location> &connection)
+{
+    BoardInfo bi(*board);
+    bi.getStraitConnection(
+        BoardInfo::cell_location(loc.first, loc.second),
+        connection);
+}
 
 void GameControl::handleMove(const BoardInfo::cell_location &loc)
 {
+    //TOFIX: never called
     qDebug() << "GameControl::handleMove: cell location is " << loc << "\n";
-    //TODO: implement it
-/*
-    std::vector<AnimatedIconButton*> connection;
-    board->getElimination(btn->getRow(), btn->getColumn(), connection);
 
-    if (connection.size() > 0) {
-        for (std::vector<AnimatedIconButton*>::iterator i = connection.begin();
-            i < connection.end();
-            ++i) {
-            startEliminationAnimation(*i);
-        }
-        connect(btn, &AnimatedIconButton::animation_finished, this,
-            [this
-//            , btn
-            ] {
-//                disconnect(btn, &AnimatedIconButton::animation_finished, nullptr, nullptr);
-                this->makeNextMove();
-            });
-        startEliminationAnimation(btn);
-    } else {
-        this->makeNextMove();
-    }
-*/
+    std::vector<BoardInfo::cell_location> connection;
+    BoardInfo bi(*board);
+    bi.getStraitConnection(
+        BoardInfo::cell_location(loc.first, loc.second),
+        connection);
 }
 

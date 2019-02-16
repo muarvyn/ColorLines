@@ -70,6 +70,11 @@ BallColor::type CellGridControl::getColorAt(int r, int c) const
     return static_cast<BallColor::type>(boardCells[r][c]->getState());
 }
 
+void CellGridControl::setColorAt(int r, int c, BallColor::type color)
+{
+    boardCells[r][c]->setState(color);
+}
+
 AnimatedIconButton *CellGridControl::createCell(int r, int c)
 {
     AnimatedIconButton * cell = new AnimatedIconButton(r,c,ballIcons);

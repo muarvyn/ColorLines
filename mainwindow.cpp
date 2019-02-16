@@ -31,8 +31,7 @@ along with ColorLines; see the file COPYING.  If not, see
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-//    , gridControl(new CellGridControl())
-//    , gameControl(new GameControl(gridControl))
+    , score(0)
 {
     ui->setupUi(this);
     QGridLayout *grid_layout = new QGridLayout();
@@ -52,6 +51,8 @@ MainWindow::MainWindow(QWidget *parent)
         cached_colors.push_back(GameControl::getRandomColor());
     }
 
+    scoreLab = ui->scoreLab;
+    scoreLab->setText("0");
     spawnColorLabels[0] = ui->nextColor1;
     spawnColorLabels[1] = ui->nextColor2;
     spawnColorLabels[2] = ui->nextColor3;
@@ -76,10 +77,14 @@ void MainWindow::handleMove(const BoardInfo::cell_location &loc)
 
     std::vector<BoardInfo::cell_location> connection;
     gameControl->getStraitConnection(loc, connection);
+    score += connection.size();
+    scoreLab->setText(QString::number(score));
     if (!connection.empty()) {
+        /*
         connect(
             gridControl, &CellGridControl::animationFinished,
             this, &MainWindow::makeMove);
+        */
         gridControl->removeWithAnimation(connection);
     } else {
         makeMove();
@@ -106,4 +111,11 @@ void MainWindow::makeMove()
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::on_actionNew_triggered()
+{
+    gameControl->clear();
+    scoreLab->setText("0");
+    QTimer::singleShot(600, this, &MainWindow::makeMove);
 }

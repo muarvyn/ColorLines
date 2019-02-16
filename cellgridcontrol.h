@@ -45,6 +45,7 @@ public:
         QObject *parent = nullptr);
 
     BallColor::type getColorAt(int r, int c) const;
+    void setColorAt(int r, int c, BallColor::type color);
     AnimatedIconButton *createCell(int r, int c);
     void setButtonAnimation(CellButton &btn);
     void hideAnimation();

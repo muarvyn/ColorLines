@@ -63,6 +63,15 @@ bool GameControl::generateRandomSpawn(
     return spawn.size()<SPAWN_BALLS_NUM;
 }
 
+void GameControl::clear()
+{
+    for (int r = 0; r < BoardDim::ROWS_NUM; ++r) {
+        for (int c = 0; c < BoardDim::COLUMNS_NUM; ++c) {
+            board->setColorAt(r,c,BallColor::none);
+        }
+    }
+}
+
 void GameControl::makeNextMove()
 {
     //TOFIX: never called

@@ -50,8 +50,8 @@ signals:
 
 public slots:
     void makeNextMove();
-//    void handleMove(AnimatedIconButton *btn);
     void handleMove(const BoardInfo::cell_location &loc);
+    void clear();
 
 private:
     //BallColor::type next_spawn[SPAWN_BALLS_NUM];

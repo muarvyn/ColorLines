@@ -50,6 +50,8 @@ private slots:
     void handleMove(const BoardInfo::cell_location &loc);
     void makeMove();
 
+    void on_actionNew_triggered();
+
 private:
     Ui::MainWindow *ui;
     QLabel *spawnColorLabels[SPAWN_BALLS_NUM];
@@ -57,6 +59,8 @@ private:
     GameControl *gameControl;
     std::vector<BallColor::type> cached_colors;
     QIcon ballIcons[BallColor::colors_num];
+    int score;
+    QLabel *scoreLab;
 
 };
 

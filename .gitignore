@@ -33,9 +33,11 @@
 
 # Qt Creator temporary files
 *.user
+*.user.*
 *.autosave
 
 # Build directories
 build
 Release
 Debug
+

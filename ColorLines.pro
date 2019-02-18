@@ -22,7 +22,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 QMAKE_CXXFLAGS += -Wno-sign-compare
 CONFIG += c++11
-INCLUDEPATH += ../include
+INCLUDEPATH += grid2d_graph
 
 SOURCES += \
         main.cpp \

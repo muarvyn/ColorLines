@@ -32,7 +32,6 @@ FixedAspectRatioLayout::FixedAspectRatioLayout(QWidget *parent)
 FixedAspectRatioLayout::FixedAspectRatioLayout()
     : QLayout()
     , item(nullptr)
-
 {
 }
 
@@ -41,12 +40,12 @@ FixedAspectRatioLayout::~FixedAspectRatioLayout()
     delete this->item;
 }
 
-void FixedAspectRatioLayout::addItem(QLayoutItem *item)
+void FixedAspectRatioLayout::addItem(QLayoutItem *layout_item)
 {
-    if (item != nullptr) {
+    if (this->item != nullptr) {
         delete this->item;
-        this->item = item;
     }
+    this->item = layout_item;
 }
 
 int FixedAspectRatioLayout::count() const

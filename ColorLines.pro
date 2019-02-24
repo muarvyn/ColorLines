@@ -37,7 +37,8 @@ SOURCES += \
     gamecontrol.cpp \
     fixedaspectratioitem.cpp \
     boardinfo.cpp \
-    boardcontrol.cpp
+    boardcontrol.cpp \
+    basic_defs.cpp
 
 HEADERS += \
         mainwindow.h \

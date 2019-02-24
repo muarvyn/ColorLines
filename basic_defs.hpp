@@ -30,6 +30,8 @@ struct BallColor
     static const std::size_t colors_num = static_cast<std::size_t>(last+1);
 };
 
+void operator++(BallColor::type&);
+
 struct BoardDim
 {
     static const int ROWS_NUM = 9;

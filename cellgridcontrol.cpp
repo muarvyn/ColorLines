@@ -47,7 +47,7 @@ CellGridControl::CellGridControl(
 
     for (BallColor::type c=BallColor::first;
         c<=BallColor::last;
-        c=static_cast<BallColor::type>(c+1)) //TOFIX: define operator++?
+        ++c)
     {
         ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
     }

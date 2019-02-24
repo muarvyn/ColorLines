@@ -50,9 +50,10 @@ void BoardControl::handleCellClicked( AnimatedIconButton *clickedButton,
                     }
                     connect(path_button, &AnimatedIconButton::animation_finished,
                         this,
-                        [this, clickedButton] {
+                        [this, clickedButton, path_button] {
                             emit moveFinished(BoardInfo::cell_location(
                                 clickedButton->getRow(), clickedButton->getColumn()));
+                            disconnect(path_button, &AnimatedIconButton::animation_finished, nullptr, nullptr);
                         });
                     QTimer::singleShot(
                         delay,

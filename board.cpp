@@ -32,7 +32,7 @@ ColorCell::~ColorCell() {}
 
 BoardInterface::~BoardInterface() {}
 
-Board::Board(AnimatedIconButton *(&board)[BoardDim::ROWS_NUM][BoardDim::COLUMNS_NUM],
+Board::Board(const std::vector<std::vector<AnimatedIconButton*>> &board,
     QObject *parent) : QObject(parent), board(board), dijkstra(nullptr)
 {
 
@@ -53,7 +53,8 @@ void Board::getOccupiedMap(distance_type wmap[BoardDim::ROWS_NUM*BoardDim::COLUM
     int i=0;
     for (int r = 0; r < BoardDim::ROWS_NUM; ++r) {
         for (int c = 0; c < BoardDim::COLUMNS_NUM; ++c) {
-            wmap[i++] = board[r][c]->getState() == CellButton::UNOCCUPIED ? 1.E-5 : 1.;
+            wmap[i++] = board[r][c]->getState() ==
+                        CellButton::UNOCCUPIED ? EMPTY_CELL_WEIGHT : OCCUPIED_CELL_WEIGHT;
         }
     }
 }

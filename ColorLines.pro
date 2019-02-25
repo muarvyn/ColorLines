@@ -36,7 +36,8 @@ SOURCES += \
     gameboard.cpp \
     gamecontrol.cpp \
     fixedaspectratioitem.cpp \
-    boardinfo.cpp
+    boardinfo.cpp \
+    boardcontrol.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -50,7 +51,8 @@ HEADERS += \
     gameboard.h \
     gamecontrol.h \
     fixedaspectratioitem.h \
-    boardinfo.h
+    boardinfo.h \
+    boardcontrol.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

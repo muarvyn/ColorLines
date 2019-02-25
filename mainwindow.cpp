@@ -26,6 +26,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "ui_mainwindow.h"
 #include "fixedaspectratioitem.h"
 #include "cellgridcontrol.h"
+#include "boardcontrol.h"
 #include "gamecontrol.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -43,9 +44,11 @@ MainWindow::MainWindow(QWidget *parent)
     square_layout->addWidget(dull_widget);
     dull_widget->setLayout(grid_layout);
 
-    gridControl = new CellGridControl(grid_layout, this);
+    gridControl = new CellGridControl(BoardDim::ROWS_NUM, BoardDim::COLUMNS_NUM, grid_layout, this);
+    boardControl = new BoardControl(gridControl);
     gameControl = new GameControl(gridControl, this);
-    connect(gridControl, &CellGridControl::userInput, this, &MainWindow::handleMove);
+    connect(gridControl, &CellGridControl::userInput, boardControl, &BoardControl::handleCellClicked);
+    connect(boardControl, &BoardControl::moveFinished, this, &MainWindow::handleMove);
 
     for (size_t i=0; i<SPAWN_BALLS_NUM; ++i) {
         cached_colors.push_back(GameControl::getRandomColor());
@@ -98,6 +101,7 @@ void MainWindow::makeMove()
     gameControl->generateRandomSpawn(spawn_pos, spawn_colors);
 
     gridControl->putWithAnimation(spawn_pos, cached_colors);
+
     std::copy(spawn_colors.begin(), spawn_colors.end(), cached_colors.begin());
 
     for (size_t i=0; i<SPAWN_BALLS_NUM; ++i) {

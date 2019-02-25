@@ -33,6 +33,7 @@ QT_END_NAMESPACE
 
 class GameControl;
 class CellGridControl;
+class BoardControl;
 
 namespace Ui {
 class MainWindow;
@@ -56,6 +57,7 @@ private:
     Ui::MainWindow *ui;
     QLabel *spawnColorLabels[SPAWN_BALLS_NUM];
     CellGridControl *gridControl;
+    BoardControl *boardControl;
     GameControl *gameControl;
     std::vector<BallColor::type> cached_colors;
     QIcon ballIcons[BallColor::colors_num];

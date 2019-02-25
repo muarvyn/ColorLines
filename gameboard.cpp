@@ -29,7 +29,7 @@ along with ColorLines; see the file COPYING.  If not, see
 constexpr GameBoard::Direction GameBoard::orig_dirs[];
 
 GameBoard::GameBoard(
-    AnimatedIconButton *(&board)[BoardDim::ROWS_NUM][BoardDim::COLUMNS_NUM]
+    const std::vector<std::vector<AnimatedIconButton*>> &board
     , QObject *parent)
     : Board (board, parent)
 {

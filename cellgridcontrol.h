@@ -31,7 +31,6 @@ along with ColorLines; see the file COPYING.  If not, see
 QT_BEGIN_NAMESPACE
 class CellButton;
 class AnimatedIconButton;
-class GameBoard;
 class GameControl;
 QT_END_NAMESPACE
 
@@ -41,12 +40,16 @@ class CellGridControl : public QObject, public BoardInterface
     Q_OBJECT
 public:
     explicit CellGridControl(
+        int rows_num,
+        int columns_num,
         QGridLayout *gridLayout,
         QObject *parent = nullptr);
 
     BallColor::type getColorAt(int r, int c) const;
     void setColorAt(int r, int c, BallColor::type color);
     AnimatedIconButton *createCell(int r, int c);
+    const std::vector<std::vector<AnimatedIconButton*>>& getCells() const
+    { return boardCells; }
     void setButtonAnimation(CellButton &btn);
     void hideAnimation();
     void fitAnimationSize(QSize size);
@@ -57,28 +60,22 @@ public:
         const std::vector<BoardInfo::cell_location> &locations,
         const std::vector<BallColor::type> &colors);
 
-
     static constexpr double movieScale = 1.0;
-    static constexpr double OCCUPATION_THRESHOLD = 0.9;
 
 signals:
-    void userInput(const BoardInfo::cell_location &loc);
+    void userInput(AnimatedIconButton *clickedButton, CellButton *selectedCell);
     void animationFinished();
 
 public slots:
     void handleCellClicked();
-    //void makeNextMove();
-    //void handleMove(AnimatedIconButton *btn);
     void movieResized(CellButton *btn);
 
 protected:
     QMovie *movie;
     QLabel *movieLabel;
     CellButton *selectedCell;
-    GameBoard *board;
     QIcon ballIcons[BallColor::colors_num];
-    AnimatedIconButton *boardCells[BoardDim::ROWS_NUM][BoardDim::COLUMNS_NUM];
-    //GameControl *gameControl;
+    std::vector<std::vector<AnimatedIconButton*>> boardCells;
 
 };
 

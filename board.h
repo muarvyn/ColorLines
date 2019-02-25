@@ -40,25 +40,25 @@ public:
 
     static BallColor::type getRandom();
 
-//    bool isOccupied();
-
-    explicit Board(AnimatedIconButton *(&board)[BoardDim::ROWS_NUM][BoardDim::COLUMNS_NUM]
+    explicit Board(const std::vector<std::vector<AnimatedIconButton*>> &board
         , QObject *parent = nullptr);
 
     void getOccupiedMap(distance_type wmap[BoardDim::ROWS_NUM*BoardDim::COLUMNS_NUM]);
-//    void getUnoccupied(std::vector<std::pair<int,int>> &unoccupied);
     void makeDijkstraSearch(int r, int c);
     double getReversePathTo(int dest_r, int dest_c, std::vector<std::pair<int,int>> &path);
     distance_type getDistance(int dest_r, int dest_c);
     virtual ~Board() {}
     BallColor::type getColorAt(int r, int c);
 
+    const float EMPTY_CELL_WEIGHT = 1.0e-5f;
+    const float OCCUPIED_CELL_WEIGHT = 1.0;
+
 signals:
 
 public slots:
 
 protected:
-    AnimatedIconButton *(&board)[BoardDim::ROWS_NUM][BoardDim::COLUMNS_NUM];
+    const std::vector<std::vector<AnimatedIconButton*>> &board;
     std::shared_ptr<DijkstraSearch> dijkstra;
 };
 

@@ -38,7 +38,7 @@ public:
     static const int ORIG_DIRECTIONS_NUM = sizeof(orig_dirs)/sizeof(orig_dirs[0]);
 
     explicit GameBoard(
-        AnimatedIconButton *(&board)[BoardDim::ROWS_NUM][BoardDim::COLUMNS_NUM]
+        const std::vector<std::vector<AnimatedIconButton*>> &board
         , QObject *parent = nullptr);
 
     bool isInRange(int r, int c) {

@@ -34,6 +34,7 @@ QT_END_NAMESPACE
 class GameControl;
 class CellGridControl;
 class BoardControl;
+class EditModeControl;
 
 namespace Ui {
 class MainWindow;
@@ -50,14 +51,16 @@ public:
 private slots:
     void handleMove(const BoardInfo::cell_location &loc);
     void makeMove();
-
     void on_actionNew_triggered();
+    void on_actionEdit_toggled(bool isEditMode);
 
 private:
     Ui::MainWindow *ui;
     QLabel *spawnColorLabels[SPAWN_BALLS_NUM];
     CellGridControl *gridControl;
+    CellGridControl *editToolbar;
     BoardControl *boardControl;
+    EditModeControl *editControl;
     GameControl *gameControl;
     std::vector<BallColor::type> cached_colors;
     QIcon ballIcons[BallColor::colors_num];

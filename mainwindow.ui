@@ -26,7 +26,7 @@
      <enum>QLayout::SetMinimumSize</enum>
     </property>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QHBoxLayout" name="statusLayout">
       <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
@@ -144,6 +144,9 @@
       </item>
      </layout>
     </item>
+    <item>
+     <layout class="QHBoxLayout" name="centralRowLayout"/>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -186,6 +189,9 @@
    </property>
    <property name="text">
     <string>Edit</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit Game</string>
    </property>
   </action>
   <action name="actionSave">

@@ -27,28 +27,35 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "fixedaspectratioitem.h"
 #include "cellgridcontrol.h"
 #include "boardcontrol.h"
+#include "editmodecontrol.h"
 #include "gamecontrol.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , editControl(nullptr)
     , score(0)
 {
     ui->setupUi(this);
     QGridLayout *grid_layout = new QGridLayout();
+    QGridLayout *editTB_layout = new QGridLayout();
 
     FixedAspectRatioLayout * square_layout = new FixedAspectRatioLayout();
-    QVBoxLayout * vbox = qobject_cast<QVBoxLayout*>(ui->centralwidget->layout());
-    vbox->addLayout(square_layout);
     QWidget * dull_widget = new QWidget();
     square_layout->addWidget(dull_widget);
     dull_widget->setLayout(grid_layout);
 
     gridControl = new CellGridControl(BoardDim::ROWS_NUM, BoardDim::COLUMNS_NUM, grid_layout, this);
+    editToolbar = new CellGridControl(BallColor::colors_num, 1, editTB_layout, this);
     boardControl = new BoardControl(gridControl);
     gameControl = new GameControl(gridControl, this);
     connect(gridControl, &CellGridControl::userInput, boardControl, &BoardControl::handleCellClicked);
     connect(boardControl, &BoardControl::moveFinished, this, &MainWindow::handleMove);
+
+    QHBoxLayout * hbox = qobject_cast<QHBoxLayout*>(ui->centralRowLayout);
+    hbox->addLayout(editTB_layout);
+    hbox->setAlignment(editTB_layout, Qt::AlignRight | Qt::AlignVCenter);
+    hbox->addLayout(square_layout);
 
     for (size_t i=0; i<SPAWN_BALLS_NUM; ++i) {
         cached_colors.push_back(GameControl::getRandomColor());
@@ -122,4 +129,21 @@ void MainWindow::on_actionNew_triggered()
     gameControl->clear();
     scoreLab->setText("0");
     QTimer::singleShot(600, this, &MainWindow::makeMove);
+}
+
+void MainWindow::on_actionEdit_toggled(bool isEditMode)
+{
+    if (isEditMode && !editControl) {
+        disconnect(gridControl, &CellGridControl::userInput,
+                    boardControl, &BoardControl::handleCellClicked);
+//        disconnect(boardControl, &BoardControl::moveFinished,
+//                    this, &MainWindow::handleMove);
+        editControl = new EditModeControl(gridControl, editToolbar);
+    }
+    else if(!isEditMode && editControl) {
+        delete editControl;
+        editControl = nullptr;
+        connect(gridControl, &CellGridControl::userInput, boardControl, &BoardControl::handleCellClicked);
+//        connect(boardControl, &BoardControl::moveFinished, this, &MainWindow::handleMove);
+    }
 }

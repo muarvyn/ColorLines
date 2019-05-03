@@ -1,4 +1,4 @@
 [submodule "grid2d_graph"]
 	path = grid2d_graph
 	url = https://github.com/muarvyn/grid2d_graph.git
-	branch = version_0.1
+        branch = version_0.2

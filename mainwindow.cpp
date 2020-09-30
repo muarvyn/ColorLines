@@ -29,6 +29,8 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "boardcontrol.h"
 #include "editmodecontrol.h"
 #include "gamecontrol.h"
+#include "highscorestable.h"
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -146,4 +148,10 @@ void MainWindow::on_actionEdit_toggled(bool isEditMode)
         connect(gridControl, &CellGridControl::userInput, boardControl, &BoardControl::handleCellClicked);
 //        connect(boardControl, &BoardControl::moveFinished, this, &MainWindow::handleMove);
     }
+}
+
+void MainWindow::on_actionHighest_scores_triggered()
+{
+    QDialog *table = new HighScoresTable(this);
+    table->exec();
 }

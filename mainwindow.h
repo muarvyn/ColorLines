@@ -51,8 +51,10 @@ public:
 private slots:
     void handleMove(const BoardInfo::cell_location &loc);
     void makeMove();
+
     void on_actionNew_triggered();
     void on_actionEdit_toggled(bool isEditMode);
+    void on_actionHighest_scores_triggered();
 
 private:
     Ui::MainWindow *ui;

@@ -25,6 +25,7 @@ INCLUDEPATH += grid2d_graph
 INCLUDEPATH += D:\tools\boost_1_70_0
 
 SOURCES += \
+    highscorestable.cpp \
         main.cpp \
         mainwindow.cpp \
     board.cpp \
@@ -42,6 +43,8 @@ SOURCES += \
     editmodecontrol.cpp
 
 HEADERS += \
+    app_defs.h \
+    highscorestable.h \
         mainwindow.h \
     board.h \
     cellbutton.h \
@@ -66,4 +69,5 @@ RESOURCES += \
     images.qrc
 
 FORMS += \
+    highscorestable.ui \
     mainwindow.ui

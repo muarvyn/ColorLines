@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml xmlns="http://www.w3.org/2005/07/scxml" version="1.0" binding="early" xmlns:qt="http://www.qt.io/2015/02/scxml-ext" name="GameFSM" qt:editorversion="4.9.2" initial="NewGame">
+    <qt:editorinfo initialGeometry="16.67;22.92;-20;-20;40;40"/>
+    <state id="Spawn" initial="Appearance">
+        <qt:editorinfo geometry="255.15;339.80;-106.51;-130.04;277.55;361.54" scenegeometry="255.15;339.80;148.64;209.76;277.55;361.54"/>
+        <state id="Appearance">
+            <qt:editorinfo geometry="2.60;-3.32;-60;-50;179.32;100" scenegeometry="257.75;336.48;197.75;286.48;179.32;100"/>
+            <transition type="external" event="Transition_3" target="AfterSpawn">
+                <qt:editorinfo movePoint="46.91;2.04" startTargetFactors="50.16;88.94"/>
+            </transition>
+        </state>
+        <state id="AfterSpawn">
+            <qt:editorinfo geometry="18.93;137.67;-80.10;-50;181.51;100" scenegeometry="274.08;477.47;193.98;427.47;181.51;100"/>
+        </state>
+        <transition type="external" event="Transition_2" target="Idle"/>
+        <transition type="external" event="NoFreeCells" target="GameOver">
+            <qt:editorinfo movePoint="80;15"/>
+        </transition>
+    </state>
+    <state id="Move">
+        <qt:editorinfo geometry="456.79;742.32;-80;-122.04;500.90;197.14" scenegeometry="456.79;742.32;376.79;620.28;500.90;197.14"/>
+        <state id="PathAnimation">
+            <qt:editorinfo geometry="3;-8.90;-60;-50;185.65;100" scenegeometry="459.79;733.42;399.79;683.42;185.65;100"/>
+            <transition type="external" event="Transition_8" target="AfterMove"/>
+        </state>
+        <state id="AfterMove">
+            <qt:editorinfo geometry="238.99;-11.85;-60;-50;185.65;100" scenegeometry="695.78;730.47;635.78;680.47;185.65;100"/>
+        </state>
+        <transition type="external" event="Transition_3" target="Spawn">
+            <qt:editorinfo endTargetFactors="58.38;91.18"/>
+        </transition>
+    </state>
+    <state id="NewGame">
+        <qt:editorinfo geometry="193.77;115.24;-88.77;-50;148.77;100" scenegeometry="193.77;115.24;105;65.24;148.77;100"/>
+        <transition type="external" event="Transition_1" target="Spawn">
+            <qt:editorinfo movePoint="34.67;5.10"/>
+        </transition>
+    </state>
+    <state id="Idle" initial="NoSelection">
+        <qt:editorinfo geometry="613.95;367.22;-99.54;-161.43;618.59;298.33" scenegeometry="613.95;367.22;514.41;205.79;618.59;298.33"/>
+        <state id="ActiveSelection">
+            <qt:editorinfo geometry="392.11;1.26;-146.48;-50;166.48;114.09" scenegeometry="1006.06;368.48;859.58;318.48;166.48;114.09"/>
+            <transition type="external" event="Transition_5" target="NoSelection">
+                <qt:editorinfo movePoint="10;17" startTargetFactors="5.99;56.95"/>
+            </transition>
+            <transition type="internal" event="Update"/>
+        </state>
+        <state id="NoSelection">
+            <qt:editorinfo geometry="2.46;-20.29;-60;-50;185.65;116.05" scenegeometry="616.41;346.93;556.41;296.93;185.65;116.05"/>
+            <transition type="external" event="Transition_4" target="ActiveSelection">
+                <qt:editorinfo startTargetFactors="92.41;42.28"/>
+            </transition>
+        </state>
+        <transition type="external" event="Transition_1" target="Move">
+            <qt:editorinfo startTargetFactors="57.79;95.19"/>
+        </transition>
+    </state>
+    <state id="GameOver">
+        <qt:editorinfo geometry="492.77;115.24;-88.77;-50;148.77;100" scenegeometry="492.77;115.24;404;65.24;148.77;100"/>
+        <transition type="external" event="Transition_9" target="NewGame"/>
+    </state>
+</scxml>

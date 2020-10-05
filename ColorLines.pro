@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui widgets
+QT       += core gui widgets scxml
 
 TARGET = ColorLines
 TEMPLATE = app
@@ -71,3 +71,6 @@ RESOURCES += \
 FORMS += \
     highscorestable.ui \
     mainwindow.ui
+
+STATECHARTS += \
+    GameFSM.scxml

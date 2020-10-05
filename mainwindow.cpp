@@ -30,6 +30,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "editmodecontrol.h"
 #include "gamecontrol.h"
 #include "highscorestable.h"
+#include "GameFSM.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -80,7 +81,13 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
     }
-    QTimer::singleShot(600, this, &MainWindow::makeMove);
+
+    GameFSM *ui_state_machine = new GameFSM;
+    ui_state_machine->connectToState("NewGame", [this](bool active){ if (active) gameControl->clear(); });
+    ui_state_machine->connectToState("Appearance", [this](bool active){ if (active) gameControl->spawn(); });
+
+    ui_state_machine->start();
+    //QTimer::singleShot(600, this, &MainWindow::makeMove);
 }
 
 void MainWindow::handleMove(const BoardInfo::cell_location &loc)

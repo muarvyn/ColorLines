@@ -63,7 +63,7 @@ public:
     static constexpr double movieScale = 1.0;
 
 signals:
-    void userInput(AnimatedIconButton *clickedButton, CellButton *selectedCell);
+    void userInput(AnimatedIconButton *clickedButton);
     void animationFinished();
 
 public slots:

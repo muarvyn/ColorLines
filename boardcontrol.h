@@ -17,11 +17,19 @@ public:
     explicit BoardControl(CellGridControl *gc, QObject *parent = nullptr);
     static constexpr double OCCUPATION_THRESHOLD = 0.9;
 
+    bool selectCell(BoardInfo::cell_location);
+    bool selectCell(AnimatedIconButton *cell);
+    bool deselect();
+
+    void animatePath(std::vector<BoardInfo::cell_location> &path,
+                    AnimatedIconButton *lastButton);
+
 signals:
     void moveFinished(BoardInfo::cell_location);
 
 public slots:
     void handleCellClicked(AnimatedIconButton *clickedButton, CellButton *selectedCell);
+    void handleClicked( AnimatedIconButton *clickedButton);
 
 private:
     CellGridControl *gridControl;

@@ -18,8 +18,8 @@ public:
 signals:
 
 public slots:
-    void handleBoardInput( AnimatedIconButton *clickedButton, CellButton *unused);
-    void handleToolbarInput( AnimatedIconButton *clickedButton, CellButton *unused);
+    void handleBoardInput( AnimatedIconButton *clickedButton);
+    void handleToolbarInput( AnimatedIconButton *clickedButton);
 
 private:
     CellGridControl *board;

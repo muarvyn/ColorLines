@@ -24,8 +24,7 @@ EditModeControl::~EditModeControl()
     disconnect(this, nullptr, nullptr, nullptr);
 }
 
-void EditModeControl::handleBoardInput( AnimatedIconButton *clickedButton,
-                                        CellButton *unused)
+void EditModeControl::handleBoardInput( AnimatedIconButton *clickedButton)
 {
     if (clickedButton->getState() == CellButton::UNOCCUPIED) {
         board->setColorAt(clickedButton->getRow(),
@@ -39,8 +38,7 @@ void EditModeControl::handleBoardInput( AnimatedIconButton *clickedButton,
     }
 }
 
-void EditModeControl::handleToolbarInput( AnimatedIconButton *clickedButton,
-                                        CellButton *unused)
+void EditModeControl::handleToolbarInput( AnimatedIconButton *clickedButton)
 {
     toolbar->hideAnimation();
     toolbar->setButtonAnimation(*clickedButton);

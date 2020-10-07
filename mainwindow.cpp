@@ -51,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent)
     editToolbar = new CellGridControl(BallColor::colors_num, 1, editTB_layout, this);
     boardControl = new BoardControl(gridControl);
     gameControl = new GameControl(gridControl, this);
-    connect(gridControl, &CellGridControl::userInput, boardControl, &BoardControl::handleCellClicked);
+    connect(gridControl, &CellGridControl::userInput, boardControl, &BoardControl::handleClicked);
     connect(boardControl, &BoardControl::moveFinished, this, &MainWindow::handleMove);
 
     QHBoxLayout * hbox = qobject_cast<QHBoxLayout*>(ui->centralRowLayout);
@@ -137,7 +137,7 @@ void MainWindow::on_actionEdit_toggled(bool isEditMode)
 {
     if (isEditMode && !editControl) {
         disconnect(gridControl, &CellGridControl::userInput,
-                    boardControl, &BoardControl::handleCellClicked);
+                    boardControl, &BoardControl::handleClicked);
 //        disconnect(boardControl, &BoardControl::moveFinished,
 //                    this, &MainWindow::handleMove);
         editControl = new EditModeControl(gridControl, editToolbar);
@@ -145,7 +145,7 @@ void MainWindow::on_actionEdit_toggled(bool isEditMode)
     else if(!isEditMode && editControl) {
         delete editControl;
         editControl = nullptr;
-        connect(gridControl, &CellGridControl::userInput, boardControl, &BoardControl::handleCellClicked);
+        connect(gridControl, &CellGridControl::userInput, boardControl, &BoardControl::handleClicked);
 //        connect(boardControl, &BoardControl::moveFinished, this, &MainWindow::handleMove);
     }
 }

@@ -24,6 +24,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #define GAMEBOARD_H
 
 #include "board.h"
+#include "boardinfo.h"
 
 class GameBoard : public Board
 {
@@ -41,6 +42,7 @@ public:
         const std::vector<std::vector<AnimatedIconButton*>> &board
         , QObject *parent = nullptr);
 
+    AnimatedIconButton* getCell(BoardInfo::cell_location loc);
     bool isInRange(int r, int c) {
         return r>=0 && r<BoardDim::ROWS_NUM && c>=0 && c<BoardDim::COLUMNS_NUM;
     }

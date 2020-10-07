@@ -36,6 +36,11 @@ GameBoard::GameBoard(
 
 }
 
+AnimatedIconButton* GameBoard::getCell(BoardInfo::cell_location loc)
+{
+    return board[loc.first][loc.second];
+}
+
 int GameBoard::getUnoccupied(std::vector<const AnimatedIconButton*> &unoccupied)
 {
     for (int r = 0; r < BoardDim::ROWS_NUM; ++r) {

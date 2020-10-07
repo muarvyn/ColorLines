@@ -121,7 +121,7 @@ void CellGridControl::startEliminationAnimation(AnimatedIconButton *btn)
 void CellGridControl::handleCellClicked()
 {
     AnimatedIconButton *clickedButton = qobject_cast<AnimatedIconButton *>(sender());
-    emit userInput(clickedButton, selectedCell);
+    emit userInput(clickedButton);
 }
 
 void CellGridControl::startDelayedAnimation(

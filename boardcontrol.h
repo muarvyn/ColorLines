@@ -23,6 +23,9 @@ public:
 
     void animatePath(std::vector<BoardInfo::cell_location> &path,
                     AnimatedIconButton *lastButton);
+    void animateSpawn(
+         const std::vector<BoardInfo::cell_location> &locations,
+         const std::vector<BallColor::type> &colors);
 
 signals:
     void moveFinished(BoardInfo::cell_location);

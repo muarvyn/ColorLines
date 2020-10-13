@@ -109,7 +109,7 @@ void MainWindow::makeMove()
     std::vector<BoardInfo::cell_location> spawn_pos;
     gameControl->generateRandomSpawn(spawn_pos, spawn_colors);
 
-    gridControl->putWithAnimation(spawn_pos, cached_colors);
+    boardControl->animateSpawn(spawn_pos, cached_colors);
 
     std::copy(spawn_colors.begin(), spawn_colors.end(), cached_colors.begin());
 

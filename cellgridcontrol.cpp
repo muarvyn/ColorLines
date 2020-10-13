@@ -153,32 +153,3 @@ void CellGridControl::removeWithAnimation(
         disconnect(this, &CellGridControl::animationFinished, nullptr,nullptr);
     }
 }
-
-void CellGridControl::putWithAnimation(
-    const std::vector<BoardInfo::cell_location> &locations,
-    const std::vector<BallColor::type> &colors)
-{
-    if (locations.size() > 0) {
-        hideAnimation();
-        AnimatedIconButton *btn;
-//        for (std::vector<BoardInfo::cell_location>::iterator i = locations.begin();
-//            i < locations.end();
-        for (size_t i = 0;
-            i < locations.size();
-            ++i) {
-            BoardInfo::cell_location loc = locations[i];
-            int state = colors[i];
-            btn = boardCells[loc.first][loc.second];
-            btn->setupAnimation("opacity", 0, 1, 600, state);
-            btn->startAnimation(state);
-        }
-        connect(
-            btn, &AnimatedIconButton::animation_finished,
-            this, [this] {
-                emit animationFinished();
-                disconnect(this, &CellGridControl::animationFinished, nullptr,nullptr);});
-    } else {
-        emit animationFinished();
-        disconnect(this, &CellGridControl::animationFinished, nullptr,nullptr);
-    }
-}

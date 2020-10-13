@@ -56,9 +56,6 @@ public:
     void startEliminationAnimation(AnimatedIconButton *btn);
     void startDelayedAnimation(AnimatedIconButton *btn, int animated_state, int delay);
     void removeWithAnimation(const std::vector<BoardInfo::cell_location> &locations);
-    void putWithAnimation(
-        const std::vector<BoardInfo::cell_location> &locations,
-        const std::vector<BallColor::type> &colors);
 
     static constexpr double movieScale = 1.0;
 

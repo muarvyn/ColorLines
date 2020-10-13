@@ -96,6 +96,30 @@ void BoardControl::animateSpawn(
     }
 }
 
+void BoardControl::animateDisappear(
+    const std::vector<BoardInfo::cell_location> &locations)
+{
+    if (locations.size() > 0) {
+        gridControl->hideAnimation();
+        AnimatedIconButton *btn;
+        for (std::vector<BoardInfo::cell_location>::const_iterator i = locations.begin();
+            i < locations.end();
+            ++i) {
+            btn = gridControl->getCells()[i->first][i->second];
+            gridControl->startEliminationAnimation(btn);
+        }
+        connect(
+            btn, &AnimatedIconButton::animation_finished,
+            this, [this] {
+                emit gridControl->animationFinished();
+                disconnect(gridControl, &CellGridControl::animationFinished, nullptr,nullptr);});
+    } else {
+        emit gridControl->animationFinished();
+        disconnect(gridControl, &CellGridControl::animationFinished, nullptr,nullptr);
+    }
+
+}
+
 void BoardControl::handleClicked( AnimatedIconButton *clickedButton) {
     if (clickedButton==selectedCell) {
         deselect();

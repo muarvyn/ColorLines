@@ -26,6 +26,7 @@ public:
     void animateSpawn(
          const std::vector<BoardInfo::cell_location> &locations,
          const std::vector<BallColor::type> &colors);
+    void animateDisappear(const std::vector<BoardInfo::cell_location> &locations);
 
 signals:
     void moveFinished(BoardInfo::cell_location);

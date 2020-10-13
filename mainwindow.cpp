@@ -97,7 +97,7 @@ void MainWindow::handleMove(const BoardInfo::cell_location &loc)
             gridControl, &CellGridControl::animationFinished,
             this, &MainWindow::makeMove);
         */
-        gridControl->removeWithAnimation(connection);
+        boardControl->animateDisappear(connection);
     } else {
         makeMove();
     }

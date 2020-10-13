@@ -130,26 +130,3 @@ void CellGridControl::startDelayedAnimation(
     QTimer::singleShot(delay, btn,
         [btn, animated_state]{ btn->startAnimation(animated_state); });
 }
-
-void CellGridControl::removeWithAnimation(
-    const std::vector<BoardInfo::cell_location> &locations)
-{
-    if (locations.size() > 0) {
-        hideAnimation();
-        AnimatedIconButton *btn;
-        for (std::vector<BoardInfo::cell_location>::const_iterator i = locations.begin();
-            i < locations.end();
-            ++i) {
-            btn = boardCells[i->first][i->second];
-            startEliminationAnimation(btn);
-        }
-        connect(
-            btn, &AnimatedIconButton::animation_finished,
-            this, [this] {
-                emit animationFinished();
-                disconnect(this, &CellGridControl::animationFinished, nullptr,nullptr);});
-    } else {
-        emit animationFinished();
-        disconnect(this, &CellGridControl::animationFinished, nullptr,nullptr);
-    }
-}

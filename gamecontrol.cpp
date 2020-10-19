@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018 Volodymyr Kryachko
+Copyright (C) 2018-2020 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -105,6 +105,14 @@ void GameControl::getStraitConnection(
     bi.getStraitConnection(
         BoardInfo::cell_location(loc.first, loc.second),
         connection);
+}
+
+void GameControl::getAllConnections(
+        const std::vector<BoardInfo::cell_location> &spawn,
+        std::vector<BoardInfo::cell_location> &connection)
+{
+    std::for_each(spawn.cbegin(), spawn.cend(),
+        [this, &connection](const BoardInfo::cell_location &loc){ getStraitConnection(loc, connection); });
 }
 
 void GameControl::handleMove(const BoardInfo::cell_location &loc)

@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018 Volodymyr Kryachko
+Copyright (C) 2018-2020 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -29,6 +29,7 @@ along with ColorLines; see the file COPYING.  If not, see
 
 QT_BEGIN_NAMESPACE
 class QLabel;
+class QStateMachine;
 QT_END_NAMESPACE
 
 class GameControl;
@@ -47,10 +48,12 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    QStateMachine *createUIFSM();
 
 private slots:
     void handleMove(const BoardInfo::cell_location &loc);
-    void makeMove();
+    void makeSpawn();
+    void newGame();
 
     void on_actionNew_triggered();
     void on_actionEdit_toggled(bool isEditMode);
@@ -65,9 +68,11 @@ private:
     EditModeControl *editControl;
     GameControl *gameControl;
     std::vector<BallColor::type> cached_colors;
+    std::vector<BoardInfo::cell_location> spawn_locations;
     QIcon ballIcons[BallColor::colors_num];
     int score;
     QLabel *scoreLab;
+    QStateMachine *ui_fsm;
 
 };
 

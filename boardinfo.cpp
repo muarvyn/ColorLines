@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018 Volodymyr Kryachko
+Copyright (C) 2018-2020 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -33,7 +33,6 @@ constexpr BoardInfo::Direction BoardInfo::orig_dirs[];
 void BoardInfo::getStraitConnection( cell_location start,
         std::vector<cell_location> &connection)
 {
-    connection.clear();
     int state = board.getColorAt(start.first, start.second);
     if (state == BallColor::none) return;
 

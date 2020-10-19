@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018 Volodymyr Kryachko
+Copyright (C) 2018-2020 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -21,6 +21,7 @@ along with ColorLines; see the file COPYING.  If not, see
 */
 
 #include <QtWidgets>
+#include <QStateMachine>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -51,6 +52,8 @@ MainWindow::MainWindow(QWidget *parent)
     editToolbar = new CellGridControl(BallColor::colors_num, 1, editTB_layout, this);
     boardControl = new BoardControl(gridControl);
     gameControl = new GameControl(gridControl, this);
+    ui_fsm = createUIFSM();
+
     connect(gridControl, &CellGridControl::userInput, boardControl, &BoardControl::handleClicked);
     connect(boardControl, &BoardControl::moveFinished, this, &MainWindow::handleMove);
 
@@ -80,7 +83,40 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
     }
-    QTimer::singleShot(600, this, &MainWindow::makeMove);
+    QTimer::singleShot(600, this, &MainWindow::newGame);
+}
+
+void MainWindow::newGame()
+{
+    gameControl->clear();
+    scoreLab->setText("0");
+    ui_fsm->start();
+}
+
+QStateMachine *MainWindow::createUIFSM()
+{
+    QStateMachine *fsm = new QStateMachine(this);
+    QState *spawn = new QState();
+    QState *disappear = new QState();
+    QAbstractState *final =  new QFinalState;
+    spawn->addTransition(gridControl, &CellGridControl::animationFinished, disappear);
+    disappear->addTransition(gridControl, &CellGridControl::animationFinished, final);
+    QObject::connect(spawn, &QState::entered, this, &MainWindow::makeSpawn);
+    connect(disappear, &QState::entered,
+        [this](){
+            std::vector<BoardInfo::cell_location> connection;
+            gameControl->getAllConnections(spawn_locations, connection);
+            if (!connection.empty()) {
+                boardControl->animateDisappear(connection);
+            } else {
+                emit gridControl->animationFinished();
+            }
+        });
+    fsm->addState(spawn);
+    fsm->addState(disappear);
+    fsm->addState(final);
+    fsm->setInitialState(spawn);
+    return fsm;
 }
 
 void MainWindow::handleMove(const BoardInfo::cell_location &loc)
@@ -92,24 +128,19 @@ void MainWindow::handleMove(const BoardInfo::cell_location &loc)
     score += connection.size();
     scoreLab->setText(QString::number(score));
     if (!connection.empty()) {
-        /*
-        connect(
-            gridControl, &CellGridControl::animationFinished,
-            this, &MainWindow::makeMove);
-        */
         boardControl->animateDisappear(connection);
     } else {
-        makeMove();
+        ui_fsm->start();
     }
 }
 
-void MainWindow::makeMove()
+void MainWindow::makeSpawn()
 {
     std::vector<BallColor::type> spawn_colors;
-    std::vector<BoardInfo::cell_location> spawn_pos;
-    gameControl->generateRandomSpawn(spawn_pos, spawn_colors);
+    spawn_locations.clear();
+    gameControl->generateRandomSpawn(spawn_locations, spawn_colors);
 
-    boardControl->animateSpawn(spawn_pos, cached_colors);
+    boardControl->animateSpawn(spawn_locations, cached_colors);
 
     std::copy(spawn_colors.begin(), spawn_colors.end(), cached_colors.begin());
 
@@ -128,9 +159,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_actionNew_triggered()
 {
-    gameControl->clear();
-    scoreLab->setText("0");
-    QTimer::singleShot(600, this, &MainWindow::makeMove);
+    QTimer::singleShot(600, this, &MainWindow::newGame);
 }
 
 void MainWindow::on_actionEdit_toggled(bool isEditMode)

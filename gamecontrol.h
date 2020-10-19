@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018 Volodymyr Kryachko
+Copyright (C) 2018-2020 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -44,6 +44,9 @@ public:
     static BallColor::type getRandomColor();
     void getStraitConnection(
         const BoardInfo::cell_location &loc,
+        std::vector<BoardInfo::cell_location> &connection);
+    void getAllConnections(
+        const std::vector<BoardInfo::cell_location> &spawn,
         std::vector<BoardInfo::cell_location> &connection);
 
 signals:

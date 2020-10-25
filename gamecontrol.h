@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018 Volodymyr Kryachko
+Copyright (C) 2018-2020 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -34,8 +34,6 @@ class GameControl : public QObject
     Q_OBJECT
 public:
     explicit GameControl(BoardInterface *bs, QObject *parent = nullptr);
-    //void updateNextSpawn();
-    //std::pair<BallColor::type *, BallColor::type *> getNextSpawn();
     int getUnoccupied(std::vector<std::pair<int,int>> &unoccupied);
     bool generateRandomSpawn(
         std::vector<std::pair<int,int>> &spawn,
@@ -45,16 +43,17 @@ public:
     void getStraitConnection(
         const BoardInfo::cell_location &loc,
         std::vector<BoardInfo::cell_location> &connection);
+    void getAllConnections(
+        const std::vector<BoardInfo::cell_location> &spawn,
+        std::vector<BoardInfo::cell_location> &connection);
+
 
 signals:
 
 public slots:
-    void makeNextMove();
-    void handleMove(const BoardInfo::cell_location &loc);
     void clear();
 
 private:
-    //BallColor::type next_spawn[SPAWN_BALLS_NUM];
     BoardInterface *board;
 };
 

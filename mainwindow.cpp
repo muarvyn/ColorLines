@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018 Volodymyr Kryachko
+Copyright (C) 2018-2020 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -80,7 +80,7 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
     }
-    QTimer::singleShot(600, this, &MainWindow::makeMove);
+    QTimer::singleShot(600, this, &MainWindow::makeSpawn);
 }
 
 void MainWindow::handleMove(const BoardInfo::cell_location &loc)
@@ -92,24 +92,19 @@ void MainWindow::handleMove(const BoardInfo::cell_location &loc)
     score += connection.size();
     scoreLab->setText(QString::number(score));
     if (!connection.empty()) {
-        /*
-        connect(
-            gridControl, &CellGridControl::animationFinished,
-            this, &MainWindow::makeMove);
-        */
         boardControl->animateDisappear(connection);
     } else {
-        makeMove();
+        makeSpawn();
     }
 }
 
-void MainWindow::makeMove()
+void MainWindow::makeSpawn()
 {
     std::vector<BallColor::type> spawn_colors;
-    std::vector<BoardInfo::cell_location> spawn_pos;
-    gameControl->generateRandomSpawn(spawn_pos, spawn_colors);
+    spawn_locations.clear();
+    gameControl->generateRandomSpawn(spawn_locations, spawn_colors);
 
-    boardControl->animateSpawn(spawn_pos, cached_colors);
+    boardControl->animateSpawn(spawn_locations, cached_colors);
 
     std::copy(spawn_colors.begin(), spawn_colors.end(), cached_colors.begin());
 
@@ -130,7 +125,7 @@ void MainWindow::on_actionNew_triggered()
 {
     gameControl->clear();
     scoreLab->setText("0");
-    QTimer::singleShot(600, this, &MainWindow::makeMove);
+    QTimer::singleShot(600, this, &MainWindow::makeSpawn);
 }
 
 void MainWindow::on_actionEdit_toggled(bool isEditMode)
@@ -138,15 +133,12 @@ void MainWindow::on_actionEdit_toggled(bool isEditMode)
     if (isEditMode && !editControl) {
         disconnect(gridControl, &CellGridControl::userInput,
                     boardControl, &BoardControl::handleClicked);
-//        disconnect(boardControl, &BoardControl::moveFinished,
-//                    this, &MainWindow::handleMove);
         editControl = new EditModeControl(gridControl, editToolbar);
     }
     else if(!isEditMode && editControl) {
         delete editControl;
         editControl = nullptr;
         connect(gridControl, &CellGridControl::userInput, boardControl, &BoardControl::handleClicked);
-//        connect(boardControl, &BoardControl::moveFinished, this, &MainWindow::handleMove);
     }
 }
 

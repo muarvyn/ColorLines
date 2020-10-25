@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018 Volodymyr Kryachko
+Copyright (C) 2018-2020 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -72,31 +72,12 @@ void GameControl::clear()
     }
 }
 
-void GameControl::makeNextMove()
-{
-    //TOFIX: never called
-}
-
 BallColor::type GameControl::getRandomColor()
 {
     return static_cast<BallColor::type>(
         QRandomGenerator::global()->bounded(BallColor::yellow+1/*BallColor::last+1*/));
 }
-/*
-void GameControl::updateNextSpawn()
-{
-    for (BallColor::type *sc = &next_spawn[0];
-        sc < &next_spawn[SPAWN_BALLS_NUM];
-        ++sc) {
-        *sc = getRandomColor();
-    }
-}
 
-std::pair<BallColor::type *, BallColor::type *> GameControl::getNextSpawn()
-{
-    return std::make_pair(&next_spawn[0], &next_spawn[SPAWN_BALLS_NUM]);
-}
-*/
 void GameControl::getStraitConnection(
     const BoardInfo::cell_location &loc,
     std::vector<BoardInfo::cell_location> &connection)
@@ -107,15 +88,11 @@ void GameControl::getStraitConnection(
         connection);
 }
 
-void GameControl::handleMove(const BoardInfo::cell_location &loc)
+void GameControl::getAllConnections(
+        const std::vector<BoardInfo::cell_location> &spawn,
+        std::vector<BoardInfo::cell_location> &connection)
 {
-    //TOFIX: never called
-    qDebug() << "GameControl::handleMove: cell location is " << loc << "\n";
-
-    std::vector<BoardInfo::cell_location> connection;
-    BoardInfo bi(*board);
-    bi.getStraitConnection(
-        BoardInfo::cell_location(loc.first, loc.second),
-        connection);
+    std::for_each(spawn.cbegin(), spawn.cend(),
+        [this, &connection](const BoardInfo::cell_location &loc){ getStraitConnection(loc, connection); });
 }
 

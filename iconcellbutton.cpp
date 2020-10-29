@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018 Volodymyr Kryachko
+Copyright (C) 2018-2020 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -22,7 +22,9 @@ along with ColorLines; see the file COPYING.  If not, see
 
 #include "iconcellbutton.h"
 
-IconCellButton::IconCellButton(int r, int c, QIcon *i) : CellButton (r,c), icons(i)
+IconCellButton::IconCellButton(int r, int c, QIcon *i, QWidget *parent)
+    : CellButton (r,c, parent)
+    , icons(i)
 {
 
 }

@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018 Volodymyr Kryachko
+Copyright (C) 2018-2020 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -30,7 +30,8 @@ class AnimatedIconButton : public IconCellButton
     Q_OBJECT
 
 public:
-    AnimatedIconButton(int r, int c, QIcon *i = nullptr);
+    AnimatedIconButton(int r, int c, QIcon *i = nullptr, QWidget *parent = nullptr);
+    virtual ~AnimatedIconButton();
 
     void setDelayed(int state, int delay);
 

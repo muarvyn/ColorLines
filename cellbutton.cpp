@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018 Volodymyr Kryachko
+Copyright (C) 2018-2020 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -23,7 +23,11 @@ along with ColorLines; see the file COPYING.  If not, see
 
 #include "cellbutton.h"
 
-CellButton::CellButton(int r, int c) : row(r), column(c), state(-1)
+CellButton::CellButton(int r, int c, QWidget *parent)
+    : QPushButton(parent)
+    , row(r)
+    , column(c)
+    , state(-1)
 {
     QSizePolicy policy;
     policy.setControlType(QSizePolicy::ToolButton);

@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018 Volodymyr Kryachko
+Copyright (C) 2018-2020 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -22,8 +22,8 @@ along with ColorLines; see the file COPYING.  If not, see
 
 #include "animatediconbutton.h"
 
-AnimatedIconButton::AnimatedIconButton(int r, int c, QIcon *i)
-    : IconCellButton(r,c,i)
+AnimatedIconButton::AnimatedIconButton(int r, int c, QIcon *i, QWidget *parent)
+    : IconCellButton(r,c,i,parent)
     , label(this)
     , effect(this)
     , animation(new QPropertyAnimation(&this->effect, "opacity"))
@@ -31,6 +31,13 @@ AnimatedIconButton::AnimatedIconButton(int r, int c, QIcon *i)
     label.setGraphicsEffect(&this->effect);
 }
 
+AnimatedIconButton::~AnimatedIconButton()
+{
+    if (!animation->Stopped) {
+        animation->stop();
+    }
+    delete animation;
+}
 void AnimatedIconButton::setupAnimation(
     const QByteArray &propertyName, const QVariant &startValue,
     const QVariant &endValue, int duration, int final_state)

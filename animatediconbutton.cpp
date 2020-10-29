@@ -33,11 +33,22 @@ AnimatedIconButton::AnimatedIconButton(int r, int c, QIcon *i, QWidget *parent)
 
 AnimatedIconButton::~AnimatedIconButton()
 {
-    if (!animation->Stopped) {
-        animation->stop();
+    if (isAnimating()) {
+        stopAnimation();
     }
     delete animation;
 }
+
+bool AnimatedIconButton::isAnimating()
+{
+    return animation->state() != QAbstractAnimation::Stopped;
+}
+
+void AnimatedIconButton::stopAnimation()
+{
+    animation->stop();
+}
+
 void AnimatedIconButton::setupAnimation(
     const QByteArray &propertyName, const QVariant &startValue,
     const QVariant &endValue, int duration, int final_state)
@@ -58,13 +69,6 @@ void AnimatedIconButton::setupAnimation(
     animation->setPropertyName(propertyName);
     connect(animation, &QPropertyAnimation::finished, this,
         [this, final_state] () {finalizeAnimation(final_state);});
-//    animation->setEasingCurve(QEasingCurve::OutBack);
-
-}
-
-void AnimatedIconButton::setDelayed(int state, int delay)
-{
-    QTimer::singleShot(delay, this, [this, state] () { this->setState(state); });
 }
 
 void AnimatedIconButton::finalizeAnimation(int final_state)

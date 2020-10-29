@@ -33,11 +33,11 @@ public:
     AnimatedIconButton(int r, int c, QIcon *i = nullptr, QWidget *parent = nullptr);
     virtual ~AnimatedIconButton();
 
-    void setDelayed(int state, int delay);
-
     void setupAnimation(
         const QByteArray &propertyName, const QVariant &startValue,
         const QVariant &endValue, int duration, int final_state);
+    bool isAnimating();
+    void stopAnimation();
 
 public slots:
     void finalizeAnimation(int final_state);

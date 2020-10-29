@@ -27,6 +27,11 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "../basic_defs.hpp"
 #include "../animatediconbutton.h"
 
+int getColor(const AnimatedIconButton *btn)
+{
+    return btn->getColumn();
+}
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -45,6 +50,23 @@ MainWindow::MainWindow(QWidget *parent)
         AnimatedIconButton *btn = new AnimatedIconButton(0,color,ballIcons,this);
         btn->setColor(color);
         grid->addWidget(btn, btn->getRow(), btn->getColumn());
+        connect(btn, &AnimatedIconButton::clicked, this, &MainWindow::handleButtonClick);
+    }
+}
+
+void MainWindow::handleButtonClick()
+{
+    AnimatedIconButton *clickedButton = qobject_cast<AnimatedIconButton *>(sender());
+    if (clickedButton->isAnimating()) {
+        clickedButton->stopAnimation();
+    } else if (clickedButton->getState()==AnimatedIconButton::UNOCCUPIED) {
+        int st = getColor(clickedButton);
+        clickedButton->setupAnimation("opacity", 0, 1, 600, st);
+        clickedButton->startAnimation(st);
+    } else {
+        clickedButton->setupAnimation("iconSize", clickedButton->size(), QSize(5,5),
+            600, AnimatedIconButton::UNOCCUPIED);
+        clickedButton->startAnimation(clickedButton->getState());
     }
 }
 

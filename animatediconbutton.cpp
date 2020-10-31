@@ -47,15 +47,18 @@ bool AnimatedIconButton::isAnimating()
 void AnimatedIconButton::stopAnimation()
 {
     animation->stop();
+    // TODO: do emit animation_finished or do not?
+    finalizeAnimation(0);
 }
 
 void AnimatedIconButton::setupAnimation(
     const QByteArray &propertyName, const QVariant &startValue,
-    const QVariant &endValue, int duration, int final_state)
+    const QVariant &endValue, int duration)
 {
-    if (!animation->Stopped) {
-        animation->stop();
+    if (isAnimating()) {
+        stopAnimation();
     }
+    animation->setPropertyName(""); // this prevents QPropertyAnimation from a warning at runtime
     if (propertyName == "opacity") {
         animation->setTargetObject(&effect);
     } else if (propertyName == "iconSize") {
@@ -68,21 +71,22 @@ void AnimatedIconButton::setupAnimation(
     animation->setEndValue(endValue);
     animation->setPropertyName(propertyName);
     connect(animation, &QPropertyAnimation::finished, this,
-        [this, final_state] () {finalizeAnimation(final_state);});
+        [this] () {finalizeAnimation(getState());});
 }
 
-void AnimatedIconButton::finalizeAnimation(int final_state)
+void AnimatedIconButton::finalizeAnimation(int previous_state)
 {
+    Q_UNUSED(previous_state) // TODO: is previous_state needed?
     label.hide();
-    setState(final_state);
     emit animation_finished();
+    // TODO: disconnect always?
     disconnect(this, &AnimatedIconButton::animation_finished, nullptr, nullptr);
+    setState(state);
 }
 
-void AnimatedIconButton::startAnimation(int animated_state)
+void AnimatedIconButton::startAnimation(int animation_state, int final_state)
 {
-    setState(UNOCCUPIED);
-    const QIcon icon = icons[animated_state];
+    const QIcon icon = (animation_state != UNOCCUPIED) ? icons[animation_state] : QIcon();
     if (animation->propertyName() == "iconSize") {
         setIcon(icon);
     } else {
@@ -95,5 +99,6 @@ void AnimatedIconButton::startAnimation(int animated_state)
         effect.update();
         label.show();
     }
+    state = final_state;
     this->animation->start();
 }

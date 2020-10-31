@@ -21,6 +21,7 @@ along with ColorLines; see the file COPYING.  If not, see
 */
 
 #include <QtWidgets>
+#include <QDebug>
 
 #include "mainwindow_test.h"
 #include "ui_mainwindow_test.h"
@@ -33,11 +34,8 @@ int getColor(const AnimatedIconButton *btn)
 }
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    : QWidget(parent)
 {
-    ui->setupUi(this);
-
     for (BallColor::type c=BallColor::first;
         c<=BallColor::last;
         ++c)
@@ -45,33 +43,49 @@ MainWindow::MainWindow(QWidget *parent)
         ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
     }
 
-    QGridLayout *grid = ui->gridLayout;
+    QGridLayout *grid = new QGridLayout(this);
+    grid->setSizeConstraint(QLayout::SetNoConstraint);
     for (BallColor::type color=BallColor::first; color < BallColor::first+3; ++color) {
         AnimatedIconButton *btn = new AnimatedIconButton(0,color,ballIcons,this);
         btn->setColor(color);
         grid->addWidget(btn, btn->getRow(), btn->getColumn());
         connect(btn, &AnimatedIconButton::clicked, this, &MainWindow::handleButtonClick);
     }
+    setLayout(grid);
 }
 
 void MainWindow::handleButtonClick()
 {
     AnimatedIconButton *clickedButton = qobject_cast<AnimatedIconButton *>(sender());
     if (clickedButton->isAnimating()) {
+        qDebug() << "Clicked button state at animation time: " << clickedButton->getState();
         clickedButton->stopAnimation();
+        qDebug() << "Clicked button state immediately after animation stop: " << clickedButton->getState();
     } else if (clickedButton->getState()==AnimatedIconButton::UNOCCUPIED) {
         int st = getColor(clickedButton);
-        clickedButton->setupAnimation("opacity", 0, 1, 600, st);
-        clickedButton->startAnimation(st);
+        clickedButton->setupAnimation("opacity", 0, 1, 600);
+        clickedButton->startAnimation(st, st);
+        connect(clickedButton, &AnimatedIconButton::animation_finished,
+                this, &MainWindow::handleAnimationFinished);
     } else {
-        clickedButton->setupAnimation("iconSize", clickedButton->size(), QSize(5,5),
-            600, AnimatedIconButton::UNOCCUPIED);
-        clickedButton->startAnimation(clickedButton->getState());
+        int anim_st = clickedButton->getState();
+        clickedButton->setupAnimation("iconSize", clickedButton->size(), QSize(5,5), 600);
+        clickedButton->startAnimation(anim_st, AnimatedIconButton::UNOCCUPIED);
+        connect(clickedButton, &AnimatedIconButton::animation_finished,
+                this, &MainWindow::handleAnimationFinished);
     }
+}
+
+void MainWindow::handleAnimationFinished()
+{
+    AnimatedIconButton *senderButton = qobject_cast<AnimatedIconButton *>(sender());
+    qDebug() << "Button animation has finished. State is : " << senderButton->getState();
+    qDebug() << "AnimatedIconButton::isAnimating returned " << senderButton->isAnimating();
+    // No need to disconnect explicitly
+    // disconnect(senderButton, &AnimatedIconButton::animation_finished, nullptr, nullptr);
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
 }
 

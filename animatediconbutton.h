@@ -35,13 +35,13 @@ public:
 
     void setupAnimation(
         const QByteArray &propertyName, const QVariant &startValue,
-        const QVariant &endValue, int duration, int final_state);
+        const QVariant &endValue, int duration);
     bool isAnimating();
     void stopAnimation();
 
 public slots:
-    void finalizeAnimation(int final_state);
-    void startAnimation(int animated_state);
+    void finalizeAnimation(int previous_state);
+    void startAnimation(int animation_state, int final_state);
 
 signals:
     void animation_finished();

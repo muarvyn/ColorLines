@@ -8,8 +8,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-#INCLUDEPATH += $${_PRO_FILE_PWD_}/..
-
 SOURCES += \
     main_test.cpp \
     mainwindow_test.cpp \
@@ -27,9 +25,6 @@ HEADERS += \
 
 RESOURCES += \
     ../images.qrc
-
-FORMS += \
-    mainwindow_test.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

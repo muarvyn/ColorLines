@@ -24,14 +24,15 @@ along with ColorLines; see the file COPYING.  If not, see
 #define CELLBUTTON_H
 
 #include <QtWidgets>
-#include "board.h"
+#include "basic_defs.hpp"
 
 class CellButton : public QPushButton, public ColorCell
 {
     Q_OBJECT
 
 public:
-    CellButton(int r, int c);
+    CellButton(int r, int c, QWidget *parent = nullptr);
+    ~CellButton() override {}
 
     QSize sizeHint() const override;
 

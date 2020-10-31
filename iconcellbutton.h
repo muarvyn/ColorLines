@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018 Volodymyr Kryachko
+Copyright (C) 2018-2020 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -29,16 +29,14 @@ class IconCellButton : public CellButton
 {
     Q_OBJECT
 public:
-    IconCellButton(int r, int c, QIcon *i = nullptr);
+    IconCellButton(int r, int c, QIcon *i = nullptr, QWidget *parent = nullptr);
 
     virtual void setState(int s) override;
-//    virtual void resize(const QSize &s) override;
     void setIcons(const QIcon *i) { icons = i; }
 
     static constexpr double iconScale = 1.0;
 
 signals:
-//    void resized(QResizeEvent * event);
 
 protected:
     void resizeEvent(QResizeEvent * event) override;

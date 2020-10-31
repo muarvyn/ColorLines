@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018 Volodymyr Kryachko
+Copyright (C) 2018-2020 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -53,7 +53,6 @@ class BoardInterface
 public:
     virtual BallColor::type getColorAt(int r, int c) const = 0;
     virtual void setColorAt(int r, int c, BallColor::type color) = 0;
-//    virtual ColorCell &getCellAt(int r, int c) const = 0;
     virtual ~BoardInterface();
 };
 

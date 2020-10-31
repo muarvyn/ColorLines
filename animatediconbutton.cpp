@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018 Volodymyr Kryachko
+Copyright (C) 2018-2020 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -22,8 +22,8 @@ along with ColorLines; see the file COPYING.  If not, see
 
 #include "animatediconbutton.h"
 
-AnimatedIconButton::AnimatedIconButton(int r, int c, QIcon *i)
-    : IconCellButton(r,c,i)
+AnimatedIconButton::AnimatedIconButton(int r, int c, QIcon *i, QWidget *parent)
+    : IconCellButton(r,c,i,parent)
     , label(this)
     , effect(this)
     , animation(new QPropertyAnimation(&this->effect, "opacity"))
@@ -31,13 +31,34 @@ AnimatedIconButton::AnimatedIconButton(int r, int c, QIcon *i)
     label.setGraphicsEffect(&this->effect);
 }
 
+AnimatedIconButton::~AnimatedIconButton()
+{
+    if (isAnimating()) {
+        stopAnimation();
+    }
+    delete animation;
+}
+
+bool AnimatedIconButton::isAnimating()
+{
+    return animation->state() != QAbstractAnimation::Stopped;
+}
+
+void AnimatedIconButton::stopAnimation()
+{
+    animation->stop();
+    // TODO: do emit animation_finished or do not?
+    finalizeAnimation(0);
+}
+
 void AnimatedIconButton::setupAnimation(
     const QByteArray &propertyName, const QVariant &startValue,
-    const QVariant &endValue, int duration, int final_state)
+    const QVariant &endValue, int duration)
 {
-    if (!animation->Stopped) {
-        animation->stop();
+    if (isAnimating()) {
+        stopAnimation();
     }
+    animation->setPropertyName(""); // this prevents QPropertyAnimation from a warning at runtime
     if (propertyName == "opacity") {
         animation->setTargetObject(&effect);
     } else if (propertyName == "iconSize") {
@@ -50,28 +71,22 @@ void AnimatedIconButton::setupAnimation(
     animation->setEndValue(endValue);
     animation->setPropertyName(propertyName);
     connect(animation, &QPropertyAnimation::finished, this,
-        [this, final_state] () {finalizeAnimation(final_state);});
-//    animation->setEasingCurve(QEasingCurve::OutBack);
-
+        [this] () {finalizeAnimation(getState());});
 }
 
-void AnimatedIconButton::setDelayed(int state, int delay)
+void AnimatedIconButton::finalizeAnimation(int previous_state)
 {
-    QTimer::singleShot(delay, this, [this, state] () { this->setState(state); });
-}
-
-void AnimatedIconButton::finalizeAnimation(int final_state)
-{
+    Q_UNUSED(previous_state) // TODO: is previous_state needed?
     label.hide();
-    setState(final_state);
     emit animation_finished();
+    // TODO: disconnect always?
     disconnect(this, &AnimatedIconButton::animation_finished, nullptr, nullptr);
+    setState(state);
 }
 
-void AnimatedIconButton::startAnimation(int animated_state)
+void AnimatedIconButton::startAnimation(int animation_state, int final_state)
 {
-    setState(UNOCCUPIED);
-    const QIcon icon = icons[animated_state];
+    const QIcon icon = (animation_state != UNOCCUPIED) ? icons[animation_state] : QIcon();
     if (animation->propertyName() == "iconSize") {
         setIcon(icon);
     } else {
@@ -84,5 +99,6 @@ void AnimatedIconButton::startAnimation(int animated_state)
         effect.update();
         label.show();
     }
+    state = final_state;
     this->animation->start();
 }

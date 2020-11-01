@@ -54,7 +54,7 @@ public:
     void hideAnimation();
     void fitAnimationSize(QSize size);
     void startEliminationAnimation(AnimatedIconButton *btn);
-    void startDelayedAnimation(AnimatedIconButton *btn, int animated_state, int delay);
+    void startDelayedAnimation(AnimatedIconButton *btn, int animated_state, int final_state, int delay);
 
     static constexpr double movieScale = 1.0;
 

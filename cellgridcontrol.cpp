@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018 Volodymyr Kryachko
+Copyright (C) 2018-2020 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -113,9 +113,8 @@ void CellGridControl::fitAnimationSize(QSize size)
 
 void CellGridControl::startEliminationAnimation(AnimatedIconButton *btn)
 {
-    btn->setupAnimation("iconSize", btn->size(), QSize(5,5),
-        600, AnimatedIconButton::UNOCCUPIED);
-    btn->startAnimation(btn->getState());
+    btn->setupAnimation("iconSize", btn->size(), QSize(5,5), 600);
+    btn->startAnimation(btn->getState(), AnimatedIconButton::UNOCCUPIED);
 }
 
 void CellGridControl::handleCellClicked()
@@ -125,8 +124,8 @@ void CellGridControl::handleCellClicked()
 }
 
 void CellGridControl::startDelayedAnimation(
-    AnimatedIconButton *btn, int animated_state, int delay)
+    AnimatedIconButton *btn, int animated_state, int final_state, int delay)
 {
     QTimer::singleShot(delay, btn,
-        [btn, animated_state]{ btn->startAnimation(animated_state); });
+        [btn, animated_state, final_state]{ btn->startAnimation(animated_state, final_state); });
 }

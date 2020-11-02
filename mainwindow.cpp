@@ -52,6 +52,7 @@ MainWindow::MainWindow(QWidget *parent)
     boardControl = new BoardControl(gridControl);
     gameControl = new GameControl(gridControl, this);
     connect(gridControl, &CellGridControl::userInput, boardControl, &BoardControl::handleClicked);
+    connect(boardControl, &BoardControl::spawnAnimationFinished, this, &MainWindow::finalizeSpawn);
     connect(boardControl, &BoardControl::moveFinished, this, &MainWindow::handleMove);
 
     QHBoxLayout * hbox = qobject_cast<QHBoxLayout*>(ui->centralRowLayout);
@@ -113,6 +114,17 @@ void MainWindow::makeSpawn()
         QLabel *lab = spawnColorLabels[i];
         lab->setPixmap(icon.pixmap(lab->size()/2));
         lab->setAlignment(Qt::AlignCenter);
+    }
+}
+
+void MainWindow::finalizeSpawn()
+{
+    std::vector<BoardInfo::cell_location> connection;
+    gameControl->getAllConnections(spawn_locations, connection);
+    if (!connection.empty()) {
+        boardControl->animateDisappear(connection);
+    } else {
+        emit gridControl->animationFinished();
     }
 }
 

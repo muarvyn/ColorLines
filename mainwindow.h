@@ -51,6 +51,7 @@ public:
 private slots:
     void handleMove(const BoardInfo::cell_location &loc);
     void makeSpawn();
+    void finalizeSpawn();
 
     void on_actionNew_triggered();
     void on_actionEdit_toggled(bool isEditMode);

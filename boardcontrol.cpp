@@ -54,10 +54,9 @@ void BoardControl::animatePath(std::vector<BoardInfo::cell_location> &path,
     }
     connect(path_button, &AnimatedIconButton::animation_finished,
         this,
-        [this, lastButton, path_button] {
+        [this, lastButton] {
             emit moveFinished(BoardInfo::cell_location(
                 lastButton->getRow(), lastButton->getColumn()));
-            disconnect(path_button, &AnimatedIconButton::animation_finished, nullptr, nullptr);
         });
     QTimer::singleShot(
         delay,
@@ -87,12 +86,11 @@ void BoardControl::animateSpawn(
         connect(
             btn, &AnimatedIconButton::animation_finished,
             this, [this] {
-                emit gridControl->animationFinished();
-                //disconnect(gridControl, &CellGridControl::animationFinished, nullptr,nullptr);
+                emit spawnAnimationFinished();
                 });
     } else {
+        // TODO: handle endgame
         emit gridControl->animationFinished();
-        //disconnect(gridControl, &CellGridControl::animationFinished, nullptr,nullptr);
     }
 }
 
@@ -192,7 +190,6 @@ void BoardControl::handleCellClicked( AnimatedIconButton *clickedButton,
                         [this, clickedButton, path_button] {
                             emit moveFinished(BoardInfo::cell_location(
                                 clickedButton->getRow(), clickedButton->getColumn()));
-                            disconnect(path_button, &AnimatedIconButton::animation_finished, nullptr, nullptr);
                         });
                     QTimer::singleShot(
                         delay,

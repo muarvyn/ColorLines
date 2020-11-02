@@ -52,6 +52,7 @@ public:
 
 signals:
     void moveFinished(BoardInfo::cell_location);
+    void spawnAnimationFinished();
 
 public slots:
     void handleClicked( AnimatedIconButton *clickedButton);

@@ -33,7 +33,7 @@ BoardControl::BoardControl(CellGridControl *gc, QObject *parent)
 
 bool BoardControl::selectCell(BoardInfo::cell_location loc)
 {
-    selectCell(board->getCell(loc));
+    return selectCell(board->getCell(loc));
 }
 
 bool BoardControl::selectCell(AnimatedIconButton *cell)
@@ -41,13 +41,9 @@ bool BoardControl::selectCell(AnimatedIconButton *cell)
     if (cell == selectedCell || cell->getState() == CellButton::UNOCCUPIED) {
         return false;
     }
-    //TODO: does it stop selectedCell animation?
-    if (selectedCell != nullptr) {
-        selectedCell->setState(selectedCell->getState());
-    }
-
     gridControl->setButtonAnimation(*cell);
     selectedCell = cell;
+    return true;
 }
 
 bool BoardControl::deselect() {
@@ -62,8 +58,10 @@ void BoardControl::animatePath(std::vector<BoardInfo::cell_location> &path,
                                 AnimatedIconButton *lastButton) {
 
     int delay = 0;
-    AnimatedIconButton *path_button = nullptr;
-    int st = selectedCell->getState();
+    BoardInfo::cell_location first_loc = path.back();
+    AnimatedIconButton *path_button = gridControl->getCells()[first_loc.first][first_loc.second];
+    int st = path_button->getState();
+    path_button->setState(AnimatedIconButton::UNOCCUPIED);
 
     for (std::vector<BoardInfo::cell_location>::reverse_iterator ri = path.rbegin();
         ri != path.rend();
@@ -75,16 +73,13 @@ void BoardControl::animatePath(std::vector<BoardInfo::cell_location> &path,
     }
     connect(path_button, &AnimatedIconButton::animation_finished,
         this,
-        [this, lastButton, path_button] {
+        [this, lastButton] {
             emit moveFinished(BoardInfo::cell_location(
                 lastButton->getRow(), lastButton->getColumn()));
-            disconnect(path_button, &AnimatedIconButton::animation_finished, nullptr, nullptr);
         });
     QTimer::singleShot(
         delay,
-        lastButton,
         [lastButton, st]{ lastButton->setState(st); });
-    selectedCell = nullptr;
 }
 
 void BoardControl::animateSpawn(
@@ -106,12 +101,11 @@ void BoardControl::animateSpawn(
         connect(
             btn, &AnimatedIconButton::animation_finished,
             this, [this] {
-                emit gridControl->animationFinished();
-                //disconnect(gridControl, &CellGridControl::animationFinished, nullptr,nullptr);
+                emit spawnAnimationFinished();
                 });
     } else {
+        // TODO: handle endgame
         emit gridControl->animationFinished();
-        //disconnect(gridControl, &CellGridControl::animationFinished, nullptr,nullptr);
     }
 }
 
@@ -157,12 +151,12 @@ void BoardControl::handleClicked( AnimatedIconButton *clickedButton) {
                 path);
 
             if (dist < OCCUPATION_THRESHOLD) {
-                gridControl->hideAnimation();
+                deselect();
                 animatePath(path, clickedButton);
             }
         }
     } else {
         gridControl->setButtonAnimation(*clickedButton);
-        selectedCell=clickedButton;
+        selectCell(clickedButton);
     }
 }

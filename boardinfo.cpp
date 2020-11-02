@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018 Volodymyr Kryachko
+Copyright (C) 2018-2020 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -33,9 +33,9 @@ constexpr BoardInfo::Direction BoardInfo::orig_dirs[];
 void BoardInfo::getStraitConnection( cell_location start,
         std::vector<cell_location> &connection)
 {
-    connection.clear();
     int state = board.getColorAt(start.first, start.second);
     if (state == BallColor::none) return;
+    bool not_empty = false;
 
     for (const Direction *dir = &orig_dirs[0];
         dir < &orig_dirs[ORIG_DIRECTIONS_NUM];
@@ -58,10 +58,12 @@ void BoardInfo::getStraitConnection( cell_location start,
             if (board.getColorAt(row,column) != state) break;
             line.push_back(cell_location(row,column));
         }
-        if (line.size() >= MIN_LINE_ELIMINATION_SIZE-1) { //TOFIX: isn't this exactly expected behaviour?
+        bool got_line = line.size() >= MIN_LINE_ELIMINATION_SIZE-1;
+        not_empty = not_empty || got_line;
+        if (got_line) {
             std::copy(line.begin(), line.end(), std::back_inserter(connection));
         }
         line.clear();
     }
-    if (!connection.empty()) { connection.push_back(start); }
+    if (not_empty) { connection.push_back(start); }
 }

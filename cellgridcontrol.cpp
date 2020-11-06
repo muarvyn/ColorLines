@@ -20,7 +20,6 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#include "gameboard.h"
 #include "gamecontrol.h"
 #include "animatediconbutton.h"
 #include "cellgridcontrol.h"
@@ -32,7 +31,6 @@ CellGridControl::CellGridControl(
     QObject *parent
     )
     : QObject(parent)
-    , selectedCell(nullptr)
     , boardCells(rows_num, std::vector<AnimatedIconButton*>(columns_num,nullptr))
 {
     movie = new QMovie(this);
@@ -70,6 +68,15 @@ void CellGridControl::setColorAt(int r, int c, BallColor::type color)
     boardCells[r][c]->setState(color);
 }
 
+void CellGridControl::clear()
+{
+    for (int r = 0; r < BoardDim::ROWS_NUM; ++r) {
+        for (int c = 0; c < BoardDim::COLUMNS_NUM; ++c) {
+            boardCells[r][c]->setState(BallColor::none);
+        }
+    }
+}
+
 AnimatedIconButton *CellGridControl::createCell(int r, int c)
 {
     AnimatedIconButton * cell = new AnimatedIconButton(r,c,ballIcons);
@@ -94,8 +101,6 @@ void CellGridControl::movieResized(CellButton *btn)
     // just drop selection
     hideAnimation();
     disconnect(btn, &CellButton::resized,nullptr, nullptr);
-    selectedCell=nullptr;
-    //fitAnimationSize(btn->size());
 }
 
 void CellGridControl::hideAnimation()

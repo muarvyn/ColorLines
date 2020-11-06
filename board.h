@@ -30,6 +30,7 @@ class AnimatedIconButton;
 QT_END_NAMESPACE
 class DijkstraSearch;
 #include "basic_defs.hpp"
+#include "boardinfo.h"
 
 class Board : public QObject
 {
@@ -49,6 +50,12 @@ public:
     distance_type getDistance(int dest_r, int dest_c);
     virtual ~Board() {}
     BallColor::type getColorAt(int r, int c);
+    AnimatedIconButton* getCell(BoardInfo::cell_location loc)
+    { return board[loc.first][loc.second]; }
+
+    bool isInRange(int r, int c) {
+        return r>=0 && r<BoardDim::ROWS_NUM && c>=0 && c<BoardDim::COLUMNS_NUM;
+    }
 
     const float EMPTY_CELL_WEIGHT = 1.0e-5f;
     const float OCCUPIED_CELL_WEIGHT = 1.0;

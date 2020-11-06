@@ -20,7 +20,7 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#include "gameboard.h"
+#include "board.h"
 #include "boardcontrol.h"
 
 BoardControl::BoardControl(CellGridControl *gc, QObject *parent)
@@ -28,7 +28,7 @@ BoardControl::BoardControl(CellGridControl *gc, QObject *parent)
     , gridControl(gc)
     , selectedCell(nullptr)
 {
-    board = new GameBoard(gridControl->getCells(), this);
+    board = new Board(gridControl->getCells(), this);
 }
 
 bool BoardControl::selectCell(BoardInfo::cell_location loc)

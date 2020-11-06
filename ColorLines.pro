@@ -34,13 +34,13 @@ SOURCES += \
     cellgridcontrol.cpp \
     iconcellbutton.cpp \
     animatediconbutton.cpp \
-    gameboard.cpp \
     gamecontrol.cpp \
     fixedaspectratioitem.cpp \
     boardinfo.cpp \
     boardcontrol.cpp \
     basic_defs.cpp \
-    editmodecontrol.cpp
+    editmodecontrol.cpp \
+    settings.cpp
 
 HEADERS += \
     app_defs.h \
@@ -53,12 +53,12 @@ HEADERS += \
     cellgridcontrol.h \
     iconcellbutton.h \
     animatediconbutton.h \
-    gameboard.h \
     gamecontrol.h \
     fixedaspectratioitem.h \
     boardinfo.h \
     boardcontrol.h \
-    editmodecontrol.h
+    editmodecontrol.h \
+    settings.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -135,7 +135,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_actionNew_triggered()
 {
-    gameControl->clear();
+    gridControl->clear();
     scoreLab->setText("0");
     QTimer::singleShot(600, this, &MainWindow::makeSpawn);
 }

@@ -29,7 +29,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "cellgridcontrol.h"
 
 QT_BEGIN_NAMESPACE
-class GameBoard;
+class Board;
 QT_END_NAMESPACE
 
 class BoardControl : public QObject
@@ -60,7 +60,7 @@ public slots:
 private:
     CellGridControl *gridControl;
     CellButton *selectedCell;
-    GameBoard *board;
+    Board *board;
 };
 
 #endif // BOARDCONTROL_H

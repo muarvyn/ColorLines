@@ -20,16 +20,15 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#ifndef APP_DEFS_H
-#define APP_DEFS_H
+#include "settings.h"
+#include "basic_defs.hpp"
 
-#include <QString>
+Settings::Settings(QObject *parent) : QObject(parent)
+{
 
-const QString
-    OrganizationName("One Buck Software"),
-    ApplicationName("ColorLines"),
-    SettingsGroupName("Highscores");
+}
 
-const int MAX_SAVED_HIGHSCORES = 10;
-
-#endif // APP_DEFS_H
+void Settings::loadGame(BoardInterface *board)
+{
+    board->clear();
+}

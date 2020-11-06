@@ -51,7 +51,6 @@ public:
 signals:
 
 public slots:
-    void clear();
 
 private:
     BoardInterface *board;

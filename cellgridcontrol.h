@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018 Volodymyr Kryachko
+Copyright (C) 2018-2020 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -29,7 +29,6 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "cellbutton.h"
 
 QT_BEGIN_NAMESPACE
-class CellButton;
 class AnimatedIconButton;
 class GameControl;
 QT_END_NAMESPACE
@@ -47,6 +46,7 @@ public:
 
     BallColor::type getColorAt(int r, int c) const;
     void setColorAt(int r, int c, BallColor::type color);
+    void clear();
     AnimatedIconButton *createCell(int r, int c);
     const std::vector<std::vector<AnimatedIconButton*>>& getCells() const
     { return boardCells; }
@@ -69,7 +69,6 @@ public slots:
 protected:
     QMovie *movie;
     QLabel *movieLabel;
-    CellButton *selectedCell;
     QIcon ballIcons[BallColor::colors_num];
     std::vector<std::vector<AnimatedIconButton*>> boardCells;
 

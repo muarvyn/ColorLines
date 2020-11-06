@@ -1,3 +1,25 @@
+/*
+
+Copyright (C) 2020 Volodymyr Kryachko
+
+This file is part of ColorLines.
+
+ColorLines is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3 of the License, or (at your
+option) any later version.
+
+ColorLines is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with ColorLines; see the file COPYING.  If not, see
+<http://www.gnu.org/licenses/>.
+
+*/
+
 #include <QSettings>
 #include <QShowEvent>
 
@@ -63,7 +85,7 @@ Qt::ItemFlags HighScoresModel::flags(const QModelIndex &index) const {
 
 void HighScoresModel::loadData() {
     QSettings load_settings(OrganizationName, ApplicationName);
-    load_settings.beginGroup(SettingsGnoupName);
+    load_settings.beginGroup(SettingsGroupName);
 
     foreach (const QString &key, load_settings.childKeys()) {
         mData.append(QPair<QString, int>(key, load_settings.value(key).toInt()));
@@ -85,7 +107,7 @@ void HighScoresModel::populate() {
         Surnames[QRandomGenerator::global()->bounded(int(sizeof(Surnames)/sizeof(*Surnames)))]);
     int val_1 = QRandomGenerator::global()->bounded(500+1);
     QSettings save_settings(OrganizationName, ApplicationName);
-    save_settings.beginGroup(SettingsGnoupName);
+    save_settings.beginGroup(SettingsGroupName);
 
     save_settings.setValue(key_1, val_1);
     HighscoresList data;

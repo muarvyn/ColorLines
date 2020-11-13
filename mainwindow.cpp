@@ -30,6 +30,8 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "editmodecontrol.h"
 #include "gamecontrol.h"
 #include "highscorestable.h"
+#include "settings.h"
+#include "app_defs.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -39,6 +41,10 @@ MainWindow::MainWindow(QWidget *parent)
     , score(0)
 {
     ui->setupUi(this);
+    QSettings load_settings(OrganizationName, ApplicationName);
+    restoreGeometry(load_settings.value("geometry").toByteArray());
+    restoreState(load_settings.value("windowState").toByteArray());
+
     QGridLayout *grid_layout = new QGridLayout();
     QGridLayout *editTB_layout = new QGridLayout();
 
@@ -64,8 +70,6 @@ MainWindow::MainWindow(QWidget *parent)
         cached_colors.push_back(GameControl::getRandomColor());
     }
 
-    scoreLab = ui->scoreLab;
-    scoreLab->setText("0");
     spawnColorLabels[0] = ui->nextColor1;
     spawnColorLabels[1] = ui->nextColor2;
     spawnColorLabels[2] = ui->nextColor3;
@@ -81,7 +85,13 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
     }
-    QTimer::singleShot(600, this, &MainWindow::makeSpawn);
+    Settings s;
+    s.loadGame(*gridControl, score);
+    scoreLab = ui->scoreLab;
+    scoreLab->setText(QString::number(score));
+    gameControl->generateRandomSpawn(spawn_locations, cached_colors);
+    showNextSpawn();
+    //QTimer::singleShot(600, this, &MainWindow::makeSpawn);
 }
 
 void MainWindow::handleMove(const BoardInfo::cell_location &loc)
@@ -108,7 +118,10 @@ void MainWindow::makeSpawn()
     boardControl->animateSpawn(spawn_locations, cached_colors);
 
     std::copy(spawn_colors.begin(), spawn_colors.end(), cached_colors.begin());
+    showNextSpawn();
+}
 
+void MainWindow::showNextSpawn() {
     for (size_t i=0; i<SPAWN_BALLS_NUM; ++i) {
         const QIcon icon = ballIcons[cached_colors[i]];
         QLabel *lab = spawnColorLabels[i];
@@ -158,4 +171,18 @@ void MainWindow::on_actionHighest_scores_triggered()
 {
     QDialog *table = new HighScoresTable(this);
     table->exec();
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    {
+        Settings s;
+        s.saveGame(*gridControl, scoreLab->text().toInt());
+    }
+    {
+        QSettings settings(OrganizationName, ApplicationName);
+        settings.setValue("geometry", saveGeometry());
+        settings.setValue("windowState", saveState());
+    }
+    QMainWindow::closeEvent(event);
 }

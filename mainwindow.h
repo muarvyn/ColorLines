@@ -51,11 +51,13 @@ public:
 private slots:
     void handleMove(const BoardInfo::cell_location &loc);
     void makeSpawn();
+    void showNextSpawn();
     void finalizeSpawn();
 
     void on_actionNew_triggered();
     void on_actionEdit_toggled(bool isEditMode);
     void on_actionHighest_scores_triggered();
+    void closeEvent(QCloseEvent *event);
 
 private:
     Ui::MainWindow *ui;

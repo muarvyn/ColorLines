@@ -34,7 +34,7 @@ GameControl::GameControl(BoardInterface *bs, QObject *parent)
 
 }
 
-int GameControl::getUnoccupied(std::vector<std::pair<int,int>> &unoccupied)
+int GameControl::getUnoccupied(std::vector<BoardInfo::cell_location> &unoccupied)
 {
     for (int r = 0; r < BoardDim::ROWS_NUM; ++r) {
         for (int c = 0; c < BoardDim::COLUMNS_NUM; ++c) {
@@ -47,10 +47,10 @@ int GameControl::getUnoccupied(std::vector<std::pair<int,int>> &unoccupied)
 }
 
 bool GameControl::generateRandomSpawn(
-    std::vector<std::pair<int,int>> &spawn,
+    std::vector<BoardInfo::cell_location> &spawn,
     std::vector<BallColor::type> &color)
 {
-    std::vector<std::pair<int,int>> unoccupied;
+    std::vector<BoardInfo::cell_location> unoccupied;
     getUnoccupied(unoccupied);
     std::random_shuffle(unoccupied.begin(), unoccupied.end());
     std::copy(unoccupied.begin(),

@@ -34,9 +34,9 @@ class GameControl : public QObject
     Q_OBJECT
 public:
     explicit GameControl(BoardInterface *bs, QObject *parent = nullptr);
-    int getUnoccupied(std::vector<std::pair<int,int>> &unoccupied);
+    int getUnoccupied(std::vector<BoardInfo::cell_location> &unoccupied);
     bool generateRandomSpawn(
-        std::vector<std::pair<int,int>> &spawn,
+        std::vector<BoardInfo::cell_location> &spawn,
         std::vector<BallColor::type> &color);
 
     static BallColor::type getRandomColor();

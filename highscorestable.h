@@ -1,11 +1,13 @@
 #ifndef HIGHSCORESTABLE_H
 #define HIGHSCORESTABLE_H
 
+#include <tuple>
 #include <QDialog>
 
 #include "qabstractitemmodel.h"
 
-typedef QPair<QString, int> ScoreEntry;
+
+typedef std::tuple<QString, int, bool> ScoreEntry;
 typedef QList<ScoreEntry> HighscoresList;
 
 class HighScoresModel : public QAbstractTableModel
@@ -21,14 +23,20 @@ public :
     { return 2; }
 
     QVariant data(const QModelIndex &index, int role) const override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
     virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
+
+    HighscoresList &getData() { return mData; }
 
     void populate();
 
     void loadData();
+    void saveData() const;
+    const QString &getUserName() { return user_name; }
 
 private:
     HighscoresList mData;
+    QString user_name;
 
 };
 
@@ -42,13 +50,13 @@ class HighScoresTable : public QDialog
 
 public:
     explicit HighScoresTable(QWidget *parent = nullptr);
+    int newScore(int score);
     ~HighScoresTable();
 
 private:
     Ui::HighScoresTable *ui;
 
 private slots:
-    //void showEvent(QShowEvent *event);
 };
 
 #endif // HIGHSCORESTABLE_H

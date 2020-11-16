@@ -21,12 +21,22 @@ along with ColorLines; see the file COPYING.  If not, see
 */
 
 #include <QSettings>
-#include <QShowEvent>
 
 #include "app_defs.h"
 #include "highscorestable.h"
 #include "ui_highscorestable.h"
 
+#define getName std::get<0>
+#define getScore std::get<1>
+#define getIsEditable std::get<2>
+
+
+ScoreEntry makeScoreEntry(QString name, int score, bool editable) {
+    return std::make_tuple(name, score, editable);
+}
+
+bool EntryScoreGreaterThan(HighscoresList::const_reference a, HighscoresList::const_reference b)
+{ return getScore(a) > getScore(b); };
 
 HighScoresTable::HighScoresTable(QWidget *parent) :
     QDialog(parent),
@@ -41,24 +51,30 @@ HighScoresTable::HighScoresTable(QWidget *parent) :
     tableView->resizeColumnsToContents();
 }
 
+int HighScoresTable::newScore(int score)
+{
+    HighScoresModel *model = qobject_cast<HighScoresModel *>(ui->highScoresView->model());
+    HighscoresList &list = model->getData();
+    HighscoresList::iterator record_position =
+        std::find_if_not(list.begin(), list.end(),
+        [score](HighscoresList::const_reference item){ return getScore(item) > score; });
+    list.insert(record_position, makeScoreEntry(model->getUserName(), score, true));
+    int status = exec();
+    model->saveData();
+    return status;
+}
+
 HighScoresTable::~HighScoresTable()
 {
     delete ui;
 }
 
-//void HighScoresTable::showEvent(QShowEvent *event) {
-//    QDialog::showEvent(event);
-//    if (!event->spontaneous()){
-//        ui->highScoresView->resizeColumnsToContents();
-//    }
-
-//}
-
 HighScoresModel::HighScoresModel(QObject * parent)
     : QAbstractTableModel(parent)
     , mData()
+    , user_name(qgetenv("USER"))
 {
-    //loadData();
+
 }
 
 QVariant HighScoresModel::data(const QModelIndex & index, int role) const {
@@ -71,16 +87,30 @@ QVariant HighScoresModel::data(const QModelIndex & index, int role) const {
     const ScoreEntry &entry = mData[index.row()];
 
     if (index.column() == 0) {
-        return entry.first;
+        return getName(entry);
     }
     else {
-        return entry.second;
+        return getScore(entry);
     }
 }
 
+bool HighScoresModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    QString name = value.toString().trimmed();
+    if (name.isEmpty()) return false;
+    ScoreEntry &entry = mData[index.row()];
+    getName(entry) = name;
+    emit dataChanged(index, index);
+    return true;
+}
+
+
 Qt::ItemFlags HighScoresModel::flags(const QModelIndex &index) const {
-    Q_UNUSED(index)
-    return Qt::ItemIsEnabled;
+    Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemNeverHasChildren | Qt::ItemIsSelectable;
+    if (getIsEditable(mData[index.row()])) {
+        flags |= Qt::ItemIsEditable;
+    }
+    return flags;
 }
 
 void HighScoresModel::loadData() {
@@ -88,13 +118,25 @@ void HighScoresModel::loadData() {
     load_settings.beginGroup(SettingsGroupName);
 
     foreach (const QString &key, load_settings.childKeys()) {
-        mData.append(QPair<QString, int>(key, load_settings.value(key).toInt()));
+        mData.append(makeScoreEntry(key, load_settings.value(key).toInt(), false));
     }
-    std::sort(mData.begin(), mData.end(),
-        [](HighscoresList::const_reference a, HighscoresList::const_reference b)
-            { return a.second > b.second; });
+    std::sort(mData.begin(), mData.end(), &EntryScoreGreaterThan);
 
     load_settings.endGroup();
+}
+
+void HighScoresModel::saveData() const
+{
+    QSettings save_settings(OrganizationName, ApplicationName);
+    save_settings.beginGroup(SettingsGroupName);
+
+    int i=0;
+    save_settings.remove("");
+    foreach (const ScoreEntry &entry, mData) {
+        if (++i <= MAX_SAVED_HIGHSCORES)
+            save_settings.setValue(getName(entry), getScore(entry));
+    }
+    save_settings.endGroup();
 }
 
 //******************** For testing ********************
@@ -112,17 +154,15 @@ void HighScoresModel::populate() {
     save_settings.setValue(key_1, val_1);
     HighscoresList data;
     foreach (const QString &key, save_settings.childKeys()) {
-        data.append(QPair<QString, int>(key, save_settings.value(key).toInt()));
+        data.append(makeScoreEntry(key, save_settings.value(key).toInt(),false));
     }
 
-    std::sort(data.begin(), data.end(),
-        [](HighscoresList::const_reference a, HighscoresList::const_reference b)
-            { return a.second > b.second; });
+    std::sort(data.begin(), data.end(), &EntryScoreGreaterThan);
     int i=0;
     save_settings.remove("");
     foreach (const ScoreEntry &entry, data) {
         if (++i <= MAX_SAVED_HIGHSCORES)
-            save_settings.setValue(entry.first, entry.second);
+            save_settings.setValue(getName(entry), getScore(entry));
     }
     save_settings.endGroup();
 

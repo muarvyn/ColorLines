@@ -88,7 +88,7 @@ void BoardControl::animateSpawn(
 {
     if (locations.size() > 0) {
         gridControl->hideAnimation();
-        AnimatedIconButton *btn;
+        AnimatedIconButton *btn = nullptr;
         for (size_t i = 0;
             i < locations.size();
             ++i) {
@@ -98,14 +98,12 @@ void BoardControl::animateSpawn(
             btn->setupAnimation("opacity", 0, 1, 600);
             btn->startAnimation(state, state);
         }
-        connect(
-            btn, &AnimatedIconButton::animation_finished,
-            this, [this] {
-                emit spawnAnimationFinished();
-                });
+        connect(btn, &AnimatedIconButton::animation_finished, this, &BoardControl::spawnAnimationFinished);
+        qDebug() << __FUNCTION__ << ": animation_finished is connected.";
+        if (!btn->isAnimating()) qWarning() << __FUNCTION__ << "btn must be animating.";
     } else {
-        // TODO: handle endgame
-        emit gridControl->animationFinished();
+        qWarning() << "BoardControl::animateSpawn: locations.size() must not be 0?";
+        emit spawnAnimationFinished();
     }
 }
 

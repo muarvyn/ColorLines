@@ -73,10 +73,9 @@ void GameControl::getStraitConnection(
     const BoardInfo::cell_location &loc,
     std::vector<BoardInfo::cell_location> &connection)
 {
+    qDebug() << "getStraitConnection: " << loc << " " << board->getColorAt(loc.first, loc.second);
     BoardInfo bi(*board);
-    bi.getStraitConnection(
-        BoardInfo::cell_location(loc.first, loc.second),
-        connection);
+    bi.getStraitConnection(loc, connection);
 }
 
 void GameControl::getAllConnections(

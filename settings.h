@@ -32,7 +32,7 @@ class Settings : public QObject
     Q_OBJECT
 public:
     explicit Settings(QObject *parent = nullptr);
-    void loadGame(BoardInterface &board, int &score);
+    std::size_t loadGame(BoardInterface &board, int &score);
     void saveGame(const BoardInterface &board, int score);
 
 signals:

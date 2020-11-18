@@ -66,10 +66,6 @@ MainWindow::MainWindow(QWidget *parent)
     hbox->setAlignment(editTB_layout, Qt::AlignRight | Qt::AlignVCenter);
     hbox->addLayout(square_layout);
 
-    for (size_t i=0; i<SPAWN_BALLS_NUM; ++i) {
-        cached_colors.push_back(GameControl::getRandomColor());
-    }
-
     spawnColorLabels[0] = ui->nextColor1;
     spawnColorLabels[1] = ui->nextColor2;
     spawnColorLabels[2] = ui->nextColor3;
@@ -86,18 +82,18 @@ MainWindow::MainWindow(QWidget *parent)
         ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
     }
     Settings s;
-    s.loadGame(*gridControl, score);
+    std::size_t balls_num = s.loadGame(*gridControl, score);
     scoreLab = ui->scoreLab;
     scoreLab->setText(QString::number(score));
     gameControl->generateRandomSpawn(spawn_locations, cached_colors);
     showNextSpawn();
-    //QTimer::singleShot(600, this, &MainWindow::makeSpawn);
+    if (balls_num < SPAWN_BALLS_NUM) {
+        QTimer::singleShot(600, this, &MainWindow::makeSpawn);
+    }
 }
 
 void MainWindow::handleMove(const BoardInfo::cell_location &loc)
 {
-    qDebug() << "GameControl::handleMove: cell location is " << loc << "\n";
-
     std::vector<BoardInfo::cell_location> connection;
     gameControl->getStraitConnection(loc, connection);
     score += connection.size();
@@ -114,6 +110,10 @@ void MainWindow::makeSpawn()
     std::vector<BallColor::type> spawn_colors;
     spawn_locations.clear();
     gameControl->generateRandomSpawn(spawn_locations, spawn_colors);
+    if (spawn_locations.size() < SPAWN_BALLS_NUM) {
+        handleEndGame();
+        return;
+    }
 
     boardControl->animateSpawn(spawn_locations, cached_colors);
 
@@ -121,7 +121,8 @@ void MainWindow::makeSpawn()
     showNextSpawn();
 }
 
-void MainWindow::showNextSpawn() {
+void MainWindow::showNextSpawn()
+{
     for (size_t i=0; i<SPAWN_BALLS_NUM; ++i) {
         const QIcon icon = ballIcons[cached_colors[i]];
         QLabel *lab = spawnColorLabels[i];
@@ -132,13 +133,29 @@ void MainWindow::showNextSpawn() {
 
 void MainWindow::finalizeSpawn()
 {
+    qDebug() << "MainWindow::finalizeSpawn: entry.";
     std::vector<BoardInfo::cell_location> connection;
     gameControl->getAllConnections(spawn_locations, connection);
     if (!connection.empty()) {
         boardControl->animateDisappear(connection);
     } else {
-        emit gridControl->animationFinished();
+        std::vector<BoardInfo::cell_location> unoccupied;
+        gameControl->getUnoccupied(unoccupied);
+        if (unoccupied.size() == 0) {
+            handleEndGame();
+        } else {
+            emit gridControl->animationFinished(); // TOFIX: Not a good practice
+        }
     }
+}
+
+void MainWindow::handleEndGame()
+{
+    qDebug() << "Endgame is occured.";
+    HighScoresTable *table = new HighScoresTable(this);
+    table->newScore(scoreLab->text().toInt());
+
+    on_actionNew_triggered();
 }
 
 MainWindow::~MainWindow()

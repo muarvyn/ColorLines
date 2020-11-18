@@ -53,6 +53,7 @@ private slots:
     void makeSpawn();
     void showNextSpawn();
     void finalizeSpawn();
+    void handleEndGame();
 
     void on_actionNew_triggered();
     void on_actionEdit_toggled(bool isEditMode);

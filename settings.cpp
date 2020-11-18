@@ -34,12 +34,13 @@ Settings::Settings(QObject *parent) : QObject(parent)
 
 }
 
-void Settings::loadGame(BoardInterface &board, int &score)
+std::size_t Settings::loadGame(BoardInterface &board, int &score)
 {
     board.clear();
     QSettings load_settings(OrganizationName, ApplicationName);
     load_settings.beginGroup(SavedGameSettingsGroupName);
     bool is_number;
+    std::size_t count = 0;
 
     foreach (const QString &key, load_settings.childKeys()) {
         key.toInt(&is_number);
@@ -51,16 +52,18 @@ void Settings::loadGame(BoardInterface &board, int &score)
             }
             int row = list[0].toInt(&is_number);
             if (!is_number) continue;
-            int column = list[1].toInt();
+            int column = list[1].toInt(&is_number);
             if (!is_number) continue;
-            int color = list[2].toInt();
+            int color = list[2].toInt(&is_number);
             if (!is_number) continue;
             board.setColorAt(row, column, BallColor::type(color));
+            ++count;
         } else {
             score = load_settings.value(key).toInt();
         }
     }
     load_settings.endGroup();
+    return count;
 }
 
 void Settings::saveGame(const BoardInterface &board, int score)

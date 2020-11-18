@@ -66,7 +66,7 @@ bool GameControl::generateRandomSpawn(
 BallColor::type GameControl::getRandomColor()
 {
     return static_cast<BallColor::type>(
-        QRandomGenerator::global()->bounded(BallColor::yellow+1/*BallColor::last+1*/));
+        QRandomGenerator::global()->bounded(int(BallColor::colors_num)));
 }
 
 void GameControl::getStraitConnection(

@@ -26,7 +26,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #include <cstddef>
 struct BallColor
 {
-    enum type {brown, red, green, blue, yellow, pink, navy, first=brown, last=yellow, none=-1}; //TOFIX: last=navy
+    enum type {brown, red, green, navy, yellow, pink, blue, first=brown, last=blue, none=-1};
     static const std::size_t colors_num = static_cast<std::size_t>(last+1);
 };
 

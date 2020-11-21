@@ -38,7 +38,6 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , editControl(nullptr)
-    , score(0)
 {
     ui->setupUi(this);
     QSettings load_settings(OrganizationName, ApplicationName);
@@ -82,6 +81,7 @@ MainWindow::MainWindow(QWidget *parent)
         ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
     }
     Settings s;
+    int score;
     std::size_t balls_num = s.loadGame(*gridControl, score);
     scoreLab = ui->scoreLab;
     scoreLab->setText(QString::number(score));
@@ -96,8 +96,7 @@ void MainWindow::handleMove(const BoardInfo::cell_location &loc)
 {
     std::vector<BoardInfo::cell_location> connection;
     gameControl->getStraitConnection(loc, connection);
-    score += connection.size();
-    scoreLab->setText(QString::number(score));
+    scoreLab->setText(QString::number(scoreLab->text().toUInt()+connection.size()));
     if (!connection.empty()) {
         boardControl->animateDisappear(connection);
     } else {

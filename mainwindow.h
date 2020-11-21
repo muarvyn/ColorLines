@@ -71,7 +71,6 @@ private:
     std::vector<BallColor::type> cached_colors;
     std::vector<BoardInfo::cell_location> spawn_locations;
     QIcon ballIcons[BallColor::colors_num];
-    int score;
     QLabel *scoreLab;
 
 };

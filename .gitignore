@@ -37,7 +37,7 @@
 *.autosave
 
 # Build directories
-build
-Release
-Debug
+build*
+Release*
+Debug*
 

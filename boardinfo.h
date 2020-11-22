@@ -32,8 +32,8 @@ class BoardInfo
 public:
     typedef std::pair<int,int> cell_location;
     typedef std::pair<int,int> Direction;
-    static constexpr Direction orig_dirs[] = {{-1,0},{-1,-1},{0,-1},{1,-1}};
-    static const int ORIG_DIRECTIONS_NUM = sizeof(orig_dirs)/sizeof(orig_dirs[0]);
+    static const int ORIG_DIRECTIONS_NUM = 4;
+    static const Direction orig_dirs[ORIG_DIRECTIONS_NUM];
     static const int MIN_LINE_ELIMINATION_SIZE = 5;
 
     BoardInfo(BoardInterface &);

@@ -54,11 +54,13 @@ HighScoresTable::HighScoresTable(QWidget *parent) :
 int HighScoresTable::newScore(int score)
 {
     HighScoresModel *model = qobject_cast<HighScoresModel *>(ui->highScoresView->model());
-    HighscoresList &list = model->getData();
-    HighscoresList::iterator record_position =
+    HighscoresList &list = model->getData(); // TOFIX: use HighScoresModel::data
+    HighscoresList::const_iterator record_it =
         std::find_if_not(list.begin(), list.end(),
         [score](HighscoresList::const_reference item){ return getScore(item) > score; });
-    list.insert(record_position, makeScoreEntry(model->getUserName(), score, true));
+    int row = record_it - list.cbegin();
+    model->insertRows(row, 1);
+    getScore(list[row]) = score;
     int status = exec();
     model->saveData();
     return status;
@@ -112,6 +114,20 @@ Qt::ItemFlags HighScoresModel::flags(const QModelIndex &index) const {
     }
     return flags;
 }
+
+bool HighScoresModel::insertRows(int row, int count, const QModelIndex &parent)
+{
+    if (count <= 0) {
+        return false;
+    }
+    beginInsertRows(parent, row, row+count-1);
+    for(int i=0; i<count; ++i) {
+        mData.insert(row, makeScoreEntry(getUserName(), 0, true));
+    }
+    endInsertRows();
+    return true;
+}
+
 
 void HighScoresModel::loadData() {
     QSettings load_settings(OrganizationName, ApplicationName);

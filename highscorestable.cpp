@@ -45,7 +45,6 @@ HighScoresTable::HighScoresTable(QWidget *parent) :
     ui->setupUi(this);
     QTableView *tableView = ui->highScoresView;
     HighScoresModel *tableModel = new HighScoresModel(this);
-    //tableModel->populate();
     tableModel->loadData();
     tableView->setModel(tableModel);
     tableView->resizeColumnsToContents();
@@ -61,6 +60,8 @@ int HighScoresTable::newScore(int score)
     int row = record_it - list.cbegin();
     model->insertRows(row, 1);
     getScore(list[row]) = score;
+    QModelIndex selection = model->index(row,0);
+    ui->highScoresView->selectionModel()->select(selection, QItemSelectionModel::ClearAndSelect);
     int status = exec();
     model->saveData();
     return status;
@@ -98,7 +99,7 @@ QVariant HighScoresModel::data(const QModelIndex & index, int role) const {
 
 bool HighScoresModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    QString name = value.toString().trimmed();
+    QString name = value.toString().trimmed().remove('\'');
     if (name.isEmpty()) return false;
     ScoreEntry &entry = mData[index.row()];
     getName(entry) = name;
@@ -131,10 +132,15 @@ bool HighScoresModel::insertRows(int row, int count, const QModelIndex &parent)
 
 void HighScoresModel::loadData() {
     QSettings load_settings(OrganizationName, ApplicationName);
-    load_settings.beginGroup(SettingsGroupName);
+    load_settings.beginGroup(HighscoresSettingsGroupName);
 
     foreach (const QString &key, load_settings.childKeys()) {
-        mData.append(makeScoreEntry(key, load_settings.value(key).toInt(), false));
+        QString entry_str(load_settings.value(key).toString());
+        QStringList list = entry_str.split('\'');
+            if (list.size() < 2) {
+                continue;
+            }
+        mData.append(makeScoreEntry(list[0], list[1].toInt(), false));
     }
     std::sort(mData.begin(), mData.end(), &EntryScoreGreaterThan);
 
@@ -144,42 +150,17 @@ void HighScoresModel::loadData() {
 void HighScoresModel::saveData() const
 {
     QSettings save_settings(OrganizationName, ApplicationName);
-    save_settings.beginGroup(SettingsGroupName);
+    save_settings.beginGroup(HighscoresSettingsGroupName);
 
     int i=0;
     save_settings.remove("");
+    QString format("%1'%2");
     foreach (const ScoreEntry &entry, mData) {
-        if (++i <= MAX_SAVED_HIGHSCORES)
-            save_settings.setValue(getName(entry), getScore(entry));
+        save_settings.setValue(QString::number(i), format.arg(getName(entry)).arg(int(getScore(entry))));
+        if (++i >= MAX_SAVED_HIGHSCORES) {
+            break;
+        }
     }
     save_settings.endGroup();
 }
 
-//******************** For testing ********************
-#include <QRandomGenerator>
-const QString Names[8] = {"John", "Michael", "Maria", "Isaac", "Christopher", "Jack", "Isabella", "Carolina"};
-const QString Surnames[7] = {"Silver", "Black", "Brown", "Lee", "Carpenter", "Smith", "Woods"};
-
-void HighScoresModel::populate() {
-    QString key_1(Names[QRandomGenerator::global()->bounded(int(sizeof(Names)/sizeof(*Names)))]+" "+
-        Surnames[QRandomGenerator::global()->bounded(int(sizeof(Surnames)/sizeof(*Surnames)))]);
-    int val_1 = QRandomGenerator::global()->bounded(500+1);
-    QSettings save_settings(OrganizationName, ApplicationName);
-    save_settings.beginGroup(SettingsGroupName);
-
-    save_settings.setValue(key_1, val_1);
-    HighscoresList data;
-    foreach (const QString &key, save_settings.childKeys()) {
-        data.append(makeScoreEntry(key, save_settings.value(key).toInt(),false));
-    }
-
-    std::sort(data.begin(), data.end(), &EntryScoreGreaterThan);
-    int i=0;
-    save_settings.remove("");
-    foreach (const ScoreEntry &entry, data) {
-        if (++i <= MAX_SAVED_HIGHSCORES)
-            save_settings.setValue(getName(entry), getScore(entry));
-    }
-    save_settings.endGroup();
-
-}

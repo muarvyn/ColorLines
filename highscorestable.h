@@ -29,8 +29,6 @@ public :
 
     HighscoresList &getData() { return mData; }
 
-    void populate();
-
     void loadData();
     void saveData() const;
     const QString &getUserName() { return user_name; }

@@ -26,7 +26,6 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "mainwindow_test.h"
 #include "ui_mainwindow_test.h"
 #include "../basic_defs.hpp"
-#include "../animatediconbutton.h"
 
 int getColor(const AnimatedIconButton *btn)
 {
@@ -42,16 +41,13 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
     }
-
-    QGridLayout *grid = new QGridLayout(this);
-    grid->setSizeConstraint(QLayout::SetNoConstraint);
     for (BallColor::type color=BallColor::first; color < BallColor::first+3; ++color) {
-        AnimatedIconButton *btn = new AnimatedIconButton(0,color,ballIcons,this);
+        AnimatedIconButton *btn = new AnimatedIconButton(0,color,ballIcons);
         btn->setColor(color);
-        grid->addWidget(btn, btn->getRow(), btn->getColumn());
         connect(btn, &AnimatedIconButton::clicked, this, &MainWindow::handleButtonClick);
+        button_list.append(btn);
     }
-    setLayout(grid);
+    setupLayout(QBoxLayout::LeftToRight);
 }
 
 void MainWindow::handleButtonClick()
@@ -81,11 +77,30 @@ void MainWindow::handleAnimationFinished()
     AnimatedIconButton *senderButton = qobject_cast<AnimatedIconButton *>(sender());
     qDebug() << "Button animation has finished. State is : " << senderButton->getState();
     qDebug() << "AnimatedIconButton::isAnimating returned " << senderButton->isAnimating();
-    // No need to disconnect explicitly
-    // disconnect(senderButton, &AnimatedIconButton::animation_finished, nullptr, nullptr);
+}
+
+void MainWindow::resizeEvent(QResizeEvent *e)
+{
+    QBoxLayout::Direction dir = e->size().width() > e->size().height() ?
+        QBoxLayout::LeftToRight : QBoxLayout::TopToBottom;
+    setupLayout(dir);
+    QWidget::resizeEvent(e);
 }
 
 MainWindow::~MainWindow()
 {
 }
 
+void MainWindow::setupLayout(QBoxLayout::Direction dir)
+{
+    if (layout()) {
+        QBoxLayout::Direction old_dir = qobject_cast<QBoxLayout *>(layout())->direction();
+        if (old_dir == dir) return;
+        delete layout();
+    }
+    QBoxLayout *box = new QBoxLayout(dir);
+    for (AnimatedIconButton *btn : qAsConst(button_list)) {
+        box->addWidget(btn);
+    }
+    setLayout(box);
+}

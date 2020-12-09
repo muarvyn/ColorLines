@@ -26,6 +26,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "mainwindow_test.h"
 #include "ui_mainwindow_test.h"
 #include "../basic_defs.hpp"
+#include "../fixedaspectratioitem.h"
 
 int getColor(const AnimatedIconButton *btn)
 {
@@ -99,8 +100,13 @@ void MainWindow::setupLayout(QBoxLayout::Direction dir)
         delete layout();
     }
     QBoxLayout *box = new QBoxLayout(dir);
+    int i = 0;
     for (AnimatedIconButton *btn : qAsConst(button_list)) {
-        box->addWidget(btn);
+        if (++i != 2) {
+            box->addWidget(btn);
+        } else {
+            box->addItem(new FixedAspectRatioItem(btn));
+        }
     }
     setLayout(box);
 }

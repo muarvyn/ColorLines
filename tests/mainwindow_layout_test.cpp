@@ -34,25 +34,33 @@ MainWindow::MainWindow(QWidget *parent)
     QBoxLayout *v_layout = new QBoxLayout(QBoxLayout::TopToBottom);
 
     QBoxLayout *layout = new QBoxLayout(QBoxLayout::LeftToRight);
-    QSizePolicy size_policy = QSizePolicy(QSizePolicy::Preferred,
-                                          QSizePolicy::Preferred,
+    QSizePolicy size_policy = QSizePolicy(QSizePolicy::Maximum,
+                                          QSizePolicy::Maximum,
                                           QSizePolicy::ToolButton);
+//    QSizePolicy size_policy = QSizePolicy(QSizePolicy::MinimumExpanding,
+//                                          QSizePolicy::MinimumExpanding,
+//                                          QSizePolicy::ToolButton);
     QSizePolicy size_policy_central = QSizePolicy(QSizePolicy::MinimumExpanding,
                                           QSizePolicy::MinimumExpanding,
                                           QSizePolicy::ToolButton);
     layout->addStretch(1);
     QAbstractButton *btn = new CustomToolButton(this);
     btn->setSizePolicy(size_policy);
-    layout->addWidget(btn);
+    //layout->addWidget(btn);
+    layout->addItem(new FixedAspectRatioItem(btn));
+    layout->setStretch(layout->count(),1);
 
     btn = new CustomToolButton(this);
     btn->setSizePolicy(size_policy_central);
     TestWidgetItem *item = new TestWidgetItem(layout);
     item->addCentralWidget(btn);
+    layout->setStretch(layout->count(),10);
 
     btn = new CustomToolButton(this);
     btn->setSizePolicy(size_policy);
-    layout->addWidget(btn);
+//    layout->addWidget(btn);
+    layout->addItem(new FixedAspectRatioItem(btn));
+    layout->setStretch(layout->count(),1);
     layout->addStretch(1);
 
     //v_layout->addStretch(1);

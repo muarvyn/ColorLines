@@ -20,13 +20,15 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
+#define QT_NO_DEBUG_OUTPUT
+
 #include <QDebug>
 #include <QResizeEvent>
 #include "customtoolbutton.h"
 
 CustomToolButton::CustomToolButton(QWidget *parent)
     : QToolButton(parent)
-    , hintSize(QSize(40,40))
+    , hintSize(QSize(80,80))
 {
     setMinimumSize(QSize(40,40));
     setMaximumSize(QSize(400,400));

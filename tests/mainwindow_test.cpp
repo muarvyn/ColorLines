@@ -42,9 +42,18 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
     }
+    const QSizePolicy sp1(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    const QSizePolicy sp2(QSizePolicy::Minimum, QSizePolicy::Minimum);
+//    const QSizePolicy sp1(QSizePolicy::Expanding, QSizePolicy::Preferred);
+//    const QSizePolicy sp2(QSizePolicy::Preferred, QSizePolicy::Preferred);
     for (BallColor::type color=BallColor::first; color < BallColor::first+3; ++color) {
         AnimatedIconButton *btn = new AnimatedIconButton(0,color,ballIcons);
         btn->setColor(color);
+        if (color == BallColor::red) {
+            btn->setSizePolicy(sp1);
+        } else {
+            btn->setSizePolicy(sp2);
+        }
         connect(btn, &AnimatedIconButton::clicked, this, &MainWindow::handleButtonClick);
         button_list.append(btn);
     }

@@ -46,12 +46,15 @@ int FixedAspectRatioItem::heightForWidth(int w) const
 
 void FixedAspectRatioItem::setGeometry(const QRect &rect)
 {
+    qDebug() << "FixedAspectRatioItem::setGeometry of object" << this << "rect:" << rect << "\n";
     QSize size = rect.size().boundedTo(
         QSize(qIntCast(rect.height()/scale), qIntCast(rect.width()*scale)));
     QPoint origin = rect.topLeft();
     origin += QPoint((rect.width()-size.width())/2, (rect.height()-size.height())/2);
     QWidgetItem::setGeometry(QRect(origin, size));
 }
+
+/************ FixedAspectRatioLayout **************/
 
 FixedAspectRatioLayout::FixedAspectRatioLayout(QWidget *parent)
     : QLayout(parent)

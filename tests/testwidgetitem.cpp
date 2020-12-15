@@ -24,16 +24,16 @@ along with ColorLines; see the file COPYING.  If not, see
 #include <QLayout>
 #include <QWidget>
 
+#include "../fixedaspectratioitem.h"
 #include "testwidgetitem.h"
 
-class TradeForSizeItem : public QWidgetItem
+class TradeForSizeItem : public FixedAspectRatioItem
 {
 public:
     TradeForSizeItem(QWidget *widget);
     ~TradeForSizeItem() override = default;
 
     QSize sizeHint() const override;
-    //void setGeometry(const QRect &rect) override;
     QSize tradeForSize(const QSize& r);
     bool assignSize(const QSize s);
 
@@ -42,13 +42,14 @@ private:
 };
 
 TradeForSizeItem::TradeForSizeItem(QWidget *widget)
-    : QWidgetItem(widget)
+    : FixedAspectRatioItem(widget)
 {
     assigned = wid->sizeHint();
 }
 
 QSize TradeForSizeItem::sizeHint() const
 {
+    qDebug() << "TradeForSizeItem::sizeHint: " << assigned;
     return assigned;
 }
 
@@ -56,7 +57,7 @@ QSize TradeForSizeItem::tradeForSize(const QSize& s)
 {
     QSize trade = s;
     trade.transpose();
-    return trade.boundedTo(s);
+    return trade.boundedTo(s).expandedTo(QSize(80,80));
 }
 
 bool TradeForSizeItem::assignSize(const QSize s)
@@ -113,16 +114,17 @@ QRect TestWidgetItem::geometry() const
     return layout->geometry();
 }
 
-void TestWidgetItem::setGeometry(const QRect& r)
+void TestWidgetItem::setGeometry(const QRect& rect)
 {
-    qDebug() << "TestWidgetItem::setGeometry: " << r;
+    qDebug() << "TestWidgetItem::setGeometry: " << rect;
     if (centralItem) {
-        QSize trade = centralItem->tradeForSize(r.size());
+        QSize trade = centralItem->tradeForSize(rect.size());
         if (centralItem->assignSize(trade))
         {
+            qDebug() << "TestWidgetItem::setGeometry - Central Item size:" << trade;
             layout->invalidate();
         }
     }
-    layout->setGeometry(r);
+    layout->setGeometry(rect);
 }
 

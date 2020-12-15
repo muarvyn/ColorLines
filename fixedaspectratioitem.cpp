@@ -22,8 +22,39 @@ along with ColorLines; see the file COPYING.  If not, see
 
 #define QT_NO_DEBUG_OUTPUT
 
+#include <cmath>
 #include <QtDebug>
+#include <QWidget>
 #include "fixedaspectratioitem.h"
+
+FixedAspectRatioItem::FixedAspectRatioItem(QWidget *widget, double s)
+    : QWidgetItem(widget)
+    , scale(s)
+{
+
+}
+
+bool FixedAspectRatioItem::hasHeightForWidth() const
+{
+    return false;
+}
+
+int FixedAspectRatioItem::heightForWidth(int w) const
+{
+    return qIntCast(scale * w);
+}
+
+void FixedAspectRatioItem::setGeometry(const QRect &rect)
+{
+    qDebug() << "FixedAspectRatioItem::setGeometry of object" << this << "rect:" << rect << "\n";
+    QSize size = rect.size().boundedTo(
+        QSize(qIntCast(rect.height()/scale), qIntCast(rect.width()*scale)));
+    QPoint origin = rect.topLeft();
+    origin += QPoint((rect.width()-size.width())/2, (rect.height()-size.height())/2);
+    QWidgetItem::setGeometry(QRect(origin, size));
+}
+
+/************ FixedAspectRatioLayout **************/
 
 FixedAspectRatioLayout::FixedAspectRatioLayout(QWidget *parent)
     : QLayout(parent)

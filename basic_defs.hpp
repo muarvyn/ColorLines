@@ -45,7 +45,7 @@ class ColorCell
 public:
     virtual BallColor::type getColor() const = 0;
     virtual void setColor(BallColor::type color) = 0;
-    virtual ~ColorCell();
+    virtual ~ColorCell() = default;
 };
 
 class BoardInterface

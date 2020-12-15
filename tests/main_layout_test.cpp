@@ -20,38 +20,14 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#include "mainwindow_layout_test.h"
 
-#include <QWidget>
-#include <QList>
-#include <QBoxLayout>
-#include <QIcon>
+#include <QApplication>
 
-#include "../basic_defs.hpp"
-#include "../animatediconbutton.h"
-
-
-class MainWindow : public QWidget
+int main(int argc, char *argv[])
 {
-    Q_OBJECT
-
-public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow() override;
-
-    void setupLayout(QBoxLayout::Direction dir);
-
-protected:
-    void resizeEvent(QResizeEvent *e) override;
-
-public slots:
-    void handleButtonClick();
-    void handleAnimationFinished();
-
-private:
-    QList<AnimatedIconButton *> button_list;
-    QIcon ballIcons[BallColor::colors_num];
-
-};
-#endif // MAINWINDOW_H
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
+    return a.exec();
+}

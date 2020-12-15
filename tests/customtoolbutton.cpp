@@ -20,38 +20,29 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#define QT_NO_DEBUG_OUTPUT
 
-#include <QWidget>
-#include <QList>
-#include <QBoxLayout>
-#include <QIcon>
+#include <QDebug>
+#include <QResizeEvent>
+#include "customtoolbutton.h"
 
-#include "../basic_defs.hpp"
-#include "../animatediconbutton.h"
-
-
-class MainWindow : public QWidget
+CustomToolButton::CustomToolButton(QWidget *parent)
+    : QToolButton(parent)
+    , hintSize(QSize(80,80))
 {
-    Q_OBJECT
+    setMinimumSize(QSize(40,40));
+    setMaximumSize(QSize(400,400));
+}
 
-public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow() override;
+QSize CustomToolButton::sizeHint() const
+{
+    qDebug() << "CustomToolButton::sizeHint: " << hintSize;
+    return hintSize;
+}
 
-    void setupLayout(QBoxLayout::Direction dir);
+void CustomToolButton::resizeEvent(QResizeEvent * event)
+{
+    qDebug() << "CustomToolButton::resizeEvent: " << event->size();
 
-protected:
-    void resizeEvent(QResizeEvent *e) override;
-
-public slots:
-    void handleButtonClick();
-    void handleAnimationFinished();
-
-private:
-    QList<AnimatedIconButton *> button_list;
-    QIcon ballIcons[BallColor::colors_num];
-
-};
-#endif // MAINWINDOW_H
+    QToolButton::resizeEvent(event);
+}

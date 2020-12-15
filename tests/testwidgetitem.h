@@ -20,38 +20,32 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef TESTWIDGETITEM_H
+#define TESTWIDGETITEM_H
 
-#include <QWidget>
-#include <QList>
-#include <QBoxLayout>
-#include <QIcon>
+#include <QWidgetItem>
 
-#include "../basic_defs.hpp"
-#include "../animatediconbutton.h"
+class TradeForSizeItem;
 
-
-class MainWindow : public QWidget
+class TestWidgetItem : public QLayoutItem
 {
-    Q_OBJECT
-
 public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow() override;
+    TestWidgetItem(QLayout *l, TradeForSizeItem *item = nullptr);
+    ~TestWidgetItem() override = default;
 
-    void setupLayout(QBoxLayout::Direction dir);
+    QSize sizeHint() const override;
+    QSize minimumSize() const override;
+    QSize maximumSize() const override;
+    Qt::Orientations expandingDirections() const override;
+    bool isEmpty() const override;
+    void setGeometry(const QRect&) override;
+    QRect geometry() const override;
+    void addCentralWidget(QWidget *widget);
 
 protected:
-    void resizeEvent(QResizeEvent *e) override;
-
-public slots:
-    void handleButtonClick();
-    void handleAnimationFinished();
-
-private:
-    QList<AnimatedIconButton *> button_list;
-    QIcon ballIcons[BallColor::colors_num];
-
+    //QList<QLayoutItem *> list;
+    TradeForSizeItem *centralItem;
+    QLayout *layout;
 };
-#endif // MAINWINDOW_H
+
+#endif // TESTWIDGETITEM_H

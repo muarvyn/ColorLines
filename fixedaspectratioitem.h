@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018 Volodymyr Kryachko
+Copyright (C) 2018-2020 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -29,7 +29,15 @@ along with ColorLines; see the file COPYING.  If not, see
 class FixedAspectRatioItem : public QWidgetItem
 {
 public:
-    FixedAspectRatioItem();
+    FixedAspectRatioItem(QWidget *widget, double s = 1.0);
+    ~FixedAspectRatioItem() override = default;
+
+    virtual bool hasHeightForWidth() const override;
+    int heightForWidth(int w) const override;
+    void setGeometry(const QRect &rect) override;
+
+private:
+    double scale;
 };
 
 class FixedAspectRatioLayout : public QLayout

@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018 Volodymyr Kryachko
+Copyright (C) 2018-2020 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -58,7 +58,7 @@ protected:
 
 private:
     virtual int heightForWidth( int w ) const override;
-    virtual bool hasHeightForWidth() const override { return true; }
+    virtual bool hasHeightForWidth() const override { return false; }
 };
 
 #endif // CELLBUTTON_H

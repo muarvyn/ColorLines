@@ -24,12 +24,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #define MAINWINDOW_H
 
 #include <QWidget>
-#include <QList>
-#include <QBoxLayout>
-#include <QIcon>
 
-#include "../basic_defs.hpp"
-#include "../animatediconbutton.h"
 
 
 class MainWindow : public QWidget
@@ -40,18 +35,6 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
-    void setupLayout(QBoxLayout::Direction dir);
-
-protected:
-    void resizeEvent(QResizeEvent *e) override;
-
-public slots:
-    void handleButtonClick();
-    void handleAnimationFinished();
-
-private:
-    QList<AnimatedIconButton *> button_list;
-    QIcon ballIcons[BallColor::colors_num];
 
 };
 #endif // MAINWINDOW_H

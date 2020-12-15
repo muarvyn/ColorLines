@@ -20,38 +20,25 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef CUSTOMTOOLBUTTON_H
+#define CUSTOMTOOLBUTTON_H
 
-#include <QWidget>
-#include <QList>
-#include <QBoxLayout>
-#include <QIcon>
+#include <QToolButton>
 
-#include "../basic_defs.hpp"
-#include "../animatediconbutton.h"
-
-
-class MainWindow : public QWidget
+class CustomToolButton : public QToolButton
 {
     Q_OBJECT
-
 public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow() override;
+    explicit CustomToolButton(QWidget *parent = nullptr);
 
-    void setupLayout(QBoxLayout::Direction dir);
+    QSize sizeHint() const override;
 
 protected:
-    void resizeEvent(QResizeEvent *e) override;
-
-public slots:
-    void handleButtonClick();
-    void handleAnimationFinished();
+    void resizeEvent(QResizeEvent * event) override;
 
 private:
-    QList<AnimatedIconButton *> button_list;
-    QIcon ballIcons[BallColor::colors_num];
+    QSize hintSize;
 
 };
-#endif // MAINWINDOW_H
+
+#endif // CUSTOMTOOLBUTTON_H

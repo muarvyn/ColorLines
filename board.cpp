@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018 Volodymyr Kryachko
+Copyright (C) 2018-2020 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -27,8 +27,6 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "animatediconbutton.h"
 #include "board.h"
 #include "dijkstra_search.hpp"
-
-ColorCell::~ColorCell() {}
 
 BoardInterface::~BoardInterface() {}
 

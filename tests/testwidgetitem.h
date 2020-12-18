@@ -40,6 +40,9 @@ public:
     bool isEmpty() const override;
     void setGeometry(const QRect&) override;
     QRect geometry() const override;
+    void setCentralWidget(QWidget *widget);
+    QLayoutItem *getCentralItem();
+
     void addCentralWidget(QWidget *widget);
 
 protected:

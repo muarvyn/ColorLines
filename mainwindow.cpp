@@ -44,26 +44,13 @@ MainWindow::MainWindow(QWidget *parent)
     restoreGeometry(load_settings.value("geometry").toByteArray());
     restoreState(load_settings.value("windowState").toByteArray());
 
-    QGridLayout *grid_layout = new QGridLayout();
-    QGridLayout *editTB_layout = new QGridLayout();
+    setupLayout(QBoxLayout::TopToBottom);
 
-    FixedAspectRatioLayout * square_layout = new FixedAspectRatioLayout();
-    QWidget * dull_widget = new QWidget();
-    square_layout->addWidget(dull_widget);
-    dull_widget->setLayout(grid_layout);
-
-    gridControl = new CellGridControl(BoardDim::ROWS_NUM, BoardDim::COLUMNS_NUM, grid_layout, this);
-    editToolbar = new CellGridControl(BallColor::colors_num, 1, editTB_layout, this);
     boardControl = new BoardControl(gridControl);
     gameControl = new GameControl(gridControl, this);
     connect(gridControl, &CellGridControl::userInput, boardControl, &BoardControl::handleClicked);
     connect(boardControl, &BoardControl::spawnAnimationFinished, this, &MainWindow::finalizeSpawn);
     connect(boardControl, &BoardControl::moveFinished, this, &MainWindow::handleMove);
-
-    QHBoxLayout * hbox = qobject_cast<QHBoxLayout*>(ui->centralRowLayout);
-    hbox->addLayout(editTB_layout);
-    hbox->setAlignment(editTB_layout, Qt::AlignRight | Qt::AlignVCenter);
-    hbox->addLayout(square_layout);
 
     spawnColorLabels[0] = ui->nextColor1;
     spawnColorLabels[1] = ui->nextColor2;
@@ -90,6 +77,37 @@ MainWindow::MainWindow(QWidget *parent)
     if (balls_num < SPAWN_BALLS_NUM) {
         QTimer::singleShot(600, this, &MainWindow::makeSpawn);
     }
+}
+
+void MainWindow::setupLayout(QBoxLayout::Direction dir)
+{
+    QGridLayout *grid_layout = new QGridLayout();
+    QGridLayout *editTB_layout = new QGridLayout();
+
+    FixedAspectRatioLayout * square_layout = new FixedAspectRatioLayout();
+    QWidget * dull_widget = new QWidget();
+    square_layout->addWidget(dull_widget);
+    dull_widget->setLayout(grid_layout);
+
+    gridControl = new CellGridControl(BoardDim::ROWS_NUM, BoardDim::COLUMNS_NUM, grid_layout, this);
+    int rows;
+    int columns;
+    Qt::Alignment al;
+    if (dir == QBoxLayout::TopToBottom) {
+        rows = 1;
+        columns = BallColor::colors_num;
+        al = Qt::AlignCenter;
+    } else {
+        rows = BallColor::colors_num;
+        columns = 1;
+        al = Qt::AlignRight | Qt::AlignVCenter;
+    }
+    editToolbar = new CellGridControl(rows, columns, editTB_layout, this);
+
+    QVBoxLayout *vbox = qobject_cast<QVBoxLayout*>(ui->mainLayout);
+    vbox->addLayout(square_layout);
+    vbox->addLayout(editTB_layout);
+    vbox->setAlignment(editTB_layout, al);
 }
 
 void MainWindow::handleMove(const BoardInfo::cell_location &loc)
@@ -174,7 +192,8 @@ void MainWindow::on_actionEdit_toggled(bool isEditMode)
     if (isEditMode && !editControl) {
         disconnect(gridControl, &CellGridControl::userInput,
                     boardControl, &BoardControl::handleClicked);
-        editControl = new EditModeControl(gridControl, editToolbar);
+        ColorCell::LineIterator iter(0,0,0,1);
+        editControl = new EditModeControl(gridControl, editToolbar, iter);
     }
     else if(!isEditMode && editControl) {
         delete editControl;

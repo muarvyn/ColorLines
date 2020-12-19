@@ -12,8 +12,11 @@ class EditModeControl : public QObject
 {
     Q_OBJECT
 public:
-    explicit EditModeControl(CellGridControl *board, CellGridControl *toolbar, QObject *parent = nullptr);
-    ~EditModeControl();
+    explicit EditModeControl(CellGridControl *board,
+                             CellGridControl *toolbar,
+                             ColorCell::LineIterator line,
+                             QObject *parent = nullptr);
+    ~EditModeControl() override;
 
 signals:
 

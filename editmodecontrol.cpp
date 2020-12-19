@@ -2,13 +2,16 @@
 #include "animatediconbutton.h"
 #include "editmodecontrol.h"
 
-EditModeControl::EditModeControl(CellGridControl *board, CellGridControl *toolbar, QObject *parent)
+EditModeControl::EditModeControl(CellGridControl *board,
+                                 CellGridControl *toolbar,
+                                 ColorCell::LineIterator line,
+                                 QObject *parent)
     : QObject(parent)
     , board(board)
     , toolbar(toolbar)
 {
-    for (BallColor::type c=BallColor::first; c<=BallColor::last; ++c) {
-        toolbar->setColorAt(static_cast<int>(c), 0, c);
+    for (BallColor::type c=BallColor::first; c<=BallColor::last; ++c, ++line) {
+        toolbar->setColorAt(line.row, line.column, c);
     }
     board->hideAnimation();
     CellButton *selectedCell = toolbar->getCells()[0][0];

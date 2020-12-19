@@ -46,6 +46,23 @@ public:
     virtual BallColor::type getColor() const = 0;
     virtual void setColor(BallColor::type color) = 0;
     virtual ~ColorCell() = default;
+
+    struct LineIterator {
+        LineIterator(int r, int c, int ri, int ci)
+            : row_inc(ri)
+            , column_inc(ci)
+            , row(r)
+            , column(c)
+        {}
+        int row_inc;
+        int column_inc;
+        int row;
+        int column;
+        void operator ++() {
+            row += row_inc;
+            column += column_inc;
+        }
+    };
 };
 
 class BoardInterface

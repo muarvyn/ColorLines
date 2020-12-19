@@ -23,6 +23,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QBoxLayout>
 #include <QMainWindow>
 
 #include "boardinfo.h"
@@ -46,7 +47,8 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    ~MainWindow() override;
+    void setupLayout(QBoxLayout::Direction dir);
 
 private slots:
     void handleMove(const BoardInfo::cell_location &loc);
@@ -58,7 +60,7 @@ private slots:
     void on_actionNew_triggered();
     void on_actionEdit_toggled(bool isEditMode);
     void on_actionHighest_scores_triggered();
-    void closeEvent(QCloseEvent *event);
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     Ui::MainWindow *ui;

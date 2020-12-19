@@ -21,11 +21,7 @@ along with ColorLines; see the file COPYING.  If not, see
 */
 
 #include "basic_defs.hpp"
-/*
-ColorCell::~ColorCell()
-{
-}
-*/
+
 void operator++(BallColor::type& c)
 {
     c=static_cast<BallColor::type>(c+1);

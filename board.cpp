@@ -28,7 +28,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "board.h"
 #include "dijkstra_search.hpp"
 
-ColorCell::~ColorCell() {}
+//ColorCell::~ColorCell() {}
 
 BoardInterface::~BoardInterface() {}
 

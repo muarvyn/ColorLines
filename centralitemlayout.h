@@ -71,7 +71,8 @@ void CentralItemLayout<T>::addCentralWidget(QWidget *widget)
     if (centralItem) return;
 
     T::addWidget(widget);
-    QLayoutItem *item = T::itemAt(T::count()-1);
+    QLayoutItem *item = T::takeAt(T::count()-1);
+    assert(item->widget() == widget);
     centralItem = new TradeForSizeItem(item);
     T::addItem(centralItem);
 }

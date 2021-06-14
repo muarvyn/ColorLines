@@ -24,7 +24,6 @@ along with ColorLines; see the file COPYING.  If not, see
 #include <QDebug>
 
 #include "mainwindow_test.h"
-#include "ui_mainwindow_test.h"
 #include "../basic_defs.hpp"
 #include "../fixedaspectratioitem.h"
 

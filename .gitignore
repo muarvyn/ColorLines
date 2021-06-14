@@ -38,6 +38,7 @@
 
 # Build directories
 build
+build-*
 Release
 Debug
 

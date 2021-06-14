@@ -24,7 +24,6 @@ along with ColorLines; see the file COPYING.  If not, see
 #include <QLayout>
 #include <QWidget>
 
-#include "fixedaspectratioitem.h"
 #include "centralitemlayout.h"
 
 
@@ -57,6 +56,7 @@ QSize TradeForSizeItem::minimumSize() const
 
 QSize TradeForSizeItem::maximumSize() const
 {
+    qDebug() << "TradeForSizeItem::maximumSize:" << item->maximumSize();
     return item->maximumSize();
 }
 
@@ -67,24 +67,27 @@ QRect TradeForSizeItem::geometry() const
 
 void TradeForSizeItem::setGeometry(const QRect &rect)
 {
-    qDebug() << "FixedAspectRatioItem::setGeometry of object" << this << "rect:" << rect << "\n";
-    QSize size = rect.size().boundedTo(QSize(rect.height(), rect.width()));
+    qDebug() << "TradeForSizeItem::setGeometry of object" << this << "rect:" << rect;
+    QSize size = assigned;
     QPoint origin = rect.topLeft();
-    origin += QPoint((rect.width()-size.width())/2, (rect.height()-size.height())/2);
-    item->setGeometry(QRect(origin, size));
+    QPoint disp = QPoint(qMax(rect.width()-size.width(),0)/2, qMax(rect.height()-size.height(),0)/2);
+    qDebug() << "Origin displacement:" << disp;
+    origin += disp;
+    item->setGeometry(QRect(origin, size.boundedTo(rect.size())));
 }
 
 QSize TradeForSizeItem::tradeForSize(const QSize& s)
 {
     QSize trade = s;
-    trade.transpose();
-    return trade.boundedTo(s).expandedTo(QSize(80,80));
+    return trade.boundedTo(item->maximumSize());
 }
 
 bool TradeForSizeItem::assignSize(const QSize s)
 {
     if (assigned == s) return false;
-    assigned = s;
+    QSize hint = s.boundedTo(item->maximumSize());
+    if (assigned == hint) return false;
+    assigned = hint;
     return true;
 }
 

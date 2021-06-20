@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2020 Volodymyr Kryachko
+Copyright (C) 2021 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -21,10 +21,8 @@ along with ColorLines; see the file COPYING.  If not, see
 */
 
 #include <QDebug>
-#include <QLayout>
-#include <QWidget>
 
-#include "centralitemlayout.h"
+#include "tradeforsizeitem.h"
 
 
 TradeForSizeItem::TradeForSizeItem(QLayoutItem *i, const QSize hs)

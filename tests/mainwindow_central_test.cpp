@@ -24,7 +24,6 @@ along with ColorLines; see the file COPYING.  If not, see
 
 #include "customtoolbutton.h"
 #include "mainwindow_layout_test.h"
-#include "../fixedaspectratioitem.h"
 #include "../centralitemlayout.h"
 
 

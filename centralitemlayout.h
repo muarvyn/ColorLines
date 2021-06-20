@@ -35,7 +35,7 @@ public:
     ~CentralItemLayout() override = default;
 
     void setGeometry(const QRect&) override;
-    void addCentralWidget(QWidget *widget);
+    void addCentralWidget(QWidget *widget, TradeForSizeItem *(*newItem)(QLayoutItem *));
     void addCentralLayout(QLayout *layout);
 
 protected:
@@ -43,17 +43,17 @@ protected:
 };
 
 template <typename T>
-void CentralItemLayout<T>::addCentralWidget(QWidget *widget)
+void CentralItemLayout<T>::addCentralWidget(QWidget *widget, TradeForSizeItem *(*newItem)(QLayoutItem *))
 {
     if (centralItem) return;
 
     T::addWidget(widget);
     QLayoutItem *item = T::takeAt(T::count()-1);
     assert(item->widget() == widget);
-    centralItem = new TradeForSizeItem(item);
+    centralItem = newItem(item);
     T::addItem(centralItem);
 }
-
+/*
 template <typename T>
 void CentralItemLayout<T>::addCentralLayout(QLayout *layout)
 {
@@ -64,7 +64,7 @@ void CentralItemLayout<T>::addCentralLayout(QLayout *layout)
     centralItem = new TradeForSizeItem(layout);
     T::addItem(centralItem);
 }
-
+*/
 template <typename T>
 void CentralItemLayout<T>::setGeometry(const QRect& rect)
 {

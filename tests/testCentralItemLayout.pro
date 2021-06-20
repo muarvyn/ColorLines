@@ -9,6 +9,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    ../fixedaspectratioitem2.cpp \
     ../tradeforsizeitem.cpp \
     customtoolbutton.cpp \
     main_central_test.cpp \
@@ -16,6 +17,7 @@ SOURCES += \
 
 HEADERS += \
     ../centralitemlayout.h \
+    ../fixedaspectratioitem2.h \
     ../tradeforsizeitem.h \
     customtoolbutton.h \
     mainwindow_central_test.h

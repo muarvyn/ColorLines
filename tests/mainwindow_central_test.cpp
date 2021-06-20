@@ -25,6 +25,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "customtoolbutton.h"
 #include "mainwindow_layout_test.h"
 #include "../centralitemlayout.h"
+#include "../fixedaspectratioitem2.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -43,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
     v_layout->setAlignment(btn, Qt::AlignHCenter | Qt::AlignBottom);
 
     btn = new CustomToolButton(this);
-    v_layout->addCentralWidget(btn);
+    v_layout->addCentralWidget(btn, [](QLayoutItem *i){ return (TradeForSizeItem*) new FixedAspectRatioItem(i); });
     //v_layout->setAlignment(btn, Qt::AlignCenter);
     //v_layout->setStretch(v_layout->count()-1, 100);
     btn = new CustomToolButton(this);

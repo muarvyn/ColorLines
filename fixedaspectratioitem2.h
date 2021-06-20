@@ -20,32 +20,25 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#ifndef TRADEFORSIZEITEM_H
-#define TRADEFORSIZEITEM_H
+#ifndef FIXEDASPECTRATIOITEM2_H
+#define FIXEDASPECTRATIOITEM2_H
 
-#include <QWidgetItem>
+#include "tradeforsizeitem.h"
 
 
-class TradeForSizeItem : public QLayoutItem
+class FixedAspectRatioItem : public TradeForSizeItem
 {
 public:
-    TradeForSizeItem(QLayoutItem *i, const QSize hs = QSize());
-    ~TradeForSizeItem() override = default;
+    FixedAspectRatioItem(QLayoutItem *i, const QSize hs = QSize());
+//    ~FixedAspectRatioItem() override = default;
 
-    QSize sizeHint() const override;
     QSize minimumSize() const override;
-    QSize maximumSize() const override;
-    Qt::Orientations expandingDirections() const override;
-    bool isEmpty() const override;
     void setGeometry(const QRect&) override;
-    QRect geometry() const override;
 
-    virtual QSize tradeForSize(const QSize& r);
-    virtual bool assignSize(const QSize s);
+    QSize tradeForSize(const QSize& r) override;
 
-protected:
-    QLayoutItem *item;
-    QSize assigned;
+private:
+    double scale;
 };
 
-#endif // TRADEFORSIZEITEM_H
+#endif // FIXEDASPECTRATIOITEM2_H

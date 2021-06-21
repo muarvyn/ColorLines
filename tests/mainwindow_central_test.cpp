@@ -27,24 +27,32 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "../centralitemlayout.h"
 #include "../fixedaspectratioitem2.h"
 
+TradeForSizeItem *newItem(QLayoutItem *i) {
+    TradeForSizeItem* tfsi = new FixedAspectRatioItem(i);
+    tfsi->assignSize(QSize(120,60));
+    return tfsi;
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
 {
     CentralItemLayout<QVBoxLayout> *v_layout = new CentralItemLayout<QVBoxLayout>();
 
-//    QSizePolicy size_policy = QSizePolicy(QSizePolicy::MinimumExpanding,
-//                                          QSizePolicy::MinimumExpanding,
-//                                          QSizePolicy::ToolButton);
+    QSizePolicy size_policy = QSizePolicy(QSizePolicy::Expanding,
+                                          QSizePolicy::MinimumExpanding,
+                                          QSizePolicy::DefaultType);
     v_layout->addStretch(1);
     QToolButton *btn = new CustomToolButton(this);
     btn->setArrowType(Qt::UpArrow);
+    btn->setSizePolicy(size_policy);
 
     v_layout->addWidget(btn);
     v_layout->setAlignment(btn, Qt::AlignHCenter | Qt::AlignBottom);
 
     btn = new CustomToolButton(this);
-    v_layout->addCentralWidget(btn, [](QLayoutItem *i){ return (TradeForSizeItem*) new FixedAspectRatioItem(i); });
+    btn->setSizePolicy(size_policy);
+    //v_layout->addCentralWidget(btn, [](QLayoutItem *i){ return (TradeForSizeItem*) new FixedAspectRatioItem(i); });
+    v_layout->addCentralWidget(btn, newItem);
     //v_layout->setAlignment(btn, Qt::AlignCenter);
     //v_layout->setStretch(v_layout->count()-1, 100);
     btn = new CustomToolButton(this);

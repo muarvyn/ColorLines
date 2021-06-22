@@ -25,7 +25,8 @@ along with ColorLines; see the file COPYING.  If not, see
 
 #include "mainwindow_test.h"
 #include "../basic_defs.hpp"
-#include "../fixedaspectratioitem.h"
+#include "../centralitemlayout.h"
+//#include "../fixedaspectratioitem2.h"
 
 int getColor(const AnimatedIconButton *btn)
 {
@@ -41,21 +42,24 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
     }
-    const QSizePolicy sp1(QSizePolicy::Expanding, QSizePolicy::Minimum);
-    const QSizePolicy sp2(QSizePolicy::Minimum, QSizePolicy::Minimum);
-//    const QSizePolicy sp1(QSizePolicy::Expanding, QSizePolicy::Preferred);
-//    const QSizePolicy sp2(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    const QSizePolicy sp1(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    //const QSizePolicy sp2(QSizePolicy::Minimum, QSizePolicy::Minimum);
     for (BallColor::type color=BallColor::first; color < BallColor::first+3; ++color) {
-        AnimatedIconButton *btn = new AnimatedIconButton(0,color,ballIcons);
+        AnimatedIconButton *btn = new AnimatedIconButton(0,color,ballIcons,this);
+        btn->setMaximumSize(QSize(80,80));
         btn->setColor(color);
+        btn->setSizePolicy(sp1);
+        /*
         if (color == BallColor::red) {
-            btn->setSizePolicy(sp1);
-        } else {
             btn->setSizePolicy(sp2);
-        }
+        } else {
+            btn->setSizePolicy(sp1);
+        }*/
         connect(btn, &AnimatedIconButton::clicked, this, &MainWindow::handleButtonClick);
         button_list.append(btn);
     }
+    button_list[1]->setMaximumSize(QSize(600,600));
+
     setupLayout(QBoxLayout::LeftToRight);
 }
 
@@ -100,6 +104,13 @@ MainWindow::~MainWindow()
 {
 }
 
+TradeForSizeItem *newItem(QLayoutItem *i) {
+    TradeForSizeItem* tfsi = new TradeForSizeItem(i, QSize(200,200));//new FixedAspectRatioItem(i);
+    //qDebug() << "newItem: maximumsize = " << tfsi->maximumSize();
+    tfsi->assignSize(QSize(160,160));
+    return tfsi;
+}
+
 void MainWindow::setupLayout(QBoxLayout::Direction dir)
 {
     if (layout()) {
@@ -107,14 +118,42 @@ void MainWindow::setupLayout(QBoxLayout::Direction dir)
         if (old_dir == dir) return;
         delete layout();
     }
-    QBoxLayout *box = new QBoxLayout(dir);
+    const Qt::Alignment alignment[2][3] = {
+        { Qt::AlignHCenter | Qt::AlignBottom, Qt::AlignCenter, Qt::AlignHCenter | Qt::AlignTop },
+        { Qt::AlignVCenter | Qt::AlignRight, Qt::AlignCenter, Qt::AlignVCenter | Qt::AlignLeft }
+    };
+    const Qt::Alignment *al;
+    CentralItemLayout<QBoxLayout> *box_layout = nullptr;
+    if (dir == QBoxLayout::LeftToRight) {
+        box_layout = (CentralItemLayout<QBoxLayout> *) new CentralItemLayout<QHBoxLayout>();
+        al = alignment[1];
+    } else {
+        box_layout = (CentralItemLayout<QBoxLayout> *) new CentralItemLayout<QVBoxLayout>();
+        al = alignment[0];
+    }
+
     int i = 0;
     for (AnimatedIconButton *btn : qAsConst(button_list)) {
-        if (++i != 2) {
-            box->addWidget(btn);
+        if (i != 1) {
+            box_layout->addWidget(btn);
+            box_layout->setAlignment(btn, al[i]);
         } else {
-            box->addItem(new FixedAspectRatioItem(btn));
+            //qDebug() << "MainWindow::setupLayout: btn->maximumSize = " << btn->maximumSize();
+            box_layout->addCentralWidget(btn, newItem);
+            //qDebug() << "MainWindow::setupLayout: maximumSize = "
+            //    << box_layout->itemAt(box_layout->count()-1)->maximumSize();
         }
+        i++;
     }
-    setLayout(box);
+    setLayout(box_layout);
+}
+
+#include <QApplication>
+
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
+    return a.exec();
 }

@@ -24,8 +24,9 @@ along with ColorLines; see the file COPYING.  If not, see
 #define MAINWINDOW_H
 
 #include <QWidget>
+#include <QBoxLayout>
 
-
+class CustomToolButton;
 
 class MainWindow : public QWidget
 {
@@ -34,6 +35,12 @@ class MainWindow : public QWidget
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
+    void setupLayout(QBoxLayout::Direction dir);
+
+protected:
+    void resizeEvent(QResizeEvent *e) override;
+
+    QList<CustomToolButton *> button_list;
 
 
 };

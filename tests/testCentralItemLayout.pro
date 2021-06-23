@@ -12,7 +12,6 @@ SOURCES += \
     ../fixedaspectratioitem2.cpp \
     ../tradeforsizeitem.cpp \
     customtoolbutton.cpp \
-    main_central_test.cpp \
     mainwindow_central_test.cpp
 
 HEADERS += \

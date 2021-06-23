@@ -23,50 +23,88 @@ along with ColorLines; see the file COPYING.  If not, see
 #include <QtWidgets>
 
 #include "customtoolbutton.h"
-#include "mainwindow_layout_test.h"
+#include "mainwindow_central_test.h"
 #include "../centralitemlayout.h"
 #include "../fixedaspectratioitem2.h"
 
 TradeForSizeItem *newItem(QLayoutItem *i) {
-    TradeForSizeItem* tfsi = new FixedAspectRatioItem(i);
-    tfsi->assignSize(QSize(120,60));
+    TradeForSizeItem* tfsi = new TradeForSizeItem(i); //new FixedAspectRatioItem(i);
+    tfsi->assignSize(QSize(120,120));
     return tfsi;
 }
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
 {
-    CentralItemLayout<QVBoxLayout> *v_layout = new CentralItemLayout<QVBoxLayout>();
+    const QSizePolicy sp1(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    for (int i = 0; i < 3; ++i) {
+        CustomToolButton *btn = new CustomToolButton(this);
+        btn->setMaximumSize(QSize(80,80));
+        btn->setSizePolicy(sp1);
+        button_list.append(btn);
+    }
+    button_list[1]->setMaximumSize(QSize(600,600));
+    button_list[0]->setArrowType(Qt::UpArrow);
+    button_list[2]->setArrowType(Qt::DownArrow);
 
-    QSizePolicy size_policy = QSizePolicy(QSizePolicy::Expanding,
-                                          QSizePolicy::MinimumExpanding,
-                                          QSizePolicy::DefaultType);
-    v_layout->addStretch(1);
-    QToolButton *btn = new CustomToolButton(this);
-    btn->setArrowType(Qt::UpArrow);
-    btn->setSizePolicy(size_policy);
-
-    v_layout->addWidget(btn);
-    v_layout->setAlignment(btn, Qt::AlignHCenter | Qt::AlignBottom);
-
-    btn = new CustomToolButton(this);
-    btn->setSizePolicy(size_policy);
-    //v_layout->addCentralWidget(btn, [](QLayoutItem *i){ return (TradeForSizeItem*) new FixedAspectRatioItem(i); });
-    v_layout->addCentralWidget(btn, newItem);
-    //v_layout->setAlignment(btn, Qt::AlignCenter);
-    //v_layout->setStretch(v_layout->count()-1, 100);
-    btn = new CustomToolButton(this);
-    btn->setArrowType(Qt::DownArrow);
-
-    v_layout->addWidget(btn);
-    v_layout->setAlignment(btn, Qt::AlignHCenter | Qt::AlignTop);
-
-    v_layout->addStretch(1);
-
-    setLayout(v_layout);
+    setupLayout(QBoxLayout::LeftToRight);
 }
 
 MainWindow::~MainWindow()
 {
 }
 
+void MainWindow::resizeEvent(QResizeEvent *e)
+{
+    QBoxLayout::Direction dir = e->size().width() > e->size().height() ?
+        QBoxLayout::LeftToRight : QBoxLayout::TopToBottom;
+    setupLayout(dir);
+    QWidget::resizeEvent(e);
+}
+
+void MainWindow::setupLayout(QBoxLayout::Direction dir)
+{
+    if (layout()) {
+        QBoxLayout::Direction old_dir = qobject_cast<QBoxLayout *>(layout())->direction();
+        if (old_dir == dir) return;
+        delete layout();
+    }
+    const Qt::Alignment alignment[2][3] = {
+        { Qt::AlignHCenter | Qt::AlignBottom, Qt::AlignCenter, Qt::AlignHCenter | Qt::AlignTop },
+        { Qt::AlignVCenter | Qt::AlignRight, Qt::AlignCenter, Qt::AlignVCenter | Qt::AlignLeft }
+    };
+    const Qt::Alignment *al;
+    CentralItemLayout<QBoxLayout> *box_layout = nullptr;
+    if (dir == QBoxLayout::LeftToRight) {
+        box_layout = (CentralItemLayout<QBoxLayout> *) new CentralItemLayout<QHBoxLayout>();
+        al = alignment[1];
+    } else {
+        box_layout = (CentralItemLayout<QBoxLayout> *) new CentralItemLayout<QVBoxLayout>();
+        al = alignment[0];
+    }
+
+    int i = 0;
+    for (CustomToolButton *btn : qAsConst(button_list)) {
+        if (i != 1) {
+            box_layout->addWidget(btn);
+            box_layout->setAlignment(btn, al[i]);
+        } else {
+            //qDebug() << "MainWindow::setupLayout: btn->maximumSize = " << btn->maximumSize();
+            box_layout->addCentralWidget(btn, newItem);
+            //qDebug() << "MainWindow::setupLayout: maximumSize = "
+            //    << box_layout->itemAt(box_layout->count()-1)->maximumSize();
+        }
+        i++;
+    }
+    setLayout(box_layout);
+}
+
+#include <QApplication>
+
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
+    return a.exec();
+}

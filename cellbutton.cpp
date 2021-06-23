@@ -29,17 +29,13 @@ CellButton::CellButton(int r, int c, QWidget *parent)
     , column(c)
     , state(-1)
 {
-    QSizePolicy policy;
-    policy.setControlType(QSizePolicy::ToolButton);
-    policy.setHorizontalPolicy(QSizePolicy::Preferred);
-    policy.setVerticalPolicy(QSizePolicy::Preferred);
-    policy.setHeightForWidth(true);
-    setSizePolicy(policy);
+    setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+    setMinimumSize(QSize(40,40));
 }
 
 QSize CellButton::sizeHint() const
 {
-    return QSize(40,40);
+    return minimumSize()*2;
 }
 
 int CellButton::heightForWidth( int w ) const

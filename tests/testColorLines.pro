@@ -18,6 +18,7 @@ SOURCES += \
     ../basic_defs.cpp
 
 HEADERS += \
+    ../centralitemlayout.h \
     ../fixedaspectratioitem2.h \
     ../tradeforsizeitem.h \
     mainwindow_test.h \

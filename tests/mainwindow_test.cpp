@@ -26,7 +26,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "mainwindow_test.h"
 #include "../basic_defs.hpp"
 #include "../centralitemlayout.h"
-//#include "../fixedaspectratioitem2.h"
+#include "../fixedaspectratioitem2.h"
 
 int getColor(const AnimatedIconButton *btn)
 {
@@ -42,19 +42,10 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
     }
-    const QSizePolicy sp1(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    //const QSizePolicy sp2(QSizePolicy::Minimum, QSizePolicy::Minimum);
     for (BallColor::type color=BallColor::first; color < BallColor::first+3; ++color) {
         AnimatedIconButton *btn = new AnimatedIconButton(0,color,ballIcons,this);
         btn->setMaximumSize(QSize(80,80));
         btn->setColor(color);
-        btn->setSizePolicy(sp1);
-        /*
-        if (color == BallColor::red) {
-            btn->setSizePolicy(sp2);
-        } else {
-            btn->setSizePolicy(sp1);
-        }*/
         connect(btn, &AnimatedIconButton::clicked, this, &MainWindow::handleButtonClick);
         button_list.append(btn);
     }
@@ -105,7 +96,7 @@ MainWindow::~MainWindow()
 }
 
 TradeForSizeItem *newItem(QLayoutItem *i) {
-    TradeForSizeItem* tfsi = new TradeForSizeItem(i, QSize(200,200));//new FixedAspectRatioItem(i);
+    TradeForSizeItem* tfsi = new FixedAspectRatioItem(i);
     //qDebug() << "newItem: maximumsize = " << tfsi->maximumSize();
     tfsi->assignSize(QSize(160,160));
     return tfsi;
@@ -136,13 +127,13 @@ void MainWindow::setupLayout(QBoxLayout::Direction dir)
     for (AnimatedIconButton *btn : qAsConst(button_list)) {
         if (i != 1) {
             box_layout->addWidget(btn);
-            box_layout->setAlignment(btn, al[i]);
         } else {
             //qDebug() << "MainWindow::setupLayout: btn->maximumSize = " << btn->maximumSize();
             box_layout->addCentralWidget(btn, newItem);
             //qDebug() << "MainWindow::setupLayout: maximumSize = "
             //    << box_layout->itemAt(box_layout->count()-1)->maximumSize();
         }
+        box_layout->setAlignment(btn, al[i]);
         i++;
     }
     setLayout(box_layout);

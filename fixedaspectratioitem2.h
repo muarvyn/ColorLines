@@ -33,12 +33,16 @@ public:
 //    ~FixedAspectRatioItem() override = default;
 
     QSize minimumSize() const override;
+    QSize maximumSize() const override;
     void setGeometry(const QRect&) override;
 
     QSize tradeForSize(const QSize& r) override;
 
 private:
     double scale;
+    inline QSize adjustSize(QSize size) const {
+        return size.boundedTo(QSize(qIntCast(size.height()/scale), qIntCast(size.width()*scale)));
+    }
 };
 
 #endif // FIXEDASPECTRATIOITEM2_H

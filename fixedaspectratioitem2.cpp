@@ -38,15 +38,19 @@ QSize FixedAspectRatioItem::minimumSize() const
                                     qIntCast(minsize.width()*scale)));
 }
 
+QSize FixedAspectRatioItem::maximumSize() const
+{
+    return assigned.boundedTo(item->maximumSize());
+}
+
+
 void FixedAspectRatioItem::setGeometry(const QRect &rect)
 {
-    QSize size = item->geometry().size();
-    size = rect.size().boundedTo(
-        QSize(qIntCast(rect.height()/scale), qIntCast(rect.width()*scale)));
+    QSize size = adjustSize(rect.size());
     QPoint origin = rect.topLeft();
     origin += QPoint((rect.width()-size.width())/2, (rect.height()-size.height())/2);
 
-    qDebug() << "FixedAspectRatioItem::setGeometry final size:" << size;
+    qDebug() << "FixedAspectRatioItem::setGeometry final size,origin:" << size << origin ;
     item->setGeometry(QRect(origin, size));
 }
 

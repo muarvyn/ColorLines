@@ -25,9 +25,9 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "fixedaspectratioitem2.h"
 
 
-FixedAspectRatioItem::FixedAspectRatioItem(QLayoutItem *i, const QSize hs)
+FixedAspectRatioItem::FixedAspectRatioItem(QLayoutItem *i, float s, const QSize hs)
     : TradeForSizeItem(i, hs)
-    , scale(0.5)
+    , scale(s)
 {
 }
 

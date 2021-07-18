@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2020 Volodymyr Kryachko
+Copyright (C) 2020-2021 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -24,57 +24,37 @@ along with ColorLines; see the file COPYING.  If not, see
 
 #include "customtoolbutton.h"
 #include "mainwindow_layout_test.h"
-#include "../fixedaspectratioitem.h"
+#include "../fixedaspectratioitem2.h"
 #include "../centralitemlayout.h"
 
+TradeForSizeItem *newItem(QLayoutItem *i) {
+    TradeForSizeItem* tfsi = new FixedAspectRatioItem(i, 1.0f);
+    tfsi->assignSize(QSize(120,120));
+    return tfsi;
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
 {
+    QGridLayout *toolbar_layout = new QGridLayout();
+    for (int i = 0; i < 3; ++i) {
+        CustomToolButton *btn = new CustomToolButton(this);
+        btn->setText(QString::number(i+1));
+        btn->setMaximumSize(QSize(80,80));
+        toolbutton_list.append(btn);
+        toolbar_layout->addWidget(btn, 0, i);
+    }
+
     CentralItemLayout<QVBoxLayout> *v_layout = new CentralItemLayout<QVBoxLayout>();
 
-    QHBoxLayout *h_layout = new QHBoxLayout();
-    //h_layout->setDirection(QBoxLayout::LeftToRight);
-    QSizePolicy size_policy = QSizePolicy(QSizePolicy::Maximum,
-                                          QSizePolicy::Maximum,
-                                          QSizePolicy::ToolButton);
-//    QSizePolicy size_policy = QSizePolicy(QSizePolicy::MinimumExpanding,
-//                                          QSizePolicy::MinimumExpanding,
-//                                          QSizePolicy::ToolButton);
-    QSizePolicy size_policy_central = QSizePolicy(QSizePolicy::MinimumExpanding,
-                                          QSizePolicy::MinimumExpanding,
-                                          QSizePolicy::ToolButton);
-    h_layout->addStretch(1);
+    v_layout->addLayout(toolbar_layout);
+    v_layout->setAlignment(toolbar_layout, Qt::AlignBottom | Qt::AlignHCenter);
     QToolButton *btn = new CustomToolButton(this);
-    btn->setArrowType(Qt::LeftArrow);
-    btn->setSizePolicy(size_policy);
-    h_layout->addItem(new FixedAspectRatioItem(btn));
-    h_layout->setStretch(h_layout->count()-1,10);
+    btn->setMaximumSize(QSize(400,400));
+    v_layout->addCentralWidget(btn, newItem);
 
-    btn = new CustomToolButton(this);
-    btn->setSizePolicy(size_policy_central);
-    h_layout->addItem(new FixedAspectRatioItem(btn));
-    h_layout->setStretch(h_layout->count()-1,100);
-
-    btn = new CustomToolButton(this);
-    btn->setSizePolicy(size_policy);
-    btn->setArrowType(Qt::RightArrow);
-
-    h_layout->addItem(new FixedAspectRatioItem(btn));
-    h_layout->setStretch(h_layout->count()-1,10);
-    h_layout->addStretch(1);
-
-    v_layout->addStretch(1);
-    btn = new CustomToolButton(this);
-    btn->setArrowType(Qt::UpArrow);
-
-    v_layout->addWidget(btn);
-    v_layout->setAlignment(btn, Qt::AlignHCenter | Qt::AlignBottom);
-    v_layout->addCentralLayout(h_layout);
-    //v_layout->setStretch(v_layout->count()-1, 100);
     btn = new CustomToolButton(this);
     btn->setArrowType(Qt::DownArrow);
-
     v_layout->addWidget(btn);
     v_layout->setAlignment(btn, Qt::AlignHCenter | Qt::AlignTop);
 
@@ -87,3 +67,12 @@ MainWindow::~MainWindow()
 {
 }
 
+#include <QApplication>
+
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
+    return a.exec();
+}

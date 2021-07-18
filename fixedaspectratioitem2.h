@@ -29,7 +29,7 @@ along with ColorLines; see the file COPYING.  If not, see
 class FixedAspectRatioItem : public TradeForSizeItem
 {
 public:
-    FixedAspectRatioItem(QLayoutItem *i, const QSize hs = QSize());
+    FixedAspectRatioItem(QLayoutItem *i, float s=0.5f, const QSize hs = QSize());
 //    ~FixedAspectRatioItem() override = default;
 
     QSize minimumSize() const override;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2020 Volodymyr Kryachko
+Copyright (C) 2020-2021 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -20,12 +20,12 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef MAINWINDOW_LAYOUT_TEST_H
+#define MAINWINDOW_LAYOUT_TEST_H
 
 #include <QWidget>
 
-
+class CustomToolButton;
 
 class MainWindow : public QWidget
 {
@@ -35,6 +35,8 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
+protected:
+    QList<CustomToolButton *> toolbutton_list;
 
 };
-#endif // MAINWINDOW_H
+#endif // MAINWINDOW_LAYOUT_TEST_H

@@ -29,16 +29,18 @@ class SwapLayout : public QGridLayout
 {
     Q_OBJECT
 public:
-    SwapLayout(QWidget *parent = nullptr);
+    enum Orientation { Horizontal, Vertical, Swapped };
+
+    SwapLayout(Orientation o = Vertical, QWidget *parent = nullptr);
 
     void addItem(QLayoutItem *item) override;
-    //void addWidget(QWidget *widget);
+    void addLayout(QLayout *item);
 
-    Qt::Orientation swap();
-    Qt::Orientation orientation() { return ori; };
+    Orientation orientation() { return ori; };
+    void setOrientation(Orientation);
 
 protected:
-    Qt::Orientation ori;
+    Orientation ori;
 };
 
 #endif // SWAPLAYOUT_H

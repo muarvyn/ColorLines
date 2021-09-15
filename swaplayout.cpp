@@ -23,30 +23,38 @@ along with ColorLines; see the file COPYING.  If not, see
 #include <QDebug>
 #include "swaplayout.h"
 
-SwapLayout::SwapLayout(QWidget *parent)
+SwapLayout::SwapLayout(Orientation o, QWidget *parent)
     : QGridLayout(parent)
-    , ori(Qt::Vertical)
+    , ori(o == Vertical ? Vertical : Horizontal)
 {
 
 }
 
 void SwapLayout::addItem(QLayoutItem *item)
 {
-    int inc_r = int(ori == Qt::Vertical), inc_c = int(ori == Qt::Horizontal);
+    int inc_r = int(ori == Vertical), inc_c = int(ori == Horizontal);
     int r = inc_r*count(), c = inc_c*count();
     QGridLayout::addItem(item, r, c);
 }
 
-Qt::Orientation SwapLayout::swap()
+void SwapLayout::addLayout(QLayout *item)
 {
+    int inc_r = int(ori == Vertical), inc_c = int(ori == Horizontal);
+    int r = inc_r*count(), c = inc_c*count();
+    QGridLayout::addLayout(item, r, c);
+}
+
+void SwapLayout::setOrientation(Orientation o)
+{
+    if (ori == o) return;
     setEnabled(false);
     QLayoutItem *item;
     QList<QLayoutItem*> list;
     while ((item = takeAt(1)) != nullptr) {
         list.append(item);
     }
-    ori = ori == Qt::Vertical ? Qt::Horizontal : Qt::Vertical;
-    int r=0, c=0, inc_r = int(ori == Qt::Vertical), inc_c = int(ori == Qt::Horizontal);
+    ori = ori == Vertical ? Horizontal : Vertical;
+    int r=0, c=0, inc_r = int(ori == Vertical), inc_c = int(ori == Horizontal);
     for(QLayoutItem *item : list) {
         r+=inc_r; c+=inc_c;
         QGridLayout::addItem(item, r, c);

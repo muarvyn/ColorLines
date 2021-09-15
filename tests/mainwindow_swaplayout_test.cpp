@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
 
 {
-    swap_grid = new SwapLayout(this);
+    swap_grid = new SwapLayout(SwapLayout::Vertical, this);
     setLayout(swap_grid);
     CustomToolButton *btn;
     for (int i = 0; i < 3; ++i) {
@@ -45,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::handleButtonClick()
 {
-    swap_grid->swap();
+    swap_grid->setOrientation(SwapLayout::Swapped);
 }
 
 MainWindow::~MainWindow()

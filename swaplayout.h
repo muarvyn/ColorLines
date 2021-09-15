@@ -1,0 +1,44 @@
+/*
+
+Copyright (C) 2021 Volodymyr Kryachko
+
+This file is part of ColorLines.
+
+ColorLines is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3 of the License, or (at your
+option) any later version.
+
+ColorLines is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with ColorLines; see the file COPYING.  If not, see
+<http://www.gnu.org/licenses/>.
+
+*/
+
+#ifndef SWAPLAYOUT_H
+#define SWAPLAYOUT_H
+
+#include <QGridLayout>
+
+class SwapLayout : public QGridLayout
+{
+    Q_OBJECT
+public:
+    SwapLayout(QWidget *parent = nullptr);
+
+    void addItem(QLayoutItem *item) override;
+    //void addWidget(QWidget *widget);
+
+    Qt::Orientation swap();
+    Qt::Orientation orientation() { return ori; };
+
+protected:
+    Qt::Orientation ori;
+};
+
+#endif // SWAPLAYOUT_H

@@ -25,42 +25,36 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "customtoolbutton.h"
 #include "mainwindow_layout_test.h"
 #include "../fixedaspectratioitem2.h"
-#include "../centralitemlayout.h"
-
-TradeForSizeItem *newItem(QLayoutItem *i) {
-    TradeForSizeItem* tfsi = new FixedAspectRatioItem(i, 1.0f);
-    tfsi->assignSize(QSize(120,120));
-    return tfsi;
-}
+#include "../swaplayout.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
+    , first_item(new SwapLayout(SwapLayout::Horizontal))
+    , last_item(new SwapLayout(SwapLayout::Horizontal))
+    , main_layout(new SwapLayout)
 {
-    QGridLayout *toolbar_layout = new QGridLayout();
+    first_item->addWidget(new QLabel("Hello"));
+    first_item->addWidget(new QLabel("World"));
     for (int i = 0; i < 3; ++i) {
         CustomToolButton *btn = new CustomToolButton(this);
         btn->setText(QString::number(i+1));
         btn->setMaximumSize(QSize(80,80));
-        toolbutton_list.append(btn);
-        toolbar_layout->addWidget(btn, 0, i);
+        last_item->addWidget(btn);
     }
-
-    CentralItemLayout<QVBoxLayout> *v_layout = new CentralItemLayout<QVBoxLayout>();
-
-    v_layout->addLayout(toolbar_layout);
-    v_layout->setAlignment(toolbar_layout, Qt::AlignBottom | Qt::AlignHCenter);
     QToolButton *btn = new CustomToolButton(this);
     btn->setMaximumSize(QSize(400,400));
-    v_layout->addCentralWidget(btn, newItem);
 
-    btn = new CustomToolButton(this);
-    btn->setArrowType(Qt::DownArrow);
-    v_layout->addWidget(btn);
-    v_layout->setAlignment(btn, Qt::AlignHCenter | Qt::AlignTop);
+    main_layout = new SwapLayout();
+    main_layout->addLayout(first_item);
+    main_layout->addWidget(btn);
+    connect(btn, &CustomToolButton::clicked, this, &MainWindow::handleButtonClick);
+    main_layout->addLayout(last_item);
+    setLayout(main_layout);
+}
 
-    v_layout->addStretch(1);
-
-    setLayout(v_layout);
+void MainWindow::handleButtonClick()
+{
+    main_layout->setOrientation(SwapLayout::Swapped);
 }
 
 MainWindow::~MainWindow()

@@ -26,6 +26,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #include <QWidget>
 
 class CustomToolButton;
+class SwapLayout;
 
 class MainWindow : public QWidget
 {
@@ -35,8 +36,12 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
+public slots:
+    void handleButtonClick();
+
 protected:
     QList<CustomToolButton *> toolbutton_list;
+    SwapLayout *first_item, *last_item, *main_layout;
 
 };
 #endif // MAINWINDOW_LAYOUT_TEST_H

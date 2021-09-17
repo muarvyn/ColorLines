@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2020-2021 Volodymyr Kryachko
+Copyright (C) 2021 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -20,30 +20,27 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#ifndef MAINWINDOW_LAYOUT_TEST_H
-#define MAINWINDOW_LAYOUT_TEST_H
+#include <QDebug>
+#include "swappablelayout.h"
 
-#include <QWidget>
-
-class CustomToolButton;
-class SwapLayout;
-class SwappableLayout;
-
-class MainWindow : public QWidget
+SwappableLayout::SwappableLayout(Orientation o, QWidget *parent)
+    : SwapLayout(o, parent)
 {
-    Q_OBJECT
 
-public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow() override;
+}
 
-public slots:
-    void handleButtonClick();
+void SwappableLayout::addLayout(QLayout *l)
+{
+    if (SwapLayout *swap = qobject_cast<SwapLayout *>(l)) {
+        swappables.append(swap);
+    }
+    SwapLayout::addLayout(l);
+}
 
-protected:
-    QList<CustomToolButton *> toolbutton_list;
-    SwapLayout *first_item, *last_item;
-    SwappableLayout *main_layout;
-
-};
-#endif // MAINWINDOW_LAYOUT_TEST_H
+void SwappableLayout::setOrientation(Orientation o)
+{
+    for (SwapLayout *l : swappables) {
+        l->setOrientation(o);
+    }
+    SwapLayout::setOrientation(o);
+}

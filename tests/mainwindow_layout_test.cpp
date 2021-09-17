@@ -25,13 +25,13 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "customtoolbutton.h"
 #include "mainwindow_layout_test.h"
 #include "../fixedaspectratioitem2.h"
-#include "../swaplayout.h"
+#include "../swappablelayout.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
     , first_item(new SwapLayout(SwapLayout::Horizontal))
     , last_item(new SwapLayout(SwapLayout::Horizontal))
-    , main_layout(new SwapLayout)
+    , main_layout(new SwappableLayout)
 {
     first_item->addWidget(new QLabel("Hello"));
     first_item->addWidget(new QLabel("World"));
@@ -44,7 +44,6 @@ MainWindow::MainWindow(QWidget *parent)
     QToolButton *btn = new CustomToolButton(this);
     btn->setMaximumSize(QSize(400,400));
 
-    main_layout = new SwapLayout();
     main_layout->addLayout(first_item);
     main_layout->addWidget(btn);
     connect(btn, &CustomToolButton::clicked, this, &MainWindow::handleButtonClick);

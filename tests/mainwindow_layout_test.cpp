@@ -27,19 +27,26 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "../fixedaspectratioitem2.h"
 #include "../swappablelayout.h"
 
+static const Qt::Alignment local_alignments[]=
+{
+    Qt::AlignRight|Qt::AlignBottom,
+    Qt::AlignCenter,
+    Qt::AlignLeft|Qt::AlignTop
+};
+
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
     , first_item(new SwapLayout(SwapLayout::Horizontal))
     , last_item(new SwapLayout(SwapLayout::Horizontal))
     , main_layout(new SwappableLayout)
 {
-    first_item->addWidget(new QLabel("Hello"));
-    first_item->addWidget(new QLabel("World"));
+    first_item->addWidget(new QLabel("Hello"), local_alignments[0]);
+    first_item->addWidget(new QLabel("World"), local_alignments[2]);
     for (int i = 0; i < 3; ++i) {
         CustomToolButton *btn = new CustomToolButton(this);
         btn->setText(QString::number(i+1));
         btn->setMaximumSize(QSize(80,80));
-        last_item->addWidget(btn);
+        last_item->addWidget(btn, local_alignments[i]);
     }
     QToolButton *btn = new CustomToolButton(this);
     btn->setMaximumSize(QSize(400,400));

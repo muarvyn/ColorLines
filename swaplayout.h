@@ -30,10 +30,12 @@ class SwapLayout : public QGridLayout
     Q_OBJECT
 public:
     enum Orientation { Horizontal, Vertical, Swapped };
+    static const Qt::Alignment default_policy[];
 
     SwapLayout(Orientation o = Vertical, QWidget *parent = nullptr);
 
     void addItem(QLayoutItem *item) override;
+    void addWidget(QWidget *, Qt::Alignment = Qt::Alignment());
     void addLayout(QLayout *item);
 
     Orientation orientation() { return ori; };
@@ -41,6 +43,7 @@ public:
 
 protected:
     Orientation ori;
+    const Qt::Alignment *alignment_policy;
 };
 
 #endif // SWAPLAYOUT_H

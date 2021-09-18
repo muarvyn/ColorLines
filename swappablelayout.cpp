@@ -39,8 +39,12 @@ void SwappableLayout::addLayout(QLayout *l)
 
 void SwappableLayout::setOrientation(Orientation o)
 {
-    for (SwapLayout *l : swappables) {
-        l->setOrientation(o);
-    }
     SwapLayout::setOrientation(o);
+
+    for (int i=0; i<swappables.count(); ++i) {
+        SwapLayout *l = swappables[i];
+        l->setOrientation(o);
+        //qDebug() << "SwappableLayout::setOrientation. Item " << i << ": alignment is " <<
+        //            QString("%1").arg(l->alignment(), 10, 2);
+    }
 }

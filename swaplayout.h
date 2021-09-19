@@ -44,6 +44,10 @@ public:
 protected:
     Orientation ori;
     const Qt::Alignment *alignment_policy;
+    QList<SwapLayout*> swappables;
+
+private:
+    QPair<int, int> nextPosition();
 };
 
 #endif // SWAPLAYOUT_H

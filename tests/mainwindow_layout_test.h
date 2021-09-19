@@ -43,7 +43,7 @@ public slots:
 protected:
     QList<CustomToolButton *> toolbutton_list;
     SwapLayout *first_item, *last_item;
-    SwappableLayout *main_layout;
+    SwapLayout *main_layout;
 
 };
 #endif // MAINWINDOW_LAYOUT_TEST_H

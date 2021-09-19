@@ -10,13 +10,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     ../swaplayout.cpp \
-    ../swappablelayout.cpp \
     customtoolbutton.cpp \
     mainwindow_layout_test.cpp
 
 HEADERS += \
     ../swaplayout.h \
-    ../swappablelayout.h \
     customtoolbutton.h \
     mainwindow_layout_test.h
 

@@ -39,25 +39,30 @@ SwapLayout::SwapLayout(Orientation o, QWidget *parent)
 
 }
 
+QPair<int, int> SwapLayout::nextPosition() {
+    int inc_r = int(ori == Vertical), inc_c = int(ori == Horizontal);
+    return qMakePair( inc_r*count(), inc_c*count());
+}
+
 void SwapLayout::addItem(QLayoutItem *item)
 {
-    int inc_r = int(ori == Vertical), inc_c = int(ori == Horizontal);
-    int r = inc_r*count(), c = inc_c*count();
-    QGridLayout::addItem(item, r, c);
+    auto rc = nextPosition();
+    QGridLayout::addItem(item, rc.first, rc.second);
 }
 
 void SwapLayout::addWidget(QWidget *w, Qt::Alignment a)
 {
-    int inc_r = int(ori == Vertical), inc_c = int(ori == Horizontal);
-    int r = inc_r*count(), c = inc_c*count();
-    QGridLayout::addWidget(w, r, c, a);
+    auto rc = nextPosition();
+    QGridLayout::addWidget(w, rc.first, rc.second, a);
 }
 
 void SwapLayout::addLayout(QLayout *item)
 {
-    int inc_r = int(ori == Vertical), inc_c = int(ori == Horizontal);
-    int r = inc_r*count(), c = inc_c*count();
-    QGridLayout::addLayout(item, r, c);
+    if (SwapLayout *swap = qobject_cast<SwapLayout *>(item)) {
+        swappables.append(swap);
+    }
+    auto rc = nextPosition();
+    QGridLayout::addLayout(item, rc.first, rc.second);
 }
 
 void SwapLayout::setOrientation(Orientation o)
@@ -91,6 +96,13 @@ void SwapLayout::setOrientation(Orientation o)
         Qt::Alignment loca = alignment_policy[qMax(1,i-list.count()+3)] & local_mask;
         QGridLayout::addItem(item, r, c, 1, 1, loca);
         qDebug() << QString("%1").arg(loca, 10, 2);
+    }
+
+    for (int i=0; i<swappables.count(); ++i) {
+        SwapLayout *l = swappables[i];
+        l->setOrientation(o);
+        //qDebug() << "SwappableLayout::setOrientation. Item " << i << ": alignment is " <<
+        //            QString("%1").arg(l->alignment(), 10, 2);
     }
     setEnabled(true);
 }

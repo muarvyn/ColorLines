@@ -25,7 +25,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "customtoolbutton.h"
 #include "mainwindow_layout_test.h"
 #include "../fixedaspectratioitem2.h"
-#include "../swappablelayout.h"
+#include "../swaplayout.h"
 
 static const Qt::Alignment local_alignments[]=
 {
@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
     , first_item(new SwapLayout(SwapLayout::Horizontal))
     , last_item(new SwapLayout(SwapLayout::Horizontal))
-    , main_layout(new SwappableLayout)
+    , main_layout(new SwapLayout(SwapLayout::Vertical))
 {
     first_item->addWidget(new QLabel("Hello"), local_alignments[0]);
     first_item->addWidget(new QLabel("World"), local_alignments[2]);

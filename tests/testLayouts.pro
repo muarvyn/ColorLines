@@ -15,6 +15,7 @@ SOURCES += \
 
 HEADERS += \
     ../swaplayout.h \
+    ../swappablelayout.h \
     customtoolbutton.h \
     mainwindow_layout_test.h
 

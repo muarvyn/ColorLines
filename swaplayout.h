@@ -23,13 +23,23 @@ along with ColorLines; see the file COPYING.  If not, see
 #ifndef SWAPLAYOUT_H
 #define SWAPLAYOUT_H
 
+#include "swappablelayout.h"
+
 #include <QGridLayout>
 
-class SwapLayout : public QGridLayout
+
+class SwappableGridLayout : public SwappableLayout<QGridLayout> {
+    Q_OBJECT
+public:
+    SwappableGridLayout(Orientation o = Vertical, QWidget *parent = nullptr)
+        : SwappableLayout<QGridLayout>(o, parent)
+    {};
+};
+
+class SwapLayout : public SwappableGridLayout
 {
     Q_OBJECT
 public:
-    enum Orientation { Horizontal, Vertical, Swapped };
     static const Qt::Alignment default_policy[];
 
     SwapLayout(Orientation o = Vertical, QWidget *parent = nullptr);
@@ -38,16 +48,15 @@ public:
     void addWidget(QWidget *, Qt::Alignment = Qt::Alignment());
     void addLayout(QLayout *item);
 
-    Orientation orientation() { return ori; };
-    void setOrientation(Orientation);
+    void setOrientation(Orientation) override;
 
 protected:
-    Orientation ori;
     const Qt::Alignment *alignment_policy;
-    QList<SwapLayout*> swappables;
+    QList<SwappableLayout*> swappables;
 
 private:
     QPair<int, int> nextPosition();
 };
+
 
 #endif // SWAPLAYOUT_H

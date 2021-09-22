@@ -32,8 +32,7 @@ const Qt::Alignment SwapLayout::default_policy[]=
 
 
 SwapLayout::SwapLayout(Orientation o, QWidget *parent)
-    : QGridLayout(parent)
-    , ori(o == Vertical ? Vertical : Horizontal)
+    : SwappableGridLayout(o , parent)
     , alignment_policy(default_policy)
 {
 
@@ -58,7 +57,7 @@ void SwapLayout::addWidget(QWidget *w, Qt::Alignment a)
 
 void SwapLayout::addLayout(QLayout *item)
 {
-    if (SwapLayout *swap = qobject_cast<SwapLayout *>(item)) {
+    if (SwappableGridLayout *swap = qobject_cast<SwappableGridLayout *>(item)) {
         swappables.append(swap);
     }
     auto rc = nextPosition();
@@ -99,7 +98,7 @@ void SwapLayout::setOrientation(Orientation o)
     }
 
     for (int i=0; i<swappables.count(); ++i) {
-        SwapLayout *l = swappables[i];
+        SwappableLayout *l = swappables[i];
         l->setOrientation(o);
         //qDebug() << "SwappableLayout::setOrientation. Item " << i << ": alignment is " <<
         //            QString("%1").arg(l->alignment(), 10, 2);

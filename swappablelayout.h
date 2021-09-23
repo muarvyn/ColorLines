@@ -25,18 +25,16 @@ along with ColorLines; see the file COPYING.  If not, see
 
 class QWidget;
 
-template <typename T>
-class SwappableLayout : public T
+class SwappableLayout
 {
 public:
     enum Orientation { Horizontal, Vertical, Swapped };
     //static const Qt::Alignment default_policy[];
 
-    SwappableLayout(Orientation o = Vertical, QWidget *parent = nullptr)
-        : T(parent)
-        , ori(o == Vertical ? Vertical : Horizontal) {};
+    SwappableLayout(Orientation o = Vertical)
+        : ori(o == Vertical ? Vertical : Horizontal) {};
 
-    Orientation orientation() const;
+    Orientation orientation() const   { return ori; };
     virtual void setOrientation(Orientation) = 0;
 
 protected:
@@ -44,9 +42,6 @@ protected:
 
 };
 
-template <typename T>
-typename SwappableLayout<T>::Orientation SwappableLayout<T>::orientation() const
-{ return ori; };
 
 
 #endif // SWAPPABLELAYOUT_H

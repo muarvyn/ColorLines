@@ -36,9 +36,9 @@ static const Qt::Alignment local_alignments[]=
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
-    , first_item(new SwapLayout(SwappableGridLayout::Horizontal))
-    , last_item(new SwapLayout(SwappableGridLayout::Horizontal))
-    , main_layout(new SwapLayout(SwappableGridLayout::Vertical))
+    , first_item(new SwapLayout(SwappableLayout::Horizontal))
+    , last_item(new SwapLayout(SwappableLayout::Horizontal))
+    , main_layout(new SwapLayout(SwappableLayout::Vertical))
 {
     first_item->addWidget(new QLabel("Hello"), local_alignments[0]);
     first_item->addWidget(new QLabel("World"), local_alignments[2]);

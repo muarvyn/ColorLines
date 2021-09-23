@@ -32,7 +32,8 @@ const Qt::Alignment SwapLayout::default_policy[]=
 
 
 SwapLayout::SwapLayout(Orientation o, QWidget *parent)
-    : SwappableGridLayout(o , parent)
+    : QGridLayout(parent)
+    , SwappableLayout(o)
     , alignment_policy(default_policy)
 {
 
@@ -57,7 +58,7 @@ void SwapLayout::addWidget(QWidget *w, Qt::Alignment a)
 
 void SwapLayout::addLayout(QLayout *item)
 {
-    if (SwappableGridLayout *swap = qobject_cast<SwappableGridLayout *>(item)) {
+    if (SwappableLayout *swap = dynamic_cast<SwappableLayout *>(item)) {
         swappables.append(swap);
     }
     auto rc = nextPosition();
@@ -80,7 +81,7 @@ void SwapLayout::setOrientation(Orientation o)
     }
 
     QLayoutItem *item = itemAt(0);
-    item->setAlignment(alignment_policy[0] & local_mask | alignment() & ext_mask);
+    item->setAlignment((alignment_policy[0] & local_mask) | (alignment() & ext_mask));
     qDebug() << "SwapLayout::setOrientation. item 0 alignment: " <<
                 QString("%1").arg(alignment_policy[0] & local_mask, 10, 2);
     QList<QLayoutItem*> list;

@@ -28,15 +28,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #include <QGridLayout>
 
 
-class SwappableGridLayout : public SwappableLayout<QGridLayout> {
-    Q_OBJECT
-public:
-    SwappableGridLayout(Orientation o = Vertical, QWidget *parent = nullptr)
-        : SwappableLayout<QGridLayout>(o, parent)
-    {};
-};
-
-class SwapLayout : public SwappableGridLayout
+class SwapLayout : public QGridLayout, public SwappableLayout
 {
     Q_OBJECT
 public:

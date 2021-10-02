@@ -1,5 +1,5 @@
 QT       += core gui widgets
-TARGET = testLayouts
+TARGET = testSwapLayout
 TEMPLATE = app
 CONFIG += c++11
 DEFINES += QT_DEPRECATED_WARNINGS

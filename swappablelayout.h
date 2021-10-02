@@ -23,6 +23,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #ifndef SWAPPABLELAYOUT_H
 #define SWAPPABLELAYOUT_H
 
+#include <QSize>
 class QWidget;
 
 class SwappableLayout
@@ -36,6 +37,7 @@ public:
 
     Orientation orientation() const   { return ori; };
     virtual void setOrientation(Orientation) = 0;
+    virtual QSize sizeHint(Orientation) const = 0;
 
 protected:
     Orientation ori;

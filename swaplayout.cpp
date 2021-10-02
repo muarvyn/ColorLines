@@ -106,3 +106,8 @@ void SwapLayout::setOrientation(Orientation o)
     }
     setEnabled(true);
 }
+
+QSize SwapLayout::sizeHint(SwappableLayout::Orientation o) const
+{
+    return QGridLayout::sizeHint();
+}

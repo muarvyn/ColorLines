@@ -41,6 +41,7 @@ public:
     void addLayout(QLayout *item);
 
     void setOrientation(Orientation) override;
+    QSize sizeHint(Orientation) const override;
 
 protected:
     const Qt::Alignment *alignment_policy;

@@ -23,8 +23,8 @@ along with ColorLines; see the file COPYING.  If not, see
 #include <QtWidgets>
 
 #include "customtoolbutton.h"
-#include "mainwindow_central_test.h"
-#include "../centralitemlayout.h"
+#include "mainwindow_fixed_test.h"
+#include "../intermediateitemlayout.h"
 #include "../fixedaspectratioitem2.h"
 
 TradeForSizeItem *newItem(QLayoutItem *i) {
@@ -37,65 +37,39 @@ MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
 {
     const QSizePolicy sp1(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    const QString name[3] = {"up", "center", "down"};
+
     for (int i = 0; i < 3; ++i) {
         CustomToolButton *btn = new CustomToolButton(this);
+        btn->setObjectName(name[i]);
         btn->setMaximumSize(QSize(80,80));
         btn->setSizePolicy(sp1);
         button_list.append(btn);
     }
-    button_list[1]->setMaximumSize(QSize(600,600));
     button_list[0]->setArrowType(Qt::UpArrow);
     button_list[2]->setArrowType(Qt::DownArrow);
 
-    setupLayout(QBoxLayout::LeftToRight);
+    setupLayout();
 }
 
 MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::resizeEvent(QResizeEvent *e)
+void MainWindow::setupLayout()
 {
-    QBoxLayout::Direction dir = e->size().width() > e->size().height() ?
-        QBoxLayout::LeftToRight : QBoxLayout::TopToBottom;
-    setupLayout(dir);
-    QWidget::resizeEvent(e);
-}
+    const Qt::Alignment al[3] =
+        { Qt::AlignVCenter | Qt::AlignRight, Qt::AlignCenter, Qt::AlignVCenter | Qt::AlignLeft };
+    IntermediateItemLayout<QBoxLayout> *box_layout = new IntermediateItemLayout<QBoxLayout>();
 
-void MainWindow::setupLayout(QBoxLayout::Direction dir)
-{
-    if (layout()) {
-        QBoxLayout::Direction old_dir = qobject_cast<QBoxLayout *>(layout())->direction();
-        if (old_dir == dir) return;
-        delete layout();
-    }
-    const Qt::Alignment alignment[2][3] = {
-        { Qt::AlignHCenter | Qt::AlignBottom, Qt::AlignCenter, Qt::AlignHCenter | Qt::AlignTop },
-        { Qt::AlignVCenter | Qt::AlignRight, Qt::AlignCenter, Qt::AlignVCenter | Qt::AlignLeft }
-    };
-    const Qt::Alignment *al;
-    CentralItemLayout<QBoxLayout> *box_layout = nullptr;
-    if (dir == QBoxLayout::LeftToRight) {
-        box_layout = (CentralItemLayout<QBoxLayout> *) new CentralItemLayout<QHBoxLayout>();
-        al = alignment[1];
-    } else {
-        box_layout = (CentralItemLayout<QBoxLayout> *) new CentralItemLayout<QVBoxLayout>();
-        al = alignment[0];
-    }
-
+    box_layout->addStretch(1);
     int i = 0;
     for (CustomToolButton *btn : qAsConst(button_list)) {
-        if (i != 1) {
-            box_layout->addWidget(btn);
-            box_layout->setAlignment(btn, al[i]);
-        } else {
-            //qDebug() << "MainWindow::setupLayout: btn->maximumSize = " << btn->maximumSize();
-            box_layout->addCentralWidget(btn, newItem);
-            //qDebug() << "MainWindow::setupLayout: maximumSize = "
-            //    << box_layout->itemAt(box_layout->count()-1)->maximumSize();
-        }
-        i++;
+        box_layout->addWidget(btn, newItem);
+        box_layout->setAlignment(btn, al[i]);
+        ++i;
     }
+    box_layout->addStretch(1);
     setLayout(box_layout);
 }
 

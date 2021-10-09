@@ -20,6 +20,7 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
+#include <QWidget>
 #include <QDebug>
 
 #include "tradeforsizeitem.h"
@@ -65,12 +66,23 @@ QRect TradeForSizeItem::geometry() const
 
 void TradeForSizeItem::setGeometry(const QRect &rect)
 {
-    qDebug() << "TradeForSizeItem::setGeometry of object" << this << "rect:" << rect;
+    qDebug() << "TradeForSizeItem::setGeometry of widget"
+             << this->item->widget()->objectName() << "; rect=" << rect;
+
     QSize size = assigned;
     QPoint origin = rect.topLeft();
     QPoint disp = QPoint(qMax(rect.width()-size.width(),0)/2, qMax(rect.height()-size.height(),0)/2);
-    qDebug() << "Origin displacement:" << disp;
+
     origin += disp;
+    if (assigned.width() > rect.size().width() || assigned.height() > rect.size().height()) {
+        invalidate();
+        assignSize(rect.size());
+        qDebug() << "TradeForSizeItem::setGeometry: invalidate.";
+        item->widget()->update();
+    } else {
+        assignSize(maximumSize());
+        qDebug() << "TradeForSizeItem::setGeometry: trade is ON.";
+    }
     item->setGeometry(QRect(origin, size.boundedTo(rect.size())));
 }
 

@@ -1,5 +1,5 @@
 QT       += core gui widgets
-TARGET = testCentralItemLayout
+TARGET = testFixedRatioLayout
 TEMPLATE = app
 CONFIG += c++11
 DEFINES += QT_DEPRECATED_WARNINGS
@@ -12,14 +12,14 @@ SOURCES += \
     ../fixedaspectratioitem2.cpp \
     ../tradeforsizeitem.cpp \
     customtoolbutton.cpp \
-    mainwindow_central_test.cpp
+    mainwindow_fixed_test.cpp
 
 HEADERS += \
-    ../centralitemlayout.h \
     ../fixedaspectratioitem2.h \
+    ../intermediateitemlayout.h \
     ../tradeforsizeitem.h \
     customtoolbutton.h \
-    mainwindow_central_test.h
+    mainwindow_fixed_test.h
 
 
 # Default rules for deployment.
@@ -28,6 +28,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
-    ../centralitemlayout.qmodel \
     ../testlayouts.qmodel
 

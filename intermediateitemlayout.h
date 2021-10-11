@@ -29,26 +29,46 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "tradeforsizeitem.h"
 
 
-
 template <typename T>
 class IntermediateItemLayout : public T
 {
 public:
-    IntermediateItemLayout() : T() { }
+    IntermediateItemLayout() : T(), dirty(false) { }
     ~IntermediateItemLayout() override = default;
 
-    void addWidget(QWidget *widget, TradeForSizeItem *(*newItem)(QLayoutItem *));
+    void setGeometry(const QRect&) override;
+    void addWidget(QWidget *widget,
+                   TradeForSizeItem *(*newItem)(QLayoutItem *,
+                                                TradeForSizeItem::InvalidateFunc));
+    void invalidateGeom() { dirty = true; };
+
+private:
+    bool dirty;
 
 };
 
 template <typename T>
-void IntermediateItemLayout<T>::addWidget(QWidget *widget, TradeForSizeItem *(*newItem)(QLayoutItem *))
+void IntermediateItemLayout<T>::addWidget(
+        QWidget *widget,
+        TradeForSizeItem *(*newItem)(QLayoutItem *, TradeForSizeItem::InvalidateFunc))
 {
     T::addWidget(widget);
     QLayoutItem *item = T::takeAt(T::count()-1);
     assert(item->widget() == widget);
-    TradeForSizeItem *new_item = newItem(item);
+    TradeForSizeItem *new_item = newItem(item, [this](void){ this->invalidateGeom(); });
     T::addItem(new_item);
+}
+
+template <typename T>
+void IntermediateItemLayout<T>::setGeometry(const QRect& rect)
+{
+    if (dirty) {
+        T::invalidate();
+        // TODO: protect from infinite loop
+        dirty = false;
+        qDebug() << "IntermediateItemLayout::setGeometry: invalidated";
+    }
+    T::setGeometry(rect);
 }
 
 template <>

@@ -25,11 +25,11 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "customtoolbutton.h"
 #include "mainwindow_fixed_test.h"
 #include "../intermediateitemlayout.h"
-#include "../fixedaspectratioitem2.h"
+#include "../aspectratioitem.h"
 
-TradeForSizeItem *newItem(QLayoutItem *i) {
-    TradeForSizeItem* tfsi = new TradeForSizeItem(i); //new FixedAspectRatioItem(i);
-    tfsi->assignSize(QSize(120,120));
+TradeForSizeItem *newItem(QLayoutItem *i, TradeForSizeItem::InvalidateFunc invalidate_func)
+{
+    TradeForSizeItem* tfsi = new AspectRatioItem(i, invalidate_func, 1.0, QSize(120,120));
     return tfsi;
 }
 

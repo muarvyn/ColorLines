@@ -23,13 +23,17 @@ along with ColorLines; see the file COPYING.  If not, see
 #ifndef TRADEFORSIZEITEM_H
 #define TRADEFORSIZEITEM_H
 
-#include <QWidgetItem>
-
+#include <QLayoutItem>
+#include <functional>
 
 class TradeForSizeItem : public QLayoutItem
 {
 public:
-    TradeForSizeItem(QLayoutItem *i, const QSize hs = QSize());
+    typedef std::function<void(void)> InvalidateFunc;
+
+    TradeForSizeItem(QLayoutItem *i,
+                     InvalidateFunc f,
+                     const QSize hs = QSize());
     ~TradeForSizeItem() override = default;
 
     QSize sizeHint() const override;
@@ -40,12 +44,14 @@ public:
     void setGeometry(const QRect&) override;
     QRect geometry() const override;
 
+    // TODO: remove obsoleted methods
     virtual QSize tradeForSize(const QSize& r);
     virtual bool assignSize(const QSize s);
 
 protected:
     QLayoutItem *item;
     QSize assigned;
+    InvalidateFunc invalidate_func;
 };
 
 #endif // TRADEFORSIZEITEM_H

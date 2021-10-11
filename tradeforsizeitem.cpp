@@ -21,14 +21,18 @@ along with ColorLines; see the file COPYING.  If not, see
 */
 
 #include <QWidget>
+#include <QLayout>
 #include <QDebug>
 
 #include "tradeforsizeitem.h"
 
 
-TradeForSizeItem::TradeForSizeItem(QLayoutItem *i, const QSize hs)
+TradeForSizeItem::TradeForSizeItem(QLayoutItem *i,
+                                   InvalidateFunc invalidate_func,
+                                   const QSize hs)
     : item(i)
     , assigned(hs)
+    , invalidate_func(invalidate_func)
 {
 }
 
@@ -75,12 +79,13 @@ void TradeForSizeItem::setGeometry(const QRect &rect)
 
     origin += disp;
     if (assigned.width() > rect.size().width() || assigned.height() > rect.size().height()) {
-        invalidate();
         assignSize(rect.size());
         qDebug() << "TradeForSizeItem::setGeometry: invalidate.";
-        item->widget()->update();
+        item->widget()->updateGeometry();
     } else {
-        assignSize(maximumSize());
+        if (assignSize(maximumSize()) && invalidate_func) {
+            invalidate_func();
+        }
         qDebug() << "TradeForSizeItem::setGeometry: trade is ON.";
     }
     item->setGeometry(QRect(origin, size.boundedTo(rect.size())));

@@ -36,7 +36,11 @@ public:
 
     SwapBoxLayout(Orientation o = Vertical, QWidget *parent = nullptr);
 
-    void addLayout(QLayout *item);
+    using QBoxLayout::addWidget;
+    using QBoxLayout::addLayout;
+    using QBoxLayout::sizeHint;
+
+    void addSwappable(QLayout *item);
 
     void setOrientation(Orientation) override;
     QSize sizeHint(Orientation) const override;

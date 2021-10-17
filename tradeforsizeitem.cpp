@@ -29,16 +29,20 @@ along with ColorLines; see the file COPYING.  If not, see
 
 TradeForSizeItem::TradeForSizeItem(QLayoutItem *i,
                                    InvalidateFunc invalidate_func,
-                                   const QSize hs)
+                                   const QSize hs,
+                                   QString n)
     : item(i)
     , assigned(hs)
     , invalidate_func(invalidate_func)
+    , name(n)
 {
 }
 
 QSize TradeForSizeItem::sizeHint() const
 {
-    qDebug() << "TradeForSizeItem::sizeHint: " << assigned;
+    bool dbg = !name.isEmpty();
+
+    if (dbg) qDebug() << name << "::sizeHint: " << assigned;
     return assigned;
 }
 
@@ -70,7 +74,9 @@ QRect TradeForSizeItem::geometry() const
 
 void TradeForSizeItem::setGeometry(const QRect &rect)
 {
-    qDebug() << "TradeForSizeItem::setGeometry of widget"
+    bool dbg = !name.isEmpty();
+
+    if (dbg) qDebug() << name << "::setGeometry of widget"
              << this->item->widget()->objectName() << "; rect=" << rect;
 
     QSize size = assigned;
@@ -80,13 +86,13 @@ void TradeForSizeItem::setGeometry(const QRect &rect)
     origin += disp;
     if (assigned.width() > rect.size().width() || assigned.height() > rect.size().height()) {
         assignSize(rect.size());
-        qDebug() << "TradeForSizeItem::setGeometry: invalidate.";
+        if (dbg) qDebug() << name << ": invalidate.";
         item->widget()->updateGeometry();
     } else {
         if (assignSize(maximumSize()) && invalidate_func) {
             invalidate_func();
         }
-        qDebug() << "TradeForSizeItem::setGeometry: trade is ON.";
+        if (dbg) qDebug()  << name << ": trade is ON.";
     }
     item->setGeometry(QRect(origin, size.boundedTo(rect.size())));
 }

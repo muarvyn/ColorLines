@@ -24,43 +24,70 @@ along with ColorLines; see the file COPYING.  If not, see
 
 #include "customtoolbutton.h"
 #include "mainwindow_layout_test.h"
-#include "../fixedaspectratioitem2.h"
-#include "../swaplayout.h"
+#include "../swapboxlayout.h"
+#include "../intermediateitemlayout.h"
+#include "../aspectratioitem.h"
 
-static const Qt::Alignment local_alignments[]=
+TradeForSizeItem *newItem(QLayoutItem *i, TradeForSizeItem::InvalidateFunc invalidate_func)
 {
-    Qt::AlignRight|Qt::AlignBottom,
-    Qt::AlignCenter,
-    Qt::AlignLeft|Qt::AlignTop
-};
+    TradeForSizeItem* tfsi = new AspectRatioItem(i, invalidate_func, 1.0, QSize(120,120));
+    return tfsi;
+}
+
+TradeForSizeItem *newItem2(QLayoutItem *i,
+                           TradeForSizeItem::InvalidateFunc invalidate_func,
+                           QString n)
+{
+    TradeForSizeItem* tfsi = new AspectRatioItem(i, invalidate_func, 1.0, QSize(120,120));
+    tfsi->setName(n);
+    return tfsi;
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
-    , first_item(new SwapLayout(SwappableLayout::Horizontal))
-    , last_item(new SwapLayout(SwappableLayout::Horizontal))
-    , main_layout(new SwapLayout(SwappableLayout::Vertical))
+    , first_item(new MainLayout(SwappableLayout::Horizontal))
+    , last_item(new MainLayout(SwappableLayout::Horizontal))
+    , main_layout(new MainLayout(SwappableLayout::Vertical))
 {
-    first_item->addWidget(new QLabel("Hello"), local_alignments[0]);
-    first_item->addWidget(new QLabel("World"), local_alignments[2]);
+    first_item->addStretch(1);
+    first_item->addWidget(new QLabel("Hello"));
+    first_item->addWidget(new QLabel("World"));
+    first_item->addStretch(1);
+
+    last_item->addStretch(1);
     for (int i = 0; i < 3; ++i) {
         CustomToolButton *btn = new CustomToolButton(this);
         btn->setText(QString::number(i+1));
-        btn->setMaximumSize(QSize(80,80));
-        last_item->addWidget(btn, local_alignments[i]);
+        last_item->addWidget(btn); //, newItem);
     }
+    last_item->addStretch(1);
+    last_item->setObjectName("toolbar");
     QToolButton *btn = new CustomToolButton(this);
     btn->setMaximumSize(QSize(400,400));
 
-    main_layout->addLayout(first_item);
-    main_layout->addWidget(btn);
+    main_layout->setEnabled(false);
+    main_layout->addStretch(1);
+    main_layout->addSwappable(first_item);
+    //btn->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    main_layout->addWidget(btn, newItem2, QString("Center"));
+    assert(main_layout->setStretchFactor(btn, 30));
+    // TODO: Why doesn't this work right?
+    // main_layout->addWidget(btn, Qt::AlignCenter);
     connect(btn, &CustomToolButton::clicked, this, &MainWindow::handleButtonClick);
-    main_layout->addLayout(last_item);
+    main_layout->addSwappable(last_item);
+    main_layout->setStretchFactor(last_item, 5);
+    main_layout->addStretch(1);
+    //main_layout->setObjectName("center");
+    //main_layout->setAlignment(Qt::AlignCenter);
+
     setLayout(main_layout);
+    main_layout->setEnabled(true);
+
 }
 
 void MainWindow::handleButtonClick()
 {
-    main_layout->setOrientation(SwapLayout::Swapped);
+    main_layout->setOrientation(SwappableLayout::Swapped);
 }
 
 MainWindow::~MainWindow()

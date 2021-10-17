@@ -31,7 +31,7 @@ CustomToolButton::CustomToolButton(QWidget *parent)
     , hintSize(QSize(80,80))
 {
     setMinimumSize(QSize(40,40));
-    setMaximumSize(QSize(1000,1000));
+    setMaximumSize(QSize(120,120));
 }
 
 QSize CustomToolButton::sizeHint() const

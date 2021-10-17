@@ -38,7 +38,7 @@ SwapBoxLayout::SwapBoxLayout(Orientation o, QWidget *parent)
 
 }
 
-void SwapBoxLayout::addLayout(QLayout *item)
+void SwapBoxLayout::addSwappable(QLayout *item)
 {
     if (SwappableLayout *swap = dynamic_cast<SwappableLayout *>(item)) {
         swappables.append(swap);

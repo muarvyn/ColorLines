@@ -33,7 +33,8 @@ public:
 
     TradeForSizeItem(QLayoutItem *i,
                      InvalidateFunc f,
-                     const QSize hs = QSize());
+                     const QSize hs = QSize(),
+                     QString n = "");
     ~TradeForSizeItem() override = default;
 
     QSize sizeHint() const override;
@@ -43,15 +44,18 @@ public:
     bool isEmpty() const override;
     void setGeometry(const QRect&) override;
     QRect geometry() const override;
+    QWidget *widget() override { return item->widget(); };
 
     // TODO: remove obsoleted methods
     virtual QSize tradeForSize(const QSize& r);
     virtual bool assignSize(const QSize s);
+    void setName(const QString &n) { name = n; };
 
 protected:
     QLayoutItem *item;
     QSize assigned;
     InvalidateFunc invalidate_func;
+    QString name;
 };
 
 #endif // TRADEFORSIZEITEM_H

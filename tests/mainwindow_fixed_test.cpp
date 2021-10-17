@@ -60,7 +60,8 @@ void MainWindow::setupLayout()
 {
     const Qt::Alignment al[3] =
         { Qt::AlignVCenter | Qt::AlignRight, Qt::AlignCenter, Qt::AlignVCenter | Qt::AlignLeft };
-    IntermediateItemLayout<QBoxLayout> *box_layout = new IntermediateItemLayout<QBoxLayout>();
+    IntermediateItemLayout<QBoxLayout> *box_layout =
+            new IntermediateItemLayout<QBoxLayout>(QBoxLayout::TopToBottom);
 
     box_layout->addStretch(1);
     int i = 0;

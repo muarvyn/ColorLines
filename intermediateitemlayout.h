@@ -34,12 +34,23 @@ class IntermediateItemLayout : public T
 {
 public:
     IntermediateItemLayout() : T(), dirty(false) { }
+    template <typename T1>
+    IntermediateItemLayout(T1 a1) : T(a1), dirty(false) { }
     ~IntermediateItemLayout() override = default;
 
     void setGeometry(const QRect&) override;
+
+    using T::addWidget;
     void addWidget(QWidget *widget,
                    TradeForSizeItem *(*newItem)(QLayoutItem *,
                                                 TradeForSizeItem::InvalidateFunc));
+    template <typename T1>
+    void addWidget(QWidget *widget,
+                   TradeForSizeItem *(*newItem)(QLayoutItem *,
+                                                TradeForSizeItem::InvalidateFunc,
+                                                T1 param),
+                   T1 param);
+
     void invalidateGeom() { dirty = true; };
 
 private:
@@ -60,21 +71,39 @@ void IntermediateItemLayout<T>::addWidget(
 }
 
 template <typename T>
+template <typename T1>
+void IntermediateItemLayout<T>::addWidget(
+        QWidget *widget,
+        TradeForSizeItem *(*newItem)(QLayoutItem *, TradeForSizeItem::InvalidateFunc, T1 param),
+        T1 param)
+{
+    T::addWidget(widget);
+    QLayoutItem *item = T::takeAt(T::count()-1);
+    assert(item->widget() == widget);
+    TradeForSizeItem *new_item = newItem(item, [this](void){ this->invalidateGeom(); }, param);
+    T::addItem(new_item);
+}
+
+template <typename T>
 void IntermediateItemLayout<T>::setGeometry(const QRect& rect)
 {
+    bool dbg = !T::objectName().isEmpty();
     if (dirty) {
         T::invalidate();
         // TODO: protect from infinite loop
         dirty = false;
-        qDebug() << "IntermediateItemLayout::setGeometry: invalidated";
+        if (dbg) {
+            qDebug() << "IntermediateItemLayout::setGeometry. " << T::objectName()
+                     << ": invalidated.";
+        }
     }
     T::setGeometry(rect);
+
+    if (dbg) {
+        qDebug() << "IntermediateItemLayout::setGeometry. " << T::objectName()
+                      << ": sizeHint = " << T::sizeHint();
+    }
 }
 
-template <>
-IntermediateItemLayout<QBoxLayout>::IntermediateItemLayout()
-    : QBoxLayout(QBoxLayout::LeftToRight)
-{
-}
 
 #endif // INTERMEDIATEITEMLAYOUT_H

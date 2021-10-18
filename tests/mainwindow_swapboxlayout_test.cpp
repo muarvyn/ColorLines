@@ -31,6 +31,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     const QString str[] = {"nothing", "switch", "swap"};
     SwapBoxLayout *swap_box = new SwapBoxLayout(SwappableLayout::Vertical, this);
+    swap_box->addStretch(1);
+    swap_box->setAlignment(Qt::AlignCenter);
     setLayout(swap_box);
     CustomToolButton *btn;
     for (int i = 0; i < 3; ++i) {
@@ -39,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
         btn->setMaximumSize(QSize(80,80));
         swap_box->addWidget(btn);
     }
+    swap_box->addStretch(1);
     connect(btn, &CustomToolButton::clicked, this, &MainWindow::swapLayout);
 }
 

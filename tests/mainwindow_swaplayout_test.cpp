@@ -24,7 +24,6 @@ along with ColorLines; see the file COPYING.  If not, see
 
 #include "customtoolbutton.h"
 #include "mainwindow_swaplayout_test.h"
-//#include "../fixedaspectratioitem2.h"
 #include "../swaplayout.h"
 
 MainWindow::MainWindow(QWidget *parent)

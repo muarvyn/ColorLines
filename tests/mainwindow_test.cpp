@@ -25,8 +25,8 @@ along with ColorLines; see the file COPYING.  If not, see
 
 #include "mainwindow_test.h"
 #include "../basic_defs.hpp"
-#include "../centralitemlayout.h"
-#include "../fixedaspectratioitem2.h"
+#include "../swapboxlayout.h"
+//#include "../intermediateitemlayout.h"
 
 int getColor(const AnimatedIconButton *btn)
 {
@@ -82,61 +82,44 @@ void MainWindow::handleAnimationFinished()
     qDebug() << "Button animation has finished. State is : " << senderButton->getState();
     qDebug() << "AnimatedIconButton::isAnimating returned " << senderButton->isAnimating();
 }
-
+/*
 void MainWindow::resizeEvent(QResizeEvent *e)
 {
     QBoxLayout::Direction dir = e->size().width() > e->size().height() ?
         QBoxLayout::LeftToRight : QBoxLayout::TopToBottom;
-    setupLayout(dir);
     QWidget::resizeEvent(e);
 }
-
+*/
 MainWindow::~MainWindow()
 {
 }
 
+/*
 TradeForSizeItem *newItem(QLayoutItem *i) {
     TradeForSizeItem* tfsi = new FixedAspectRatioItem(i);
     //qDebug() << "newItem: maximumsize = " << tfsi->maximumSize();
     tfsi->assignSize(QSize(160,160));
     return tfsi;
 }
+*/
 
 void MainWindow::setupLayout(QBoxLayout::Direction dir)
 {
-    if (layout()) {
-        QBoxLayout::Direction old_dir = qobject_cast<QBoxLayout *>(layout())->direction();
-        if (old_dir == dir) return;
-        delete layout();
-    }
-    const Qt::Alignment alignment[2][3] = {
-        { Qt::AlignHCenter | Qt::AlignBottom, Qt::AlignCenter, Qt::AlignHCenter | Qt::AlignTop },
-        { Qt::AlignVCenter | Qt::AlignRight, Qt::AlignCenter, Qt::AlignVCenter | Qt::AlignLeft }
-    };
-    const Qt::Alignment *al;
-    CentralItemLayout<QBoxLayout> *box_layout = nullptr;
-    if (dir == QBoxLayout::LeftToRight) {
-        box_layout = (CentralItemLayout<QBoxLayout> *) new CentralItemLayout<QHBoxLayout>();
-        al = alignment[1];
-    } else {
-        box_layout = (CentralItemLayout<QBoxLayout> *) new CentralItemLayout<QVBoxLayout>();
-        al = alignment[0];
-    }
+    const Qt::Alignment alignment[3] =
+        { Qt::AlignHCenter | Qt::AlignBottom, Qt::AlignCenter, Qt::AlignHCenter | Qt::AlignTop };
+
+    SwapBoxLayout *swap_box = new SwapBoxLayout(SwappableLayout::Vertical, this);
+    swap_box->addStretch(1);
+    swap_box->setAlignment(Qt::AlignCenter);
+    setLayout(swap_box);
 
     int i = 0;
     for (AnimatedIconButton *btn : qAsConst(button_list)) {
-        if (i != 1) {
-            box_layout->addWidget(btn);
-        } else {
-            //qDebug() << "MainWindow::setupLayout: btn->maximumSize = " << btn->maximumSize();
-            box_layout->addCentralWidget(btn, newItem);
-            //qDebug() << "MainWindow::setupLayout: maximumSize = "
-            //    << box_layout->itemAt(box_layout->count()-1)->maximumSize();
-        }
-        box_layout->setAlignment(btn, al[i]);
+        swap_box->addWidget(btn);
+        swap_box->setAlignment(btn, alignment[i]);
         i++;
     }
-    setLayout(box_layout);
+    setLayout(swap_box);
 }
 
 #include <QApplication>

@@ -43,7 +43,7 @@ public:
     void setupLayout(QBoxLayout::Direction dir);
 
 protected:
-    void resizeEvent(QResizeEvent *e) override;
+//    void resizeEvent(QResizeEvent *e) override;
 
 public slots:
     void handleButtonClick();

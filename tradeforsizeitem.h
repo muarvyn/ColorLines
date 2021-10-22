@@ -33,8 +33,7 @@ public:
 
     TradeForSizeItem(QLayoutItem *i,
                      InvalidateFunc f,
-                     const QSize hs = QSize(),
-                     QString n = "");
+                     const QSize hs = QSize());
     ~TradeForSizeItem() override = default;
 
     QSize sizeHint() const override;
@@ -49,13 +48,14 @@ public:
     // TODO: remove obsoleted methods
     virtual QSize tradeForSize(const QSize& r);
     virtual bool assignSize(const QSize s);
-    void setName(const QString &n) { name = n; };
 
 protected:
     QLayoutItem *item;
     QSize assigned;
     InvalidateFunc invalidate_func;
-    QString name;
+
+    static bool isTrade;
+    template <typename T> friend class TradeForSizeRoot;
 };
 
 #endif // TRADEFORSIZEITEM_H

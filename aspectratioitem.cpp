@@ -61,8 +61,8 @@ void AspectRatioItem::setGeometry(const QRect &rect)
 bool AspectRatioItem::assignSize(const QSize s)
 {
     if (assigned == s) return false;
-    QSize hint = s.boundedTo(item->maximumSize());
+    QSize hint = adjustSize( s.boundedTo( maximumSize()));
     if (assigned == hint) return false;
-    assigned = adjustSize(hint);
+    assigned = hint;
     return true;
 }

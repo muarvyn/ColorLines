@@ -24,7 +24,7 @@ along with ColorLines; see the file COPYING.  If not, see
 
 #include "customtoolbutton.h"
 #include "mainwindow_fixed_test.h"
-#include "../intermediateitemlayout.h"
+#include "../tradeforsizeroot.h"
 #include "../aspectratioitem.h"
 
 TradeForSizeItem *newItem(QLayoutItem *i, TradeForSizeItem::InvalidateFunc invalidate_func)
@@ -60,13 +60,14 @@ void MainWindow::setupLayout()
 {
     const Qt::Alignment al[3] =
         { Qt::AlignVCenter | Qt::AlignRight, Qt::AlignCenter, Qt::AlignVCenter | Qt::AlignLeft };
-    IntermediateItemLayout<QBoxLayout> *box_layout =
-            new IntermediateItemLayout<QBoxLayout>(QBoxLayout::TopToBottom);
+    TradeForSizeRoot<QBoxLayout> *box_layout =
+            new TradeForSizeRoot<QBoxLayout>(QBoxLayout::TopToBottom);
 
     box_layout->addStretch(1);
     int i = 0;
     for (CustomToolButton *btn : qAsConst(button_list)) {
-        box_layout->addWidget(btn, newItem);
+        box_layout->addWidget<TradeForSizeItem::InvalidateFunc>(
+                    btn, newItem, [box_layout](){ box_layout->invalidateGeom(); });
         box_layout->setAlignment(btn, al[i]);
         ++i;
     }

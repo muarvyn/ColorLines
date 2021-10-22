@@ -26,23 +26,23 @@ along with ColorLines; see the file COPYING.  If not, see
 
 #include "tradeforsizeitem.h"
 
+bool TradeForSizeItem::isTrade = true;
 
 TradeForSizeItem::TradeForSizeItem(QLayoutItem *i,
                                    InvalidateFunc invalidate_func,
-                                   const QSize hs,
-                                   QString n)
+                                   const QSize hs)
     : item(i)
     , assigned(hs)
     , invalidate_func(invalidate_func)
-    , name(n)
 {
 }
 
 QSize TradeForSizeItem::sizeHint() const
 {
-    bool dbg = !name.isEmpty();
-
-    if (dbg) qDebug() << name << "::sizeHint: " << assigned;
+    QString name = item->widget()->objectName();
+    if (!name.isEmpty())
+        qDebug() << "TradeForSizeItem::sizeHint - " << name << " :isTrade = " << isTrade;
+    if (isTrade) return maximumSize();
     return assigned;
 }
 
@@ -74,22 +74,21 @@ QRect TradeForSizeItem::geometry() const
 
 void TradeForSizeItem::setGeometry(const QRect &rect)
 {
+    QString name = item->widget()->objectName();
     bool dbg = !name.isEmpty();
 
-    if (dbg) qDebug() << name << "::setGeometry of widget"
-             << this->item->widget()->objectName() << "; rect=" << rect;
+    if (dbg) qDebug() << name << "::setGeometry: rect=" << rect;
 
     QSize size = assigned;
     QPoint origin = rect.topLeft();
     QPoint disp = QPoint(qMax(rect.width()-size.width(),0)/2, qMax(rect.height()-size.height(),0)/2);
 
     origin += disp;
-    if (assigned.width() > rect.size().width() || assigned.height() > rect.size().height()) {
-        assignSize(rect.size());
+    if (assignSize(rect.size())) {
         if (dbg) qDebug() << name << ": invalidate.";
         item->widget()->updateGeometry();
     } else {
-        if (assignSize(maximumSize()) && invalidate_func) {
+        if (invalidate_func) {
             invalidate_func();
         }
         if (dbg) qDebug()  << name << ": trade is ON.";
@@ -100,13 +99,13 @@ void TradeForSizeItem::setGeometry(const QRect &rect)
 QSize TradeForSizeItem::tradeForSize(const QSize& s)
 {
     QSize trade = s;
-    return trade.boundedTo(item->maximumSize());
+    return trade.boundedTo(maximumSize());
 }
 
 bool TradeForSizeItem::assignSize(const QSize s)
 {
     if (assigned == s) return false;
-    QSize hint = s.boundedTo(item->maximumSize());
+    QSize hint = s.boundedTo(maximumSize());
     if (assigned == hint) return false;
     assigned = hint;
     return true;

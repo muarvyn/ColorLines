@@ -18,6 +18,7 @@ HEADERS += \
     ../aspectratioitem.h \
     ../intermediateitemlayout.h \
     ../tradeforsizeitem.h \
+    ../tradeforsizeroot.h \
     customtoolbutton.h \
     mainwindow_fixed_test.h
 
@@ -27,6 +28,5 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-DISTFILES += \
-    ../testlayouts.qmodel
+DISTFILES +=
 

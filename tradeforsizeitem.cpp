@@ -21,7 +21,6 @@ along with ColorLines; see the file COPYING.  If not, see
 */
 
 #include <QWidget>
-#include <QLayout>
 #include <QDebug>
 
 #include "tradeforsizeitem.h"
@@ -84,7 +83,7 @@ void TradeForSizeItem::setGeometry(const QRect &rect)
     QPoint disp = QPoint(qMax(rect.width()-size.width(),0)/2, qMax(rect.height()-size.height(),0)/2);
 
     origin += disp;
-    if (assignSize(rect.size())) {
+    if (assignSize(rect.size()) || isTrade) {
         if (dbg) qDebug() << name << ": invalidate.";
         item->widget()->updateGeometry();
     } else {

@@ -29,32 +29,53 @@ along with ColorLines; see the file COPYING.  If not, see
 
 
 template <typename T>
-class TradeForSizeRoot : public IntermediateItemLayout<T>
+class TradeForSizeLayout : public IntermediateItemLayout<T>
+{
+public:
+    TradeForSizeLayout()
+        : IntermediateItemLayout<T>()
+        , dirty(true)
+    {}
+    template <typename T1>
+    TradeForSizeLayout(T1 a1)
+        : IntermediateItemLayout<T>(a1)
+        , dirty(true)
+    {}
+    ~TradeForSizeLayout() = default;
+
+    void setGeometry(const QRect& rect) override {
+        if (dirty /*&& TradeForSizeItem::isTrade*/) { T::invalidate(); dirty = false; }
+        T::setGeometry(rect);
+    }
+    void invalidateGeom() {
+        dirty = true;
+    }
+
+protected:
+    bool dirty;
+};
+
+
+template <typename T>
+class TradeForSizeRoot : public TradeForSizeLayout<T>
 {
 public:
     TradeForSizeRoot()
-        : IntermediateItemLayout<T>()
-        , dirty(true)
+        : TradeForSizeLayout<T>()
         , size(QSize())
         , call_i(0)
     {}
     template <typename T1>
     TradeForSizeRoot(T1 a1)
-        : IntermediateItemLayout<T>(a1)
-        , dirty(true)
+        : TradeForSizeLayout<T>(a1)
         , size(QSize())
         , call_i(0)
     {}
     ~TradeForSizeRoot() = default;
 
-    void invalidateGeom() {
-        dirty = true;
-    }
-
     void setGeometry(const QRect& rect) override;
 
 private:
-    bool dirty;
     QSize size;
     int call_i;
 };
@@ -71,7 +92,7 @@ void TradeForSizeRoot<T>::setGeometry(const QRect& rect)
         TradeForSizeItem::isTrade = true;
         T::setGeometry(rect);
         TradeForSizeItem::isTrade = false;
-        if (dirty) {
+        if (TradeForSizeLayout<T>::dirty) {
             T::invalidate();
             qDebug() << "TradeForSizeRoot::setGeometry. Second call setGeometry";
             T::setGeometry(rect);
@@ -80,7 +101,7 @@ void TradeForSizeRoot<T>::setGeometry(const QRect& rect)
         T::setGeometry(rect);
     }
     size = rect.size();
-    dirty = false;
+    TradeForSizeLayout<T>::dirty = false;
     ++call_i;
     qDebug() << "TradeForSizeRoot::setGeometry. -->>Exit; size = " << size;
 

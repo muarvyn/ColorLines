@@ -56,6 +56,7 @@ protected:
 
     static bool isTrade;
     template <typename T> friend class TradeForSizeRoot;
+    template <typename T> friend class TradeForSizeLayout;
 };
 
 #endif // TRADEFORSIZEITEM_H

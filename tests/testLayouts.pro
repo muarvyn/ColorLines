@@ -21,6 +21,7 @@ HEADERS += \
     ../swapboxlayout.h \
     ../swappablelayout.h \
     ../tradeforsizeitem.h \
+    ../tradeforsizeroot.h \
     customtoolbutton.h \
     mainwindow_layout_test.h
 

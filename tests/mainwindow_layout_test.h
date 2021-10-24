@@ -28,15 +28,15 @@ along with ColorLines; see the file COPYING.  If not, see
 class CustomToolButton;
 class SwapBoxLayout;
 template <typename T>
-class IntermediateItemLayout;
+class TradeForSizeLayout;
+template <typename T>
+class TradeForSizeRoot;
 
 class MainWindow : public QWidget
 {
     Q_OBJECT
 
 public:
-    typedef IntermediateItemLayout<SwapBoxLayout> MainLayout;
-
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
@@ -45,8 +45,9 @@ public slots:
 
 protected:
     QList<CustomToolButton *> toolbutton_list;
-    MainLayout *first_item, *last_item;
-    MainLayout *main_layout;
+    SwapBoxLayout *first_item;
+    TradeForSizeLayout<SwapBoxLayout> *last_item;
+    TradeForSizeRoot<SwapBoxLayout> *main_layout;
 
 };
 #endif // MAINWINDOW_LAYOUT_TEST_H

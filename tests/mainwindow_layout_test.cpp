@@ -25,7 +25,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "customtoolbutton.h"
 #include "mainwindow_layout_test.h"
 #include "../swapboxlayout.h"
-#include "../intermediateitemlayout.h"
+#include "../tradeforsizeroot.h"
 #include "../aspectratioitem.h"
 
 TradeForSizeItem *newItem(QLayoutItem *i, TradeForSizeItem::InvalidateFunc invalidate_func)
@@ -34,20 +34,11 @@ TradeForSizeItem *newItem(QLayoutItem *i, TradeForSizeItem::InvalidateFunc inval
     return tfsi;
 }
 
-TradeForSizeItem *newItem2(QLayoutItem *i,
-                           TradeForSizeItem::InvalidateFunc invalidate_func,
-                           QString n)
-{
-    TradeForSizeItem* tfsi = new AspectRatioItem(i, invalidate_func, 1.0, QSize(120,120));
-    tfsi->setName(n);
-    return tfsi;
-}
-
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
-    , first_item(new MainLayout(SwappableLayout::Horizontal))
-    , last_item(new MainLayout(SwappableLayout::Horizontal))
-    , main_layout(new MainLayout(SwappableLayout::Vertical))
+    , first_item(new SwapBoxLayout(SwappableLayout::Horizontal))
+    , last_item(new TradeForSizeLayout<SwapBoxLayout>(SwappableLayout::Horizontal))
+    , main_layout(new TradeForSizeRoot<SwapBoxLayout>(SwappableLayout::Vertical))
 {
     first_item->addStretch(1);
     first_item->addWidget(new QLabel("Hello"));
@@ -58,7 +49,9 @@ MainWindow::MainWindow(QWidget *parent)
     for (int i = 0; i < 3; ++i) {
         CustomToolButton *btn = new CustomToolButton(this);
         btn->setText(QString::number(i+1));
-        last_item->addWidget(btn); //, newItem);
+        last_item->addWidget<TradeForSizeItem::InvalidateFunc>(
+                    btn, newItem, [this](){ last_item->invalidateGeom(); });
+        btn->setObjectName("Button "+ QString().number(i));
     }
     last_item->addStretch(1);
     last_item->setObjectName("toolbar");
@@ -69,7 +62,8 @@ MainWindow::MainWindow(QWidget *parent)
     main_layout->addStretch(1);
     main_layout->addSwappable(first_item);
     //btn->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-    main_layout->addWidget(btn, newItem2, QString("Center"));
+    main_layout->addWidget<TradeForSizeItem::InvalidateFunc>(
+                btn, newItem, [this](){ main_layout->invalidateGeom(); });
     assert(main_layout->setStretchFactor(btn, 30));
     // TODO: Why doesn't this work right?
     // main_layout->addWidget(btn, Qt::AlignCenter);

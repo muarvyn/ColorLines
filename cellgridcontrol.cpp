@@ -27,7 +27,7 @@ along with ColorLines; see the file COPYING.  If not, see
 CellGridControl::CellGridControl(
     int rows_num,
     int columns_num,
-    QGridLayout *gridLayout,
+    addWidgetFunc addWidget,
     QObject *parent
     )
     : QObject(parent)
@@ -49,13 +49,13 @@ CellGridControl::CellGridControl(
     {
         ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
     }
-    for (int r = 0; r < boardCells.size(); ++r) {
-        for (int c = 0; c < boardCells[r].size(); ++c) {
+    for (std::size_t r = 0; r < boardCells.size(); ++r) {
+        for (std::size_t c = 0; c < boardCells[r].size(); ++c) {
             boardCells[r][c] = createCell(r,c);
-            gridLayout->addWidget(boardCells[r][c], r, c);
+            addWidget(boardCells[r][c], r, c);
         }
     }
-    gridLayout->update();
+    //gridLayout->update();
 }
 
 BallColor::type CellGridControl::getColorAt(int r, int c) const

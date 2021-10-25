@@ -24,6 +24,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #define CELLGRIDCONTROL_H
 
 #include <QtWidgets>
+#include <functional>
 
 #include "boardinfo.h"
 #include "cellbutton.h"
@@ -38,10 +39,12 @@ class CellGridControl : public QObject, public BoardInterface
 {
     Q_OBJECT
 public:
+    typedef std::function<void (QWidget*, int, int)> addWidgetFunc;
+
     explicit CellGridControl(
         int rows_num,
         int columns_num,
-        QGridLayout *gridLayout,
+        addWidgetFunc addWidget,
         QObject *parent = nullptr);
 
     BallColor::type getColorAt(int r, int c) const;

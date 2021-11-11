@@ -38,7 +38,7 @@ TradeForSizeItem::TradeForSizeItem(QLayoutItem *i,
 
 QSize TradeForSizeItem::sizeHint() const
 {
-    QString name = item->widget()->objectName();
+    QString name = item->widget() ? item->widget()->objectName() : "";
     if (!name.isEmpty())
         qDebug() << "TradeForSizeItem::sizeHint - " << name << " :isTrade = " << isTrade;
     if (isTrade) return maximumSize();
@@ -73,7 +73,7 @@ QRect TradeForSizeItem::geometry() const
 
 void TradeForSizeItem::setGeometry(const QRect &rect)
 {
-    QString name = item->widget()->objectName();
+    QString name = item->widget() ? item->widget()->objectName() : "";
     bool dbg = !name.isEmpty();
 
     if (dbg) qDebug() << name << "::setGeometry: rect=" << rect;
@@ -85,7 +85,7 @@ void TradeForSizeItem::setGeometry(const QRect &rect)
     origin += disp;
     if (assignSize(rect.size()) || isTrade) {
         if (dbg) qDebug() << name << ": invalidate.";
-        item->widget()->updateGeometry();
+        //if (item->widget()) item->widget()->updateGeometry();
     } else {
         if (invalidate_func) {
             invalidate_func();

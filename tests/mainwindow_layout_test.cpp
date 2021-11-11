@@ -30,8 +30,16 @@ along with ColorLines; see the file COPYING.  If not, see
 
 TradeForSizeItem *newItem(QLayoutItem *i, TradeForSizeItem::InvalidateFunc invalidate_func)
 {
-    TradeForSizeItem* tfsi = new AspectRatioItem(i, invalidate_func, 1.0, QSize(120,120));
+    TradeForSizeItem* tfsi = new AspectRatioItem(i, invalidate_func, 1.0, QSize(80,80));
     return tfsi;
+}
+
+CustomToolButton *newButton(QWidget *parent)
+{
+    CustomToolButton *btn = new CustomToolButton(parent);
+    btn->setMaximumSize(120,120);
+    return btn;
+
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -49,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent)
     for (int i = 0; i < 3; ++i) {
         CustomToolButton *btn = new CustomToolButton(this);
         btn->setText(QString::number(i+1));
+        btn->setMaximumSize(70,70);
         last_item->addWidget<TradeForSizeItem::InvalidateFunc>(
                     btn, newItem, [this](){ last_item->invalidateGeom(); });
         btn->setObjectName("Button "+ QString().number(i));
@@ -56,15 +65,25 @@ MainWindow::MainWindow(QWidget *parent)
     last_item->addStretch(1);
     last_item->setObjectName("toolbar");
     QToolButton *btn = new CustomToolButton(this);
-    btn->setMaximumSize(QSize(400,400));
+    btn->setText("Swap");
+    btn->setMaximumSize(QSize(120,120));
 
     main_layout->setEnabled(false);
     main_layout->addStretch(1);
     main_layout->addSwappable(first_item);
     //btn->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-    main_layout->addWidget<TradeForSizeItem::InvalidateFunc>(
-                btn, newItem, [this](){ main_layout->invalidateGeom(); });
-    assert(main_layout->setStretchFactor(btn, 30));
+    QGridLayout *grid = new QGridLayout();
+    grid->addWidget(newButton(this), 0,0);
+    grid->addWidget(newButton(this), 0,1);
+    grid->addWidget(newButton(this), 1,0);
+    grid->addWidget(btn, 1,1);
+    main_layout->addItem(new AspectRatioItem(grid,
+                                             [this](){ main_layout->invalidateGeom(); },
+                                             1.0,
+                                             QSize(400,400)));
+    //main_layout->addWidget<TradeForSizeItem::InvalidateFunc>(
+    //            btn, newItem, [this](){ main_layout->invalidateGeom(); });
+    //assert(main_layout->setStretchFactor(btn, 30));
     // TODO: Why doesn't this work right?
     // main_layout->addWidget(btn, Qt::AlignCenter);
     connect(btn, &CustomToolButton::clicked, this, &MainWindow::handleButtonClick);

@@ -32,7 +32,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "../animatediconbutton.h"
 
 
-class MainWindow : public QWidget
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
@@ -41,9 +41,6 @@ public:
     ~MainWindow() override;
 
     void setupLayout(QBoxLayout::Direction dir);
-
-protected:
-//    void resizeEvent(QResizeEvent *e) override;
 
 public slots:
     void handleButtonClick();

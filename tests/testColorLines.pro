@@ -24,6 +24,7 @@ HEADERS += \
     ../swapboxlayout.h \
     ../swappablelayout.h \
     ../tradeforsizeitem.h \
+    ../tradeforsizeroot.h \
     mainwindow_test.h \
     ../iconcellbutton.h \
     ../cellbutton.h \

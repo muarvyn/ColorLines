@@ -44,7 +44,10 @@ public:
     ~TradeForSizeLayout() = default;
 
     void setGeometry(const QRect& rect) override {
-        if (dirty /*&& TradeForSizeItem::isTrade*/) { T::invalidate(); dirty = false; }
+        if (TradeForSizeItem::isTrade) {
+            T::invalidate();
+            dirty = false;
+        }
         T::setGeometry(rect);
     }
     void invalidateGeom() {
@@ -52,7 +55,7 @@ public:
     }
 
 protected:
-    bool dirty;
+    bool dirty; //TOFIX: on need it
 };
 
 

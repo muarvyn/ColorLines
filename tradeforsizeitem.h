@@ -45,8 +45,6 @@ public:
     QRect geometry() const override;
     QWidget *widget() override { return item->widget(); };
 
-    // TODO: remove obsoleted methods
-    virtual QSize tradeForSize(const QSize& r);
     virtual bool assignSize(const QSize s);
 
 protected:

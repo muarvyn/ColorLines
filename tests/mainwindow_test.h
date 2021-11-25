@@ -31,6 +31,10 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "../basic_defs.hpp"
 #include "../animatediconbutton.h"
 
+class SwapBoxLayout;
+template <typename T>
+class TradeForSizeRoot;
+
 
 class MainWindow : public QMainWindow
 {
@@ -43,10 +47,12 @@ public:
     void setupLayout(QBoxLayout::Direction dir);
 
 public slots:
+    void swap();
     void handleButtonClick();
     void handleAnimationFinished();
 
 private:
+    TradeForSizeRoot<SwapBoxLayout> *main_layout;
     QList<AnimatedIconButton *> button_list;
     QIcon ballIcons[BallColor::colors_num];
 

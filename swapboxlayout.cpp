@@ -70,9 +70,9 @@ void SwapBoxLayout::setOrientation(Orientation o)
     for (int i=0; i<count(); ++i) {
         Qt::Alignment loca = alignment_policy[qMin(i, qMax(1,i-count()+3))] & local_mask;
         QLayoutItem *item = itemAt(i);
-        item->setAlignment(loca | (item->alignment() & ext_mask));
+        item->setAlignment(loca | (alignment() & ext_mask));
         if (dbg) qDebug() << QString("%1: %2").arg(i, 2, 10).
-                             arg(loca | (item->alignment() & ext_mask), 10, 2);
+                             arg(loca | (alignment() & ext_mask), 10, 2);
     }
 
     setDirection(ori == Vertical ? QBoxLayout::TopToBottom : QBoxLayout::LeftToRight);

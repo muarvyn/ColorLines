@@ -45,7 +45,6 @@ AnimatedIconButton *newButton(int r, int c, QIcon *ic, QWidget *parent)
     AnimatedIconButton *btn = new AnimatedIconButton(r, c, ic, parent);
     btn->setMaximumSize(120,120);
     return btn;
-
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -59,17 +58,33 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     setCentralWidget(new QWidget(this));
-    TradeForSizeRoot<SwapBoxLayout> *main_layout =
-            new TradeForSizeRoot<SwapBoxLayout>(SwappableLayout::Vertical);
+    QMenuBar *menubar = new QMenuBar(this);
+    menubar->setGeometry(QRect(0, 0, 615, 22));
+    QMenu *menuDo = new QMenu(tr("&Do"), menubar);
+    setMenuBar(menubar);
 
-    QHBoxLayout *labels_layout = new QHBoxLayout();
+    menubar->addAction(menuDo->menuAction());
+    QAction *actionSwap = new QAction(tr("&Swap"),this);
+    menuDo->addAction(actionSwap);
+    connect(actionSwap, &QAction::triggered, this, &MainWindow::swap);
+
+    main_layout = new TradeForSizeRoot<SwapBoxLayout>(SwappableLayout::Vertical);
+
+    TradeForSizeLayout<QHBoxLayout> *labels_layout = new TradeForSizeLayout<QHBoxLayout>();
     labels_layout->addStretch(1);
     for (int i = 3; i; --i) {
         QLabel *nextLab = new QLabel();
+        nextLab->setAlignment(Qt::AlignCenter);
+        nextLab->setScaledContents(true);
         nextLab->setMinimumSize(QSize(40,40));
         nextLab->setMaximumSize(QSize(80,80));
-        nextLab->setPixmap(ballIcons[BallColor::last-i].pixmap(QSize(30,30)));
-        labels_layout->addWidget(nextLab);
+        QIcon *ic = &ballIcons[BallColor::last-i];
+        nextLab->setPixmap(ic->pixmap(ic->availableSizes()[0]));
+        labels_layout->addWidget<TradeForSizeItem::InvalidateFunc>(
+                    nextLab,
+                    newItem,
+                    [this]() { main_layout->invalidateGeom(); }
+        );
     }
     labels_layout->addStretch(1);
 
@@ -92,17 +107,23 @@ MainWindow::MainWindow(QWidget *parent)
         toolbar->addWidget<TradeForSizeItem::InvalidateFunc>(
                     btn,
                     newItem,
-                    [main_layout]() { main_layout->invalidateGeom(); });
+                    [this]() { main_layout->invalidateGeom(); });
     }
     toolbar->addStretch(1);
 
     main_layout->addLayout(labels_layout);
+    main_layout->setAlignment(labels_layout, Qt::AlignCenter);
     main_layout->addItem(new AspectRatioItem(
                              grid,
-                             [main_layout](){ main_layout->invalidateGeom(); },
+                             [this](){ main_layout->invalidateGeom(); },
                              1.0f));
     main_layout->addSwappable(toolbar);
     centralWidget()->setLayout(main_layout);
+}
+
+void MainWindow::swap()
+{
+    main_layout->setOrientation(SwappableLayout::Swapped);
 }
 
 void MainWindow::handleButtonClick()

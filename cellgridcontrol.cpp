@@ -28,7 +28,7 @@ CellGridControl::CellGridControl(
     int rows_num,
     int columns_num,
     addWidgetFunc addWidget,
-    QObject *parent
+    QWidget *parent
     )
     : QObject(parent)
     , boardCells(rows_num, std::vector<AnimatedIconButton*>(columns_num,nullptr))
@@ -51,7 +51,7 @@ CellGridControl::CellGridControl(
     }
     for (std::size_t r = 0; r < boardCells.size(); ++r) {
         for (std::size_t c = 0; c < boardCells[r].size(); ++c) {
-            boardCells[r][c] = createCell(r,c);
+            boardCells[r][c] = createCell(r,c,parent);
             addWidget(boardCells[r][c], r, c);
         }
     }
@@ -77,9 +77,9 @@ void CellGridControl::clear()
     }
 }
 
-AnimatedIconButton *CellGridControl::createCell(int r, int c)
+AnimatedIconButton *CellGridControl::createCell(int r, int c, QWidget *parent)
 {
-    AnimatedIconButton * cell = new AnimatedIconButton(r,c,ballIcons);
+    AnimatedIconButton * cell = new AnimatedIconButton(r,c,ballIcons,parent);
     connect(cell, SIGNAL(clicked()), this, SLOT(handleCellClicked()));
     return cell;
 }

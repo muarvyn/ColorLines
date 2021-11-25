@@ -23,7 +23,6 @@ along with ColorLines; see the file COPYING.  If not, see
 #include <QtWidgets>
 
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 #include "swapboxlayout.h"
 #include "tradeforsizeroot.h"
 #include "aspectratioitem.h"
@@ -47,38 +46,50 @@ TradeForSizeItem *newFixedAspectRatioItem(
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
     , editControl(nullptr)
 {
-    ui->setupUi(this);
     QSettings load_settings(OrganizationName, ApplicationName);
     restoreGeometry(load_settings.value("geometry").toByteArray());
     restoreState(load_settings.value("windowState").toByteArray());
 
+    setCentralWidget(new QWidget(this));
+    setupMenu();
+
+    main_layout = new TradeForSizeRoot<SwapBoxLayout>(SwappableLayout::Vertical);
     QGridLayout *grid_layout = new QGridLayout();
+#ifdef QT_DEBUG
+    grid_layout->setObjectName("BOARD GRID");
+#endif
+
     TradeForSizeLayout<SwapBoxLayout> *editTB_layout =
             new TradeForSizeLayout<SwapBoxLayout>(SwappableLayout::Horizontal);
-
-    QWidget * dull_widget = new QWidget();
-    dull_widget->setLayout(grid_layout);
 
     gridControl = new CellGridControl(
                 BoardDim::ROWS_NUM,
                 BoardDim::COLUMNS_NUM,
                 [grid_layout](QWidget* w, int r, int c) { grid_layout->addWidget(w,r,c); },
-                this);
+                centralWidget());
+
+    editTB_layout->addStretch(1);
     editToolbar = new CellGridControl(
                 1,
                 BallColor::colors_num,
-                [editTB_layout](QWidget* w, int, int){ editTB_layout->addWidget(w); },
-                this);
+                [this, editTB_layout](QWidget* w, int, int){
+                    editTB_layout->addWidget<TradeForSizeItem::InvalidateFunc>(
+                        w,
+                        newFixedAspectRatioItem,
+                        [this]() { main_layout->invalidateGeom(); });
+                },
+                centralWidget());
+    editTB_layout->addStretch(1);
+
     boardControl = new BoardControl(gridControl);
     gameControl = new GameControl(gridControl, this);
     connect(gridControl, &CellGridControl::userInput, boardControl, &BoardControl::handleClicked);
     connect(boardControl, &BoardControl::spawnAnimationFinished, this, &MainWindow::finalizeSpawn);
     connect(boardControl, &BoardControl::moveFinished, this, &MainWindow::handleMove);
 
-    QHBoxLayout *spawnTB_layout = new QHBoxLayout();
+    TradeForSizeLayout<QHBoxLayout> *spawnTB_layout = new TradeForSizeLayout<QHBoxLayout>();
     spawnTB_layout->addStretch(1);
     for (QLabel **nextLab=&spawnColorLabels[0];
         nextLab < &spawnColorLabels[SPAWN_BALLS_NUM];
@@ -86,7 +97,13 @@ MainWindow::MainWindow(QWidget *parent)
         *nextLab = new QLabel();
         (*nextLab)->setMinimumSize(QSize(40,40)); //TOFIX: magic numbers
         (*nextLab)->setMaximumSize(QSize(80,80));
-        spawnTB_layout->addWidget(*nextLab);
+        (*nextLab)->setAlignment(Qt::AlignCenter);
+        (*nextLab)->setScaledContents(true);
+        spawnTB_layout->addWidget<TradeForSizeItem::InvalidateFunc>(
+                    *nextLab,
+                    newFixedAspectRatioItem,
+                    [this]() { main_layout->invalidateGeom(); }
+        );
     }
     //TOFIX: duplicate code
     for (BallColor::type c=BallColor::first;
@@ -103,23 +120,40 @@ MainWindow::MainWindow(QWidget *parent)
     spawnTB_layout->addWidget(scoreLab);
     spawnTB_layout->addStretch(1);
 
-    TradeForSizeRoot<SwapBoxLayout> *main_layout =
-            new TradeForSizeRoot<SwapBoxLayout>(SwappableLayout::Vertical);
-
     main_layout->addLayout(spawnTB_layout);
-    main_layout->addWidget<TradeForSizeItem::InvalidateFunc>(
-                dull_widget,
-                newFixedAspectRatioItem,
-                [main_layout](){ main_layout->invalidateGeom(); });
+    main_layout->addItem(new AspectRatioItem(
+                grid_layout,
+                [this](){ main_layout->invalidateGeom(); },
+                1.0f));
     main_layout->addSwappable(editTB_layout);
     main_layout->setAlignment(editTB_layout, Qt::AlignTop | Qt::AlignHCenter);
-    ui->centralwidget->setLayout(main_layout);
+    centralWidget()->setLayout(main_layout);
 
     gameControl->generateRandomSpawn(spawn_locations, cached_colors);
     showNextSpawn();
     if (balls_num < SPAWN_BALLS_NUM) {
         QTimer::singleShot(600, this, &MainWindow::makeSpawn);
     }
+}
+
+void MainWindow::setupMenu()
+{
+    QMenuBar *menubar = new QMenuBar(this);
+    menubar->setGeometry(QRect(0, 0, 615, 22));
+    QMenu *menuGame = new QMenu(tr("&Game"), menubar);
+    QMenu *menuFile = new QMenu(tr("&File"), menubar);
+    menuGame->addAction(tr("&New"), this, &MainWindow::on_actionNew_triggered);
+    QAction *actionEdit = menuGame->addAction(
+                tr("&Edit"), this, &MainWindow::on_actionEdit_toggled);
+    actionEdit->setCheckable(true);
+    menuFile->addAction(new QAction(tr("&Save")));
+    menuFile->addAction(tr("&Highest scores"), this,
+                        &MainWindow::on_actionHighest_scores_triggered);
+
+    menubar->addAction(menuFile->menuAction());
+    menubar->addAction(menuGame->menuAction());
+
+    setMenuBar(menubar);
 }
 
 void MainWindow::handleMove(const BoardInfo::cell_location &loc)
@@ -189,7 +223,6 @@ void MainWindow::handleEndGame()
 
 MainWindow::~MainWindow()
 {
-    delete ui;
 }
 
 void MainWindow::on_actionNew_triggered()

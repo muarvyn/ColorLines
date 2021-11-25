@@ -45,12 +45,12 @@ public:
         int rows_num,
         int columns_num,
         addWidgetFunc addWidget,
-        QObject *parent = nullptr);
+        QWidget *parent = nullptr);
 
     BallColor::type getColorAt(int r, int c) const;
     void setColorAt(int r, int c, BallColor::type color);
     void clear();
-    AnimatedIconButton *createCell(int r, int c);
+    AnimatedIconButton *createCell(int r, int c, QWidget *parent);
     const std::vector<std::vector<AnimatedIconButton*>>& getCells() const
     { return boardCells; }
     void setButtonAnimation(CellButton &btn);

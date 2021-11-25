@@ -35,10 +35,9 @@ class GameControl;
 class CellGridControl;
 class BoardControl;
 class EditModeControl;
-
-namespace Ui {
-class MainWindow;
-}
+class SwapBoxLayout;
+template <typename T>
+class TradeForSizeRoot;
 
 class MainWindow : public QMainWindow
 {
@@ -61,8 +60,10 @@ private slots:
     void closeEvent(QCloseEvent *event);
 
 private:
-    Ui::MainWindow *ui;
+    void setupMenu();
+
     QLabel *spawnColorLabels[SPAWN_BALLS_NUM];
+    TradeForSizeRoot<SwapBoxLayout> *main_layout;
     CellGridControl *gridControl;
     CellGridControl *editToolbar;
     BoardControl *boardControl;

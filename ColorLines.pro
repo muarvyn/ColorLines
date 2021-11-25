@@ -78,5 +78,4 @@ RESOURCES += \
     images.qrc
 
 FORMS += \
-    highscorestable.ui \
-    mainwindow.ui
+    highscorestable.ui

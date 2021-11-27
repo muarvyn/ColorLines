@@ -54,7 +54,7 @@ public:
     virtual BallColor::type getColorAt(int r, int c) const = 0;
     virtual void setColorAt(int r, int c, BallColor::type color) = 0;
     virtual void clear() = 0;
-    virtual ~BoardInterface();
+    virtual ~BoardInterface() = default;
 };
 
 #endif // BASIC_DEFS_HPP

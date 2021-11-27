@@ -96,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent)
         ++nextLab) {
         *nextLab = new QLabel();
         (*nextLab)->setMinimumSize(QSize(40,40)); //TOFIX: magic numbers
-        (*nextLab)->setMaximumSize(QSize(80,80));
+        (*nextLab)->setMaximumSize(QSize(50,50));
         (*nextLab)->setAlignment(Qt::AlignCenter);
         (*nextLab)->setScaledContents(true);
         spawnTB_layout->addWidget<TradeForSizeItem::InvalidateFunc>(
@@ -117,6 +117,8 @@ MainWindow::MainWindow(QWidget *parent)
     std::size_t balls_num = s.loadGame(*gridControl, score);
     scoreLab = new QLabel();
     scoreLab->setText(QString::number(score));
+    spawnTB_layout->addSpacing(20);
+    spawnTB_layout->addWidget(new QLabel("Score:"));
     spawnTB_layout->addWidget(scoreLab);
     spawnTB_layout->addStretch(1);
 
@@ -173,7 +175,7 @@ void MainWindow::makeSpawn()
     std::vector<BallColor::type> spawn_colors;
     spawn_locations.clear();
     gameControl->generateRandomSpawn(spawn_locations, spawn_colors);
-    if (spawn_locations.size() < SPAWN_BALLS_NUM) {
+    if (spawn_locations.size() < SPAWN_BALLS_NUM) { //TODO: handle this correctly in all cases
         handleEndGame();
         return;
     }
@@ -187,9 +189,9 @@ void MainWindow::makeSpawn()
 void MainWindow::showNextSpawn()
 {
     for (size_t i=0; i<SPAWN_BALLS_NUM; ++i) {
-        const QIcon icon = ballIcons[cached_colors[i]];
+        const QIcon &icon = ballIcons[cached_colors[i]];
         QLabel *lab = spawnColorLabels[i];
-        lab->setPixmap(icon.pixmap(lab->size()/2));
+        lab->setPixmap(icon.pixmap(icon.availableSizes()[0]));
         lab->setAlignment(Qt::AlignCenter);
     }
 }
@@ -242,7 +244,9 @@ void MainWindow::on_actionEdit_toggled(bool isEditMode)
     else if(!isEditMode && editControl) {
         delete editControl;
         editControl = nullptr;
-        connect(gridControl, &CellGridControl::userInput, boardControl, &BoardControl::handleClicked);
+        connect(gridControl, &CellGridControl::userInput,
+                boardControl, &BoardControl::handleClicked);
+        editToolbar->clear();
     }
 }
 
@@ -250,6 +254,7 @@ void MainWindow::on_actionHighest_scores_triggered()
 {
     QDialog *table = new HighScoresTable(this);
     table->exec();
+    delete table;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

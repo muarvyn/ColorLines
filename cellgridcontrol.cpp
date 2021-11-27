@@ -55,7 +55,6 @@ CellGridControl::CellGridControl(
             addWidget(boardCells[r][c], r, c);
         }
     }
-    //gridLayout->update();
 }
 
 BallColor::type CellGridControl::getColorAt(int r, int c) const
@@ -70,8 +69,8 @@ void CellGridControl::setColorAt(int r, int c, BallColor::type color)
 
 void CellGridControl::clear()
 {
-    for (int r = 0; r < BoardDim::ROWS_NUM; ++r) {
-        for (int c = 0; c < BoardDim::COLUMNS_NUM; ++c) {
+    for (int r = 0; r < boardCells.size(); ++r) {
+        for (int c = 0; c < boardCells[r].size(); ++c) {
             boardCells[r][c]->setState(BallColor::none);
         }
     }
@@ -80,7 +79,8 @@ void CellGridControl::clear()
 AnimatedIconButton *CellGridControl::createCell(int r, int c, QWidget *parent)
 {
     AnimatedIconButton * cell = new AnimatedIconButton(r,c,ballIcons,parent);
-    connect(cell, SIGNAL(clicked()), this, SLOT(handleCellClicked()));
+    cell->setMaximumSize(70,70);
+    connect(cell, &AnimatedIconButton::clicked, this, &CellGridControl::handleCellClicked);
     return cell;
 }
 

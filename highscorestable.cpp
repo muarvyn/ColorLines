@@ -45,7 +45,6 @@ HighScoresTable::HighScoresTable(QWidget *parent) :
     ui->setupUi(this);
     QTableView *tableView = ui->highScoresView;
     HighScoresModel *tableModel = new HighScoresModel(this);
-    //tableModel->populate();
     tableModel->loadData();
     tableView->setModel(tableModel);
     tableView->resizeColumnsToContents();

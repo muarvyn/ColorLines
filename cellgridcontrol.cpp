@@ -69,8 +69,8 @@ void CellGridControl::setColorAt(int r, int c, BallColor::type color)
 
 void CellGridControl::clear()
 {
-    for (int r = 0; r < boardCells.size(); ++r) {
-        for (int c = 0; c < boardCells[r].size(); ++c) {
+    for (std::size_t r = 0; r < boardCells.size(); ++r) {
+        for (std::size_t c = 0; c < boardCells[r].size(); ++c) {
             boardCells[r][c]->setState(BallColor::none);
         }
     }

@@ -26,6 +26,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #include <QObject>
 #include "basic_defs.hpp"
 #include "boardinfo.h"
+#include <random>
 
 class BoardState;
 
@@ -39,7 +40,7 @@ public:
         std::vector<BoardInfo::cell_location> &spawn,
         std::vector<BallColor::type> &color);
 
-    static BallColor::type getRandomColor();
+    BallColor::type getRandomColor();
     void getStraitConnection(
         const BoardInfo::cell_location &loc,
         std::vector<BoardInfo::cell_location> &connection);
@@ -54,6 +55,7 @@ public slots:
 
 private:
     BoardInterface *board;
+    std::default_random_engine generator;
 };
 
 #endif // GAMECONTROL_H

@@ -22,8 +22,6 @@ along with ColorLines; see the file COPYING.  If not, see
 
 #include <memory>
 
-#include <QRandomGenerator>
-
 #include "animatediconbutton.h"
 #include "board.h"
 #include "dijkstra_search.hpp"
@@ -38,11 +36,6 @@ Board::Board(const std::vector<std::vector<AnimatedIconButton*>> &board,
 BallColor::type Board::getColorAt(int r, int c)
 {
     return static_cast<BallColor::type>(board[r][c]->getState());
-}
-
-BallColor::type Board::getRandom()
-{
-    return static_cast<BallColor::type>(QRandomGenerator::global()->bounded(5));
 }
 
 void Board::getOccupiedMap(distance_type wmap[BoardDim::ROWS_NUM*BoardDim::COLUMNS_NUM])

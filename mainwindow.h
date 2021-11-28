@@ -47,6 +47,9 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    template <typename FunctionType>
+    QAction *addMenuAction(QMenu *menu, const QString &text, FunctionType functor);
+
 private slots:
     void handleMove(const BoardInfo::cell_location &loc);
     void makeSpawn();

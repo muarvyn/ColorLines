@@ -139,31 +139,3 @@ void HighScoresModel::saveData() const
     save_settings.endGroup();
 }
 
-//******************** For testing ********************
-#include <QRandomGenerator>
-const QString Names[8] = {"John", "Michael", "Maria", "Isaac", "Christopher", "Jack", "Isabella", "Carolina"};
-const QString Surnames[7] = {"Silver", "Black", "Brown", "Lee", "Carpenter", "Smith", "Woods"};
-
-void HighScoresModel::populate() {
-    QString key_1(Names[QRandomGenerator::global()->bounded(int(sizeof(Names)/sizeof(*Names)))]+" "+
-        Surnames[QRandomGenerator::global()->bounded(int(sizeof(Surnames)/sizeof(*Surnames)))]);
-    int val_1 = QRandomGenerator::global()->bounded(500+1);
-    QSettings save_settings(OrganizationName, ApplicationName);
-    save_settings.beginGroup(SettingsGroupName);
-
-    save_settings.setValue(key_1, val_1);
-    HighscoresList data;
-    foreach (const QString &key, save_settings.childKeys()) {
-        data.append(makeScoreEntry(key, save_settings.value(key).toInt(),false));
-    }
-
-    std::sort(data.begin(), data.end(), &EntryScoreGreaterThan);
-    int i=0;
-    save_settings.remove("");
-    foreach (const ScoreEntry &entry, data) {
-        if (++i <= MAX_SAVED_HIGHSCORES)
-            save_settings.setValue(getName(entry), getScore(entry));
-    }
-    save_settings.endGroup();
-
-}

@@ -39,8 +39,6 @@ class Board : public QObject
 public:
     typedef double distance_type;
 
-    static BallColor::type getRandom();
-
     explicit Board(const std::vector<std::vector<AnimatedIconButton*>> &board
         , QObject *parent = nullptr);
 

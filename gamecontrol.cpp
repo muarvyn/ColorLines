@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018-2020 Volodymyr Kryachko
+Copyright (C) 2018-2021 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -21,8 +21,8 @@ along with ColorLines; see the file COPYING.  If not, see
 */
 
 #include <utility>
+#include <chrono>
 #include <qdebug.h>
-#include <QRandomGenerator>
 
 #include "board.h"
 #include "gamecontrol.h"
@@ -30,6 +30,7 @@ along with ColorLines; see the file COPYING.  If not, see
 GameControl::GameControl(BoardInterface *bs, QObject *parent)
     : QObject(parent)
     , board(bs)
+    , generator(std::chrono::system_clock::now().time_since_epoch().count())
 {
 
 }
@@ -65,15 +66,16 @@ bool GameControl::generateRandomSpawn(
 
 BallColor::type GameControl::getRandomColor()
 {
-    return static_cast<BallColor::type>(
-        QRandomGenerator::global()->bounded(int(BallColor::colors_num)));
+    std::uniform_int_distribution<int> distribution(BallColor::first, BallColor::last);
+    return static_cast<BallColor::type>(distribution(generator));
 }
 
 void GameControl::getStraitConnection(
     const BoardInfo::cell_location &loc,
     std::vector<BoardInfo::cell_location> &connection)
 {
-    qDebug() << "getStraitConnection: " << loc << " " << board->getColorAt(loc.first, loc.second);
+    // TODO: define operator<< for std::pair<>
+    //qDebug() << "getStraitConnection: " << loc << " " << board->getColorAt(loc.first, loc.second);
     BoardInfo bi(*board);
     bi.getStraitConnection(loc, connection);
 }

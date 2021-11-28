@@ -23,6 +23,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #ifndef INTERMEDIATEITEMLAYOUT_H
 #define INTERMEDIATEITEMLAYOUT_H
 
+#include <assert.h>
 #include "tradeforsizeitem.h"
 
 

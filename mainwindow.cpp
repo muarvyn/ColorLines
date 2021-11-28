@@ -138,19 +138,30 @@ MainWindow::MainWindow(QWidget *parent)
     }
 }
 
+template <typename FunctionType>
+QAction *MainWindow::addMenuAction(QMenu *menu,
+                                   const QString &text,
+                                   FunctionType functor)
+{
+    QAction *action = new QAction(text, this);
+    menu->addAction(action);
+    connect(action, &QAction::triggered, this, functor);
+    return action;
+}
+
 void MainWindow::setupMenu()
 {
     QMenuBar *menubar = new QMenuBar(this);
     menubar->setGeometry(QRect(0, 0, 615, 22));
     QMenu *menuGame = new QMenu(tr("&Game"), menubar);
     QMenu *menuFile = new QMenu(tr("&File"), menubar);
-    menuGame->addAction(tr("&New"), this, &MainWindow::on_actionNew_triggered);
-    QAction *actionEdit = menuGame->addAction(
-                tr("&Edit"), this, &MainWindow::on_actionEdit_toggled);
+    addMenuAction(menuGame, tr("&New"), &MainWindow::on_actionNew_triggered);
+    QAction *actionEdit = addMenuAction(menuGame, tr("&Edit"),
+                                        &MainWindow::on_actionEdit_toggled);
     actionEdit->setCheckable(true);
-    menuFile->addAction(new QAction(tr("&Save")));
-    menuFile->addAction(tr("&Highest scores"), this,
-                        &MainWindow::on_actionHighest_scores_triggered);
+    menuFile->addAction(new QAction(tr("&Save"), this));
+    addMenuAction(menuFile, tr("&Highest scores"),
+                  &MainWindow::on_actionHighest_scores_triggered);
 
     menubar->addAction(menuFile->menuAction());
     menubar->addAction(menuGame->menuAction());

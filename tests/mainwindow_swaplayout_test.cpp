@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2020 Volodymyr Kryachko
+Copyright (C) 2021 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -20,7 +20,36 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#include "mainwindow_layout_test.h"
+#include <QtWidgets>
+
+#include "customtoolbutton.h"
+#include "mainwindow_swaplayout_test.h"
+#include "../swaplayout.h"
+
+MainWindow::MainWindow(QWidget *parent)
+    : QWidget(parent)
+
+{
+    swap_grid = new SwapLayout(SwapLayout::Vertical, this);
+    setLayout(swap_grid);
+    CustomToolButton *btn;
+    for (int i = 0; i < 3; ++i) {
+        btn = new CustomToolButton(this);
+        btn->setText(QString::number(i+1));
+        btn->setMaximumSize(QSize(80,80));
+        swap_grid->addWidget(btn);
+    }
+    connect(btn, &CustomToolButton::clicked, this, &MainWindow::handleButtonClick);
+}
+
+void MainWindow::handleButtonClick()
+{
+    swap_grid->setOrientation(SwapLayout::Swapped);
+}
+
+MainWindow::~MainWindow()
+{
+}
 
 #include <QApplication>
 

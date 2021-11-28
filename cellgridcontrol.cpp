@@ -27,8 +27,8 @@ along with ColorLines; see the file COPYING.  If not, see
 CellGridControl::CellGridControl(
     int rows_num,
     int columns_num,
-    QGridLayout *gridLayout,
-    QObject *parent
+    addWidgetFunc addWidget,
+    QWidget *parent
     )
     : QObject(parent)
     , boardCells(rows_num, std::vector<AnimatedIconButton*>(columns_num,nullptr))
@@ -49,13 +49,12 @@ CellGridControl::CellGridControl(
     {
         ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
     }
-    for (int r = 0; r < boardCells.size(); ++r) {
-        for (int c = 0; c < boardCells[r].size(); ++c) {
-            boardCells[r][c] = createCell(r,c);
-            gridLayout->addWidget(boardCells[r][c], r, c);
+    for (std::size_t r = 0; r < boardCells.size(); ++r) {
+        for (std::size_t c = 0; c < boardCells[r].size(); ++c) {
+            boardCells[r][c] = createCell(r,c,parent);
+            addWidget(boardCells[r][c], r, c);
         }
     }
-    gridLayout->update();
 }
 
 BallColor::type CellGridControl::getColorAt(int r, int c) const
@@ -70,17 +69,18 @@ void CellGridControl::setColorAt(int r, int c, BallColor::type color)
 
 void CellGridControl::clear()
 {
-    for (int r = 0; r < BoardDim::ROWS_NUM; ++r) {
-        for (int c = 0; c < BoardDim::COLUMNS_NUM; ++c) {
+    for (int r = 0; r < boardCells.size(); ++r) {
+        for (int c = 0; c < boardCells[r].size(); ++c) {
             boardCells[r][c]->setState(BallColor::none);
         }
     }
 }
 
-AnimatedIconButton *CellGridControl::createCell(int r, int c)
+AnimatedIconButton *CellGridControl::createCell(int r, int c, QWidget *parent)
 {
-    AnimatedIconButton * cell = new AnimatedIconButton(r,c,ballIcons);
-    connect(cell, SIGNAL(clicked()), this, SLOT(handleCellClicked()));
+    AnimatedIconButton * cell = new AnimatedIconButton(r,c,ballIcons,parent);
+    cell->setMaximumSize(70,70);
+    connect(cell, &AnimatedIconButton::clicked, this, &CellGridControl::handleCellClicked);
     return cell;
 }
 

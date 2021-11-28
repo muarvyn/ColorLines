@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2020-2021 Volodymyr Kryachko
+Copyright (C) 2021 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -20,34 +20,36 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#ifndef MAINWINDOW_LAYOUT_TEST_H
-#define MAINWINDOW_LAYOUT_TEST_H
+#ifndef FLIPBOXLAYOUT_H
+#define FLIPBOXLAYOUT_H
 
-#include <QWidget>
+#include "swappablelayout.h"
 
-class CustomToolButton;
-class SwapBoxLayout;
-template <typename T>
-class TradeForSizeLayout;
-template <typename T>
-class TradeForSizeRoot;
+#include <QBoxLayout>
 
-class MainWindow : public QWidget
+
+class SwapBoxLayout : public QBoxLayout, public SwappableLayout
 {
     Q_OBJECT
-
 public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow() override;
+    static const Qt::Alignment default_policy[];
 
-public slots:
-    void handleButtonClick();
+    SwapBoxLayout(Orientation o = Vertical, QWidget *parent = nullptr);
+
+    using QBoxLayout::addWidget;
+    using QBoxLayout::addLayout;
+    using QBoxLayout::sizeHint;
+
+    void addSwappable(QLayout *item);
+
+    void setOrientation(Orientation) override;
+    QSize sizeHint(Orientation) const override;
 
 protected:
-    QList<CustomToolButton *> toolbutton_list;
-    SwapBoxLayout *first_item;
-    TradeForSizeLayout<SwapBoxLayout> *last_item;
-    TradeForSizeRoot<SwapBoxLayout> *main_layout;
+    const Qt::Alignment *alignment_policy;
+    QList<SwappableLayout*> swappables;
 
 };
-#endif // MAINWINDOW_LAYOUT_TEST_H
+
+
+#endif // FLIPBOXLAYOUT_H

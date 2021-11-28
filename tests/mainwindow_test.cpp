@@ -24,17 +24,31 @@ along with ColorLines; see the file COPYING.  If not, see
 #include <QDebug>
 
 #include "mainwindow_test.h"
-#include "ui_mainwindow_test.h"
 #include "../basic_defs.hpp"
-#include "../fixedaspectratioitem.h"
+#include "../swapboxlayout.h"
+#include "../tradeforsizeroot.h"
+#include "../aspectratioitem.h"
 
 int getColor(const AnimatedIconButton *btn)
 {
     return btn->getColumn();
 }
 
+TradeForSizeItem *newItem(QLayoutItem *i, TradeForSizeItem::InvalidateFunc invalidate_func)
+{
+    TradeForSizeItem* tfsi = new AspectRatioItem(i, invalidate_func, 1.0);
+    return tfsi;
+}
+
+AnimatedIconButton *newButton(int r, int c, QIcon *ic, QWidget *parent)
+{
+    AnimatedIconButton *btn = new AnimatedIconButton(r, c, ic, parent);
+    btn->setMaximumSize(120,120);
+    return btn;
+}
+
 MainWindow::MainWindow(QWidget *parent)
-    : QWidget(parent)
+    : QMainWindow(parent)
 {
     for (BallColor::type c=BallColor::first;
         c<=BallColor::last;
@@ -42,22 +56,74 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
     }
-    const QSizePolicy sp1(QSizePolicy::Expanding, QSizePolicy::Minimum);
-    const QSizePolicy sp2(QSizePolicy::Minimum, QSizePolicy::Minimum);
-//    const QSizePolicy sp1(QSizePolicy::Expanding, QSizePolicy::Preferred);
-//    const QSizePolicy sp2(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+    setCentralWidget(new QWidget(this));
+    QMenuBar *menubar = new QMenuBar(this);
+    menubar->setGeometry(QRect(0, 0, 615, 22));
+    QMenu *menuDo = new QMenu(tr("&Do"), menubar);
+    setMenuBar(menubar);
+
+    menubar->addAction(menuDo->menuAction());
+    QAction *actionSwap = new QAction(tr("&Swap"),this);
+    menuDo->addAction(actionSwap);
+    connect(actionSwap, &QAction::triggered, this, &MainWindow::swap);
+
+    main_layout = new TradeForSizeRoot<SwapBoxLayout>(SwappableLayout::Vertical);
+
+    TradeForSizeLayout<QHBoxLayout> *labels_layout = new TradeForSizeLayout<QHBoxLayout>();
+    labels_layout->addStretch(1);
+    for (int i = 3; i; --i) {
+        QLabel *nextLab = new QLabel();
+        nextLab->setAlignment(Qt::AlignCenter);
+        nextLab->setScaledContents(true);
+        nextLab->setMinimumSize(QSize(40,40));
+        nextLab->setMaximumSize(QSize(80,80));
+        QIcon *ic = &ballIcons[BallColor::last-i];
+        nextLab->setPixmap(ic->pixmap(ic->availableSizes()[0]));
+        labels_layout->addWidget<TradeForSizeItem::InvalidateFunc>(
+                    nextLab,
+                    newItem,
+                    [this]() { main_layout->invalidateGeom(); }
+        );
+    }
+    labels_layout->addStretch(1);
+
+    QGridLayout *grid = new QGridLayout();
+    grid->addWidget(newButton(0, 0, ballIcons, centralWidget()), 0,0);
+    grid->addWidget(newButton(0, 1, ballIcons+1, centralWidget()), 0,1);
+    grid->addWidget(newButton(1, 0, ballIcons+2, centralWidget()), 1,0);
+    grid->addWidget(newButton(1, 1, ballIcons+3, centralWidget()), 1,1);
+
+    TradeForSizeLayout<SwapBoxLayout> *toolbar =
+            new TradeForSizeLayout<SwapBoxLayout>(SwappableLayout::Horizontal);
+
+    toolbar->addStretch(1);
     for (BallColor::type color=BallColor::first; color < BallColor::first+3; ++color) {
-        AnimatedIconButton *btn = new AnimatedIconButton(0,color,ballIcons);
+        AnimatedIconButton *btn = new AnimatedIconButton(0,color,ballIcons,centralWidget());
+        btn->setMaximumSize(QSize(80,80));
         btn->setColor(color);
-        if (color == BallColor::red) {
-            btn->setSizePolicy(sp1);
-        } else {
-            btn->setSizePolicy(sp2);
-        }
         connect(btn, &AnimatedIconButton::clicked, this, &MainWindow::handleButtonClick);
         button_list.append(btn);
+        toolbar->addWidget<TradeForSizeItem::InvalidateFunc>(
+                    btn,
+                    newItem,
+                    [this]() { main_layout->invalidateGeom(); });
     }
-    setupLayout(QBoxLayout::LeftToRight);
+    toolbar->addStretch(1);
+
+    main_layout->addLayout(labels_layout);
+    main_layout->setAlignment(labels_layout, Qt::AlignCenter);
+    main_layout->addItem(new AspectRatioItem(
+                             grid,
+                             [this](){ main_layout->invalidateGeom(); },
+                             1.0f));
+    main_layout->addSwappable(toolbar);
+    centralWidget()->setLayout(main_layout);
+}
+
+void MainWindow::swap()
+{
+    main_layout->setOrientation(SwappableLayout::Swapped);
 }
 
 void MainWindow::handleButtonClick()
@@ -89,33 +155,17 @@ void MainWindow::handleAnimationFinished()
     qDebug() << "AnimatedIconButton::isAnimating returned " << senderButton->isAnimating();
 }
 
-void MainWindow::resizeEvent(QResizeEvent *e)
-{
-    QBoxLayout::Direction dir = e->size().width() > e->size().height() ?
-        QBoxLayout::LeftToRight : QBoxLayout::TopToBottom;
-    setupLayout(dir);
-    QWidget::resizeEvent(e);
-}
-
 MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::setupLayout(QBoxLayout::Direction dir)
+
+#include <QApplication>
+
+int main(int argc, char *argv[])
 {
-    if (layout()) {
-        QBoxLayout::Direction old_dir = qobject_cast<QBoxLayout *>(layout())->direction();
-        if (old_dir == dir) return;
-        delete layout();
-    }
-    QBoxLayout *box = new QBoxLayout(dir);
-    int i = 0;
-    for (AnimatedIconButton *btn : qAsConst(button_list)) {
-        if (++i != 2) {
-            box->addWidget(btn);
-        } else {
-            box->addItem(new FixedAspectRatioItem(btn));
-        }
-    }
-    setLayout(box);
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
+    return a.exec();
 }

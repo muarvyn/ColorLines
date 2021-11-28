@@ -1,5 +1,5 @@
 QT       += core gui widgets
-TARGET = testColorLines
+TARGET = testGridLayout
 TEMPLATE = app
 CONFIG += c++11
 DEFINES += QT_DEPRECATED_WARNINGS
@@ -9,27 +9,25 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    ../aspectratioitem.cpp \
-    ../swapboxlayout.cpp \
-    ../tradeforsizeitem.cpp \
-    mainwindow_test.cpp \
+    ../fixedaspectratioitem.cpp \
+    customtoolbutton.cpp \
+    main_testGridLayout.cpp \
+    mainwindow_grid_layout_test.cpp \
     ../cellbutton.cpp \
     ../iconcellbutton.cpp \
     ../animatediconbutton.cpp \
-    ../basic_defs.cpp
+    ../basic_defs.cpp \
+    testwidgetitem.cpp
 
 HEADERS += \
-    ../aspectratioitem.h \
-    ../intermediateitemlayout.h \
-    ../swapboxlayout.h \
-    ../swappablelayout.h \
-    ../tradeforsizeitem.h \
-    ../tradeforsizeroot.h \
-    mainwindow_test.h \
+    ../fixedaspectratioitem.h \
+    customtoolbutton.h \
+    mainwindow_grid_layout_test.h \
     ../iconcellbutton.h \
     ../cellbutton.h \
     ../animatediconbutton.h \
-    ../basic_defs.hpp
+    ../basic_defs.hpp \
+    testwidgetitem.h
 
 RESOURCES += \
     ../images.qrc

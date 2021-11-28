@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2020 Volodymyr Kryachko
+Copyright (C) 2021 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -20,18 +20,21 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#ifndef TESTWIDGETITEM_H
-#define TESTWIDGETITEM_H
+#ifndef TRADEFORSIZEITEM_H
+#define TRADEFORSIZEITEM_H
 
-#include <QWidgetItem>
+#include <QLayoutItem>
+#include <functional>
 
-class TradeForSizeItem;
-
-class TestWidgetItem : public QLayoutItem
+class TradeForSizeItem : public QLayoutItem
 {
 public:
-    TestWidgetItem(QLayout *l, TradeForSizeItem *item = nullptr);
-    ~TestWidgetItem() override = default;
+    typedef std::function<void(void)> InvalidateFunc;
+
+    TradeForSizeItem(QLayoutItem *i,
+                     InvalidateFunc f,
+                     const QSize hs = QSize());
+    ~TradeForSizeItem() override = default;
 
     QSize sizeHint() const override;
     QSize minimumSize() const override;
@@ -40,15 +43,18 @@ public:
     bool isEmpty() const override;
     void setGeometry(const QRect&) override;
     QRect geometry() const override;
-    void setCentralWidget(QWidget *widget);
-    QLayoutItem *getCentralItem();
+    QWidget *widget() override { return item->widget(); };
 
-    void addCentralWidget(QWidget *widget);
+    virtual bool assignSize(const QSize s);
 
 protected:
-    //QList<QLayoutItem *> list;
-    TradeForSizeItem *centralItem;
-    QLayout *layout;
+    QLayoutItem *item;
+    QSize assigned;
+    InvalidateFunc invalidate_func;
+
+    static bool isTrade;
+    template <typename T> friend class TradeForSizeRoot;
+    template <typename T> friend class TradeForSizeLayout;
 };
 
-#endif // TESTWIDGETITEM_H
+#endif // TRADEFORSIZEITEM_H

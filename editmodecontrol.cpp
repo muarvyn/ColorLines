@@ -10,8 +10,8 @@ EditModeControl::EditModeControl(CellGridControl *board,
     , board(board)
     , toolbar(toolbar)
 {
-    for (BallColor::type c=BallColor::first; c<=BallColor::last; ++c, ++line) {
-        toolbar->setColorAt(line.row, line.column, c);
+    for (BallColor::type c=BallColor::first; c<=BallColor::last; ++c) {
+        toolbar->setColorAt(0, static_cast<int>(c), c);
     }
     board->hideAnimation();
     CellButton *selectedCell = toolbar->getCells()[0][0];

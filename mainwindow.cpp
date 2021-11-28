@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2018-2020 Volodymyr Kryachko
+Copyright (C) 2018-2021 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -23,8 +23,9 @@ along with ColorLines; see the file COPYING.  If not, see
 #include <QtWidgets>
 
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
-#include "fixedaspectratioitem.h"
+#include "swapboxlayout.h"
+#include "tradeforsizeroot.h"
+#include "aspectratioitem.h"
 #include "cellgridcontrol.h"
 #include "boardcontrol.h"
 #include "editmodecontrol.h"
@@ -34,17 +35,53 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "app_defs.h"
 
 
+TradeForSizeItem *newFixedAspectRatioItem(
+        QLayoutItem *i,
+        TradeForSizeItem::InvalidateFunc invalidate_func)
+{
+    TradeForSizeItem* tfsi = new AspectRatioItem(i, invalidate_func, 1.0);
+    return tfsi;
+}
+
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
     , editControl(nullptr)
 {
-    ui->setupUi(this);
     QSettings load_settings(OrganizationName, ApplicationName);
     restoreGeometry(load_settings.value("geometry").toByteArray());
     restoreState(load_settings.value("windowState").toByteArray());
 
-    setupLayout(QBoxLayout::TopToBottom);
+    setCentralWidget(new QWidget(this));
+    setupMenu();
+
+    main_layout = new TradeForSizeRoot<SwapBoxLayout>(SwappableLayout::Vertical);
+    QGridLayout *grid_layout = new QGridLayout();
+#ifdef QT_DEBUG
+    grid_layout->setObjectName("BOARD GRID");
+#endif
+
+    TradeForSizeLayout<SwapBoxLayout> *editTB_layout =
+            new TradeForSizeLayout<SwapBoxLayout>(SwappableLayout::Horizontal);
+
+    gridControl = new CellGridControl(
+                BoardDim::ROWS_NUM,
+                BoardDim::COLUMNS_NUM,
+                [grid_layout](QWidget* w, int r, int c) { grid_layout->addWidget(w,r,c); },
+                centralWidget());
+
+    editTB_layout->addStretch(1);
+    editToolbar = new CellGridControl(
+                1,
+                BallColor::colors_num,
+                [this, editTB_layout](QWidget* w, int, int){
+                    editTB_layout->addWidget<TradeForSizeItem::InvalidateFunc>(
+                        w,
+                        newFixedAspectRatioItem,
+                        [this]() { main_layout->invalidateGeom(); });
+                },
+                centralWidget());
+    editTB_layout->addStretch(1);
 
     boardControl = new BoardControl(gridControl);
     gameControl = new GameControl(gridControl, this);
@@ -52,13 +89,21 @@ MainWindow::MainWindow(QWidget *parent)
     connect(boardControl, &BoardControl::spawnAnimationFinished, this, &MainWindow::finalizeSpawn);
     connect(boardControl, &BoardControl::moveFinished, this, &MainWindow::handleMove);
 
-    spawnColorLabels[0] = ui->nextColor1;
-    spawnColorLabels[1] = ui->nextColor2;
-    spawnColorLabels[2] = ui->nextColor3;
+    TradeForSizeLayout<QHBoxLayout> *spawnTB_layout = new TradeForSizeLayout<QHBoxLayout>();
+    spawnTB_layout->addStretch(1);
     for (QLabel **nextLab=&spawnColorLabels[0];
         nextLab < &spawnColorLabels[SPAWN_BALLS_NUM];
         ++nextLab) {
+        *nextLab = new QLabel();
         (*nextLab)->setMinimumSize(QSize(40,40)); //TOFIX: magic numbers
+        (*nextLab)->setMaximumSize(QSize(50,50));
+        (*nextLab)->setAlignment(Qt::AlignCenter);
+        (*nextLab)->setScaledContents(true);
+        spawnTB_layout->addWidget<TradeForSizeItem::InvalidateFunc>(
+                    *nextLab,
+                    newFixedAspectRatioItem,
+                    [this]() { main_layout->invalidateGeom(); }
+        );
     }
     //TOFIX: duplicate code
     for (BallColor::type c=BallColor::first;
@@ -70,8 +115,22 @@ MainWindow::MainWindow(QWidget *parent)
     Settings s;
     int score;
     std::size_t balls_num = s.loadGame(*gridControl, score);
-    scoreLab = ui->scoreLab;
+    scoreLab = new QLabel();
     scoreLab->setText(QString::number(score));
+    spawnTB_layout->addSpacing(20);
+    spawnTB_layout->addWidget(new QLabel("Score:"));
+    spawnTB_layout->addWidget(scoreLab);
+    spawnTB_layout->addStretch(1);
+
+    main_layout->addLayout(spawnTB_layout);
+    main_layout->addItem(new AspectRatioItem(
+                grid_layout,
+                [this](){ main_layout->invalidateGeom(); },
+                1.0f));
+    main_layout->addSwappable(editTB_layout);
+    main_layout->setAlignment(editTB_layout, Qt::AlignTop | Qt::AlignHCenter);
+    centralWidget()->setLayout(main_layout);
+
     gameControl->generateRandomSpawn(spawn_locations, cached_colors);
     showNextSpawn();
     if (balls_num < SPAWN_BALLS_NUM) {
@@ -79,35 +138,24 @@ MainWindow::MainWindow(QWidget *parent)
     }
 }
 
-void MainWindow::setupLayout(QBoxLayout::Direction dir)
+void MainWindow::setupMenu()
 {
-    QGridLayout *grid_layout = new QGridLayout();
-    QGridLayout *editTB_layout = new QGridLayout();
+    QMenuBar *menubar = new QMenuBar(this);
+    menubar->setGeometry(QRect(0, 0, 615, 22));
+    QMenu *menuGame = new QMenu(tr("&Game"), menubar);
+    QMenu *menuFile = new QMenu(tr("&File"), menubar);
+    menuGame->addAction(tr("&New"), this, &MainWindow::on_actionNew_triggered);
+    QAction *actionEdit = menuGame->addAction(
+                tr("&Edit"), this, &MainWindow::on_actionEdit_toggled);
+    actionEdit->setCheckable(true);
+    menuFile->addAction(new QAction(tr("&Save")));
+    menuFile->addAction(tr("&Highest scores"), this,
+                        &MainWindow::on_actionHighest_scores_triggered);
 
-    FixedAspectRatioLayout * square_layout = new FixedAspectRatioLayout();
-    QWidget * dull_widget = new QWidget();
-    square_layout->addWidget(dull_widget);
-    dull_widget->setLayout(grid_layout);
+    menubar->addAction(menuFile->menuAction());
+    menubar->addAction(menuGame->menuAction());
 
-    gridControl = new CellGridControl(BoardDim::ROWS_NUM, BoardDim::COLUMNS_NUM, grid_layout, this);
-    int rows;
-    int columns;
-    Qt::Alignment al;
-    if (dir == QBoxLayout::TopToBottom) {
-        rows = 1;
-        columns = BallColor::colors_num;
-        al = Qt::AlignCenter;
-    } else {
-        rows = BallColor::colors_num;
-        columns = 1;
-        al = Qt::AlignRight | Qt::AlignVCenter;
-    }
-    editToolbar = new CellGridControl(rows, columns, editTB_layout, this);
-
-    QVBoxLayout *vbox = qobject_cast<QVBoxLayout*>(ui->mainLayout);
-    vbox->addLayout(square_layout);
-    vbox->addLayout(editTB_layout);
-    vbox->setAlignment(editTB_layout, al);
+    setMenuBar(menubar);
 }
 
 void MainWindow::handleMove(const BoardInfo::cell_location &loc)
@@ -127,7 +175,7 @@ void MainWindow::makeSpawn()
     std::vector<BallColor::type> spawn_colors;
     spawn_locations.clear();
     gameControl->generateRandomSpawn(spawn_locations, spawn_colors);
-    if (spawn_locations.size() < SPAWN_BALLS_NUM) {
+    if (spawn_locations.size() < SPAWN_BALLS_NUM) { //TODO: handle this correctly in all cases
         handleEndGame();
         return;
     }
@@ -141,9 +189,9 @@ void MainWindow::makeSpawn()
 void MainWindow::showNextSpawn()
 {
     for (size_t i=0; i<SPAWN_BALLS_NUM; ++i) {
-        const QIcon icon = ballIcons[cached_colors[i]];
+        const QIcon &icon = ballIcons[cached_colors[i]];
         QLabel *lab = spawnColorLabels[i];
-        lab->setPixmap(icon.pixmap(lab->size()/2));
+        lab->setPixmap(icon.pixmap(icon.availableSizes()[0]));
         lab->setAlignment(Qt::AlignCenter);
     }
 }
@@ -177,7 +225,6 @@ void MainWindow::handleEndGame()
 
 MainWindow::~MainWindow()
 {
-    delete ui;
 }
 
 void MainWindow::on_actionNew_triggered()
@@ -198,7 +245,9 @@ void MainWindow::on_actionEdit_toggled(bool isEditMode)
     else if(!isEditMode && editControl) {
         delete editControl;
         editControl = nullptr;
-        connect(gridControl, &CellGridControl::userInput, boardControl, &BoardControl::handleClicked);
+        connect(gridControl, &CellGridControl::userInput,
+                boardControl, &BoardControl::handleClicked);
+        editToolbar->clear();
     }
 }
 
@@ -206,6 +255,7 @@ void MainWindow::on_actionHighest_scores_triggered()
 {
     QDialog *table = new HighScoresTable(this);
     table->exec();
+    delete table;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

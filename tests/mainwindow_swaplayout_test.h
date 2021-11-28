@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2020 Volodymyr Kryachko
+Copyright (C) 2021 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -20,23 +20,15 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef MAINWINDOW_SWAPLAYOUT_TEST_H
+#define MAINWINDOW_SWAPLAYOUT_TEST_H
 
 #include <QWidget>
-#include <QList>
-#include <QBoxLayout>
-#include <QIcon>
 
-#include "../basic_defs.hpp"
-#include "../animatediconbutton.h"
+//class CustomToolButton;
+class SwapLayout;
 
-class SwapBoxLayout;
-template <typename T>
-class TradeForSizeRoot;
-
-
-class MainWindow : public QMainWindow
+class MainWindow : public QWidget
 {
     Q_OBJECT
 
@@ -44,17 +36,12 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
-    void setupLayout(QBoxLayout::Direction dir);
-
 public slots:
-    void swap();
     void handleButtonClick();
-    void handleAnimationFinished();
 
-private:
-    TradeForSizeRoot<SwapBoxLayout> *main_layout;
-    QList<AnimatedIconButton *> button_list;
-    QIcon ballIcons[BallColor::colors_num];
+protected:
+    SwapLayout *swap_grid;
+//    QList<CustomToolButton *> toolbutton_list;
 
 };
-#endif // MAINWINDOW_H
+#endif // MAINWINDOW_SWAPLAYOUT_TEST_H

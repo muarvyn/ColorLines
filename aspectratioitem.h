@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2020 Volodymyr Kryachko
+Copyright (C) 2021 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -20,35 +20,28 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#ifndef TESTWIDGETITEM_H
-#define TESTWIDGETITEM_H
+#ifndef ASPECTRATIOITEM_H
+#define ASPECTRATIOITEM_H
 
-#include <QWidgetItem>
+#include "tradeforsizeitem.h"
 
-class TradeForSizeItem;
 
-class TestWidgetItem : public QLayoutItem
+class AspectRatioItem : public TradeForSizeItem
 {
 public:
-    TestWidgetItem(QLayout *l, TradeForSizeItem *item = nullptr);
-    ~TestWidgetItem() override = default;
+    AspectRatioItem(QLayoutItem *i, TradeForSizeItem::InvalidateFunc,
+                    float r=1.0f, const QSize hs = QSize());
 
-    QSize sizeHint() const override;
     QSize minimumSize() const override;
     QSize maximumSize() const override;
-    Qt::Orientations expandingDirections() const override;
-    bool isEmpty() const override;
-    void setGeometry(const QRect&) override;
-    QRect geometry() const override;
-    void setCentralWidget(QWidget *widget);
-    QLayoutItem *getCentralItem();
+    bool assignSize(const QSize s) override;
 
-    void addCentralWidget(QWidget *widget);
-
-protected:
-    //QList<QLayoutItem *> list;
-    TradeForSizeItem *centralItem;
-    QLayout *layout;
+private:
+    /** height = width * ratio **/
+    double ratio;
+    inline QSize adjustSize(QSize size) const {
+        return size.boundedTo(QSize(qIntCast(size.height()/ratio), qIntCast(size.width()*ratio)));
+    }
 };
 
-#endif // TESTWIDGETITEM_H
+#endif // ASPECTRATIOITEM_H

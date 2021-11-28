@@ -77,10 +77,20 @@ TestWidgetItem::TestWidgetItem(QLayout *l, TradeForSizeItem *item)
 
 }
 
-void TestWidgetItem::addCentralWidget(QWidget *widget)
+void TestWidgetItem::setCentralWidget(QWidget *widget)
 {
     if (centralItem) return;
     centralItem = new TradeForSizeItem(widget);
+}
+
+QLayoutItem *TestWidgetItem::getCentralItem()
+{
+    return centralItem;
+}
+
+void TestWidgetItem::addCentralWidget(QWidget *widget)
+{
+    setCentralWidget(widget);
     layout->addItem(centralItem);
 }
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2020 Volodymyr Kryachko
+Copyright (C) 2020-2021 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -24,53 +24,95 @@ along with ColorLines; see the file COPYING.  If not, see
 
 #include "customtoolbutton.h"
 #include "mainwindow_layout_test.h"
-#include "../fixedaspectratioitem.h"
-#include "testwidgetitem.h"
+#include "../swapboxlayout.h"
+#include "../tradeforsizeroot.h"
+#include "../aspectratioitem.h"
 
+TradeForSizeItem *newItem(QLayoutItem *i, TradeForSizeItem::InvalidateFunc invalidate_func)
+{
+    TradeForSizeItem* tfsi = new AspectRatioItem(i, invalidate_func, 1.0, QSize(80,80));
+    return tfsi;
+}
+
+CustomToolButton *newButton(QWidget *parent)
+{
+    CustomToolButton *btn = new CustomToolButton(parent);
+    btn->setMaximumSize(120,120);
+    return btn;
+
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
+    , first_item(new SwapBoxLayout(SwappableLayout::Horizontal))
+    , last_item(new TradeForSizeLayout<SwapBoxLayout>(SwappableLayout::Horizontal))
+    , main_layout(new TradeForSizeRoot<SwapBoxLayout>(SwappableLayout::Vertical))
 {
-    QBoxLayout *v_layout = new QBoxLayout(QBoxLayout::TopToBottom);
+    first_item->addStretch(1);
+    first_item->addWidget(new QLabel("Hello"));
+    first_item->addWidget(new QLabel("World"));
+    first_item->addStretch(1);
 
-    QBoxLayout *layout = new QBoxLayout(QBoxLayout::LeftToRight);
-    QSizePolicy size_policy = QSizePolicy(QSizePolicy::Maximum,
-                                          QSizePolicy::Maximum,
-                                          QSizePolicy::ToolButton);
-//    QSizePolicy size_policy = QSizePolicy(QSizePolicy::MinimumExpanding,
-//                                          QSizePolicy::MinimumExpanding,
-//                                          QSizePolicy::ToolButton);
-    QSizePolicy size_policy_central = QSizePolicy(QSizePolicy::MinimumExpanding,
-                                          QSizePolicy::MinimumExpanding,
-                                          QSizePolicy::ToolButton);
-    layout->addStretch(1);
-    QAbstractButton *btn = new CustomToolButton(this);
-    btn->setSizePolicy(size_policy);
-    //layout->addWidget(btn);
-    layout->addItem(new FixedAspectRatioItem(btn));
-    layout->setStretch(layout->count(),1);
+    last_item->addStretch(1);
+    for (int i = 0; i < 3; ++i) {
+        CustomToolButton *btn = new CustomToolButton(this);
+        btn->setText(QString::number(i+1));
+        btn->setMaximumSize(70,70);
+        last_item->addWidget<TradeForSizeItem::InvalidateFunc>(
+                    btn, newItem, [this](){ last_item->invalidateGeom(); });
+        btn->setObjectName("Button "+ QString().number(i));
+    }
+    last_item->addStretch(1);
+    last_item->setObjectName("toolbar");
+    QToolButton *btn = new CustomToolButton(this);
+    btn->setText("Swap");
+    btn->setMaximumSize(QSize(120,120));
 
-    btn = new CustomToolButton(this);
-    btn->setSizePolicy(size_policy_central);
-    TestWidgetItem *item = new TestWidgetItem(layout);
-    item->addCentralWidget(btn);
-    layout->setStretch(layout->count(),10);
+    main_layout->setEnabled(false);
+    main_layout->addStretch(1);
+    main_layout->addSwappable(first_item);
+    //btn->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    QGridLayout *grid = new QGridLayout();
+    grid->addWidget(newButton(this), 0,0);
+    grid->addWidget(newButton(this), 0,1);
+    grid->addWidget(newButton(this), 1,0);
+    grid->addWidget(btn, 1,1);
+    main_layout->addItem(new AspectRatioItem(grid,
+                                             [this](){ main_layout->invalidateGeom(); },
+                                             1.0,
+                                             QSize(400,400)));
+    //main_layout->addWidget<TradeForSizeItem::InvalidateFunc>(
+    //            btn, newItem, [this](){ main_layout->invalidateGeom(); });
+    //assert(main_layout->setStretchFactor(btn, 30));
+    // TODO: Why doesn't this work right?
+    // main_layout->addWidget(btn, Qt::AlignCenter);
+    connect(btn, &CustomToolButton::clicked, this, &MainWindow::handleButtonClick);
+    main_layout->addSwappable(last_item);
+    main_layout->setStretchFactor(last_item, 5);
+    main_layout->addStretch(1);
+    //main_layout->setObjectName("center");
+    //main_layout->setAlignment(Qt::AlignCenter);
 
-    btn = new CustomToolButton(this);
-    btn->setSizePolicy(size_policy);
-//    layout->addWidget(btn);
-    layout->addItem(new FixedAspectRatioItem(btn));
-    layout->setStretch(layout->count(),1);
-    layout->addStretch(1);
+    setLayout(main_layout);
+    main_layout->setEnabled(true);
 
-    //v_layout->addStretch(1);
-    v_layout->addItem(item);
-    //v_layout->addStretch(1);
+}
 
-    setLayout(v_layout);
+void MainWindow::handleButtonClick()
+{
+    main_layout->setOrientation(SwappableLayout::Swapped);
 }
 
 MainWindow::~MainWindow()
 {
 }
 
+#include <QApplication>
+
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
+    return a.exec();
+}

@@ -31,6 +31,7 @@ android: {
 }
 
 SOURCES += \
+    aspectratioitem.cpp \
     highscorestable.cpp \
         main.cpp \
         mainwindow.cpp \
@@ -46,11 +47,15 @@ SOURCES += \
     boardcontrol.cpp \
     basic_defs.cpp \
     editmodecontrol.cpp \
-    settings.cpp
+    settings.cpp \
+    swapboxlayout.cpp \
+    tradeforsizeitem.cpp
 
 HEADERS += \
     app_defs.h \
+    aspectratioitem.h \
     highscorestable.h \
+    intermediateitemlayout.h \
         mainwindow.h \
     board.h \
     cellbutton.h \
@@ -64,7 +69,11 @@ HEADERS += \
     boardinfo.h \
     boardcontrol.h \
     editmodecontrol.h \
-    settings.h
+    settings.h \
+    swapboxlayout.h \
+    swappablelayout.h \
+    tradeforsizeitem.h \
+    tradeforsizeroot.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -75,7 +84,6 @@ RESOURCES += \
     images.qrc
 
 FORMS += \
-    highscorestable.ui \
-    mainwindow.ui
+    highscorestable.ui
 
 ANDROID_ABIS = armeabi-v7a

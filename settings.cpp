@@ -26,8 +26,8 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "basic_defs.hpp"
 #include "app_defs.h"
 
-const QString SavedGameSettingsGroupName("saved game");
-const QString ScoreSavedSetting("score");
+const static QString &SavedGameSettingsGroupName("saved game");
+const static QString &ScoreSavedSetting("score");
 
 Settings::Settings(QObject *parent) : QObject(parent)
 {
@@ -58,7 +58,7 @@ std::size_t Settings::loadGame(BoardInterface &board, int &score)
             if (!is_number) continue;
             board.setColorAt(row, column, BallColor::type(color));
             ++count;
-        } else {
+        } else if (key == ScoreSavedSetting) {
             score = load_settings.value(key).toInt();
         }
     }

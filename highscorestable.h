@@ -9,6 +9,7 @@
 
 typedef std::tuple<QString, int, bool> ScoreEntry;
 typedef QList<ScoreEntry> HighscoresList;
+ScoreEntry makeScoreEntry(QString name, int score, bool editable);
 
 class HighScoresModel : public QAbstractTableModel
 {

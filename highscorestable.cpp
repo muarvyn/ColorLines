@@ -21,6 +21,7 @@ along with ColorLines; see the file COPYING.  If not, see
 */
 
 #include <QSettings>
+#include <QDebug>
 
 #include "app_defs.h"
 #include "highscorestable.h"
@@ -59,6 +60,9 @@ int HighScoresTable::newScore(int score)
         [score](HighscoresList::const_reference item){ return getScore(item) > score; });
     list.insert(record_position, makeScoreEntry(model->getUserName(), score, true));
     int status = exec();
+    for (auto item : list) {
+        qDebug() << "HighScoresTable: " << std::get<0>(item) << " : " << std::get<1>(item);
+    }
     model->saveData();
     return status;
 }
@@ -131,7 +135,10 @@ void HighScoresModel::saveData() const
 
     int i=0;
     save_settings.remove("");
-    foreach (const ScoreEntry &entry, mData) {
+    for (const ScoreEntry &entry : mData) {
+        if (save_settings.contains(getName(entry)) &&
+            getScore(entry) <= save_settings.value(getName(entry)).toInt())
+                continue;
         if (++i <= MAX_SAVED_HIGHSCORES)
             save_settings.setValue(getName(entry), getScore(entry));
     }

@@ -113,7 +113,7 @@ MainWindow::MainWindow(QWidget *parent)
         ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
     }
     Settings s;
-    int score;
+    int score = 0;
     std::size_t balls_num = s.loadGame(*gridControl, score);
     scoreLab = new QLabel();
     scoreLab->setText(QString::number(score));

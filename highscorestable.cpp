@@ -54,14 +54,18 @@ HighScoresTable::HighScoresTable(QWidget *parent) :
 int HighScoresTable::newScore(int score)
 {
     HighScoresModel *model = qobject_cast<HighScoresModel *>(ui->highScoresView->model());
-    HighscoresList &list = model->getData();
-    HighscoresList::iterator record_position =
+    HighscoresList &list = model->getData(); // TOFIX: use HighScoresModel::data
+    HighscoresList::const_iterator record_it =
         std::find_if_not(list.begin(), list.end(),
         [score](HighscoresList::const_reference item){ return getScore(item) > score; });
-    list.insert(record_position, makeScoreEntry(model->getUserName(), score, true));
+    int row = record_it - list.cbegin();
+    model->insertRows(row, 1);
+    getScore(list[row]) = score;
+    QModelIndex selection = model->index(row,0);
+    ui->highScoresView->selectionModel()->select(selection, QItemSelectionModel::ClearAndSelect);
     int status = exec();
     for (auto item : list) {
-        qDebug() << "HighScoresTable: " << std::get<0>(item) << " : " << std::get<1>(item);
+        qDebug() << "HighScoresTable: " << getName(item) << " : " << getScore(item);
     }
     model->saveData();
     return status;
@@ -99,7 +103,7 @@ QVariant HighScoresModel::data(const QModelIndex & index, int role) const {
 
 bool HighScoresModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    QString name = value.toString().trimmed();
+    QString name = value.toString().trimmed().remove('\'');
     if (name.isEmpty()) return false;
     ScoreEntry &entry = mData[index.row()];
     getName(entry) = name;
@@ -116,12 +120,31 @@ Qt::ItemFlags HighScoresModel::flags(const QModelIndex &index) const {
     return flags;
 }
 
+bool HighScoresModel::insertRows(int row, int count, const QModelIndex &parent)
+{
+    if (count <= 0) {
+        return false;
+    }
+    beginInsertRows(parent, row, row+count-1);
+    for(int i=0; i<count; ++i) {
+        mData.insert(row, makeScoreEntry(getUserName(), 0, true));
+    }
+    endInsertRows();
+    return true;
+}
+
+
 void HighScoresModel::loadData() {
     QSettings load_settings(OrganizationName, ApplicationName);
-    load_settings.beginGroup(SettingsGroupName);
+    load_settings.beginGroup(HighscoresSettingsGroupName);
 
-    foreach (const QString &key, load_settings.childKeys()) {
-        mData.append(makeScoreEntry(key, load_settings.value(key).toInt(), false));
+    for (const QString &key : load_settings.childKeys()) {
+        QString entry_str(load_settings.value(key).toString());
+        QStringList list = entry_str.split('\'');
+            if (list.size() < 2) {
+                continue;
+            }
+        mData.append(makeScoreEntry(list[0], list[1].toInt(), false));
     }
     std::sort(mData.begin(), mData.end(), &EntryScoreGreaterThan);
 
@@ -131,16 +154,16 @@ void HighScoresModel::loadData() {
 void HighScoresModel::saveData() const
 {
     QSettings save_settings(OrganizationName, ApplicationName);
-    save_settings.beginGroup(SettingsGroupName);
+    save_settings.beginGroup(HighscoresSettingsGroupName);
 
     int i=0;
     save_settings.remove("");
+    const QString format("%1'%2");
     for (const ScoreEntry &entry : mData) {
-        if (save_settings.contains(getName(entry)) &&
-            getScore(entry) <= save_settings.value(getName(entry)).toInt())
-                continue;
-        if (++i <= MAX_SAVED_HIGHSCORES)
-            save_settings.setValue(getName(entry), getScore(entry));
+        save_settings.setValue(QString::number(i), format.arg(getName(entry)).arg(int(getScore(entry))));
+        if (++i >= MAX_SAVED_HIGHSCORES) {
+            break;
+        }
     }
     save_settings.endGroup();
 }

@@ -45,7 +45,7 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    ~MainWindow() override;
 
     template <typename FunctionType>
     QAction *addMenuAction(QMenu *menu, const QString &text, FunctionType functor);
@@ -60,7 +60,7 @@ private slots:
     void on_actionNew_triggered();
     void on_actionEdit_toggled(bool isEditMode);
     void on_actionHighest_scores_triggered();
-    void closeEvent(QCloseEvent *event);
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     void setupMenu();

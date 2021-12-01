@@ -28,7 +28,7 @@ along with ColorLines; see the file COPYING.  If not, see
 const QString
     OrganizationName("One Buck Software"),
     ApplicationName("ColorLines"),
-    SettingsGroupName("Highscores");
+    HighscoresSettingsGroupName("Highscores");
 
 const int MAX_SAVED_HIGHSCORES = 10;
 

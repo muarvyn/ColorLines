@@ -22,7 +22,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 CONFIG += c++11
 INCLUDEPATH += grid2d_graph
-INCLUDEPATH += D:\tools\boost_1_70_0
+win32:INCLUDEPATH += D:\tools\boost_1_70_0
+android: {
+    boost_link.target = boost
+    boost_link.commands = ln -s /usr/include/boost ./boost
+    "$(OBJECTS_DIR)dijkstra_search.o".depends = boost_link
+    QMAKE_EXTRA_TARGETS += $(OBJECTS_DIR)dijkstra_search.o boost_link
+}
 
 SOURCES += \
     aspectratioitem.cpp \
@@ -79,3 +85,5 @@ RESOURCES += \
 
 FORMS += \
     highscorestable.ui
+
+ANDROID_ABIS = armeabi-v7a

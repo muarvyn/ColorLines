@@ -28,7 +28,7 @@ BoardInfo::BoardInfo(BoardInterface &b)
 
 }
 
-constexpr BoardInfo::Direction BoardInfo::orig_dirs[];
+const BoardInfo::Direction BoardInfo::orig_dirs[] = {{-1,0},{-1,-1},{0,-1},{1,-1}};
 
 void BoardInfo::getStraitConnection( cell_location start,
         std::vector<cell_location> &connection)

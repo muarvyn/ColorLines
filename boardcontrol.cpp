@@ -71,10 +71,12 @@ void BoardControl::animatePath(std::vector<BoardInfo::cell_location> &path,
         gridControl->startDelayedAnimation(path_button, st, AnimatedIconButton::UNOCCUPIED, delay);
         delay+=100;
     }
-    connect(path_button, &AnimatedIconButton::animation_finished,
-        this,
-        [this, lastButton] {
-            emit moveFinished(BoardInfo::cell_location(
+    connect(path_button,
+            &AnimatedIconButton::animation_finished,
+            this,
+            [this, lastButton, path_button] {
+            disconnect(path_button, &AnimatedIconButton::animation_finished, nullptr, nullptr);
+            emit this->moveFinished(BoardInfo::cell_location(
                 lastButton->getRow(), lastButton->getColumn()));
         });
     QTimer::singleShot(
@@ -98,7 +100,14 @@ void BoardControl::animateSpawn(
             btn->setupAnimation("opacity", 0, 1, 600);
             btn->startAnimation(state, state);
         }
-        connect(btn, &AnimatedIconButton::animation_finished, this, &BoardControl::spawnAnimationFinished);
+        connect(btn,
+                &AnimatedIconButton::animation_finished,
+                this,
+                [this, btn](){
+            disconnect(btn, &AnimatedIconButton::animation_finished, nullptr, nullptr);
+            emit this->spawnAnimationFinished();
+            }
+        );
         qDebug() << __FUNCTION__ << ": animation_finished is connected.";
         if (!btn->isAnimating()) qWarning() << __FUNCTION__ << "btn must be animating.";
     } else {

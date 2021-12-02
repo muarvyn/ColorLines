@@ -40,7 +40,7 @@ public:
     void stopAnimation();
 
 public slots:
-    void finalizeAnimation(int previous_state);
+    void finalizeAnimation();
     void startAnimation(int animation_state, int final_state);
 
 signals:

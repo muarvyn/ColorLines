@@ -29,6 +29,8 @@ AnimatedIconButton::AnimatedIconButton(int r, int c, QIcon *i, QWidget *parent)
     , animation(new QPropertyAnimation(&this->effect, "opacity"))
 {
     label.setGraphicsEffect(&this->effect);
+    connect(animation, &QPropertyAnimation::finished,
+            this, &AnimatedIconButton::finalizeAnimation);
 }
 
 AnimatedIconButton::~AnimatedIconButton()
@@ -46,9 +48,10 @@ bool AnimatedIconButton::isAnimating()
 
 void AnimatedIconButton::stopAnimation()
 {
-    animation->stop();
-    // TODO: do emit animation_finished or do not?
-    finalizeAnimation(0);
+    if (isAnimating()) {
+        animation->stop();
+        finalizeAnimation();
+    }
 }
 
 void AnimatedIconButton::setupAnimation(
@@ -70,17 +73,12 @@ void AnimatedIconButton::setupAnimation(
     animation->setStartValue(startValue);
     animation->setEndValue(endValue);
     animation->setPropertyName(propertyName);
-    connect(animation, &QPropertyAnimation::finished, this,
-        [this] () {finalizeAnimation(getState());});
 }
 
-void AnimatedIconButton::finalizeAnimation(int previous_state)
+void AnimatedIconButton::finalizeAnimation()
 {
-    Q_UNUSED(previous_state) // TODO: is previous_state needed?
     label.hide();
     emit animation_finished();
-    // TODO: disconnect always?
-    disconnect(this, &AnimatedIconButton::animation_finished, nullptr, nullptr);
     setState(state);
 }
 

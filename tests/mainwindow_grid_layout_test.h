@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2020 Volodymyr Kryachko
+Copyright (C) 2024 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -20,16 +20,11 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef MAINWINDOW_GRID_LAYOUT_TEST_H
+#define MAINWINDOW_GRID_LAYOUT_TEST_H
 
 #include <QWidget>
-#include <QList>
-#include <QBoxLayout>
-#include <QIcon>
-
-#include "../basic_defs.hpp"
-#include "../animatediconbutton.h"
+#include <QGridLayout>
 
 
 class MainWindow : public QWidget
@@ -40,19 +35,13 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
-    void setupLayout(QBoxLayout::Direction dir);
+    void setupLayout(const QSize &size);
 
 protected:
     void resizeEvent(QResizeEvent *e) override;
 
-public slots:
-    void handleButtonClick();
-    void handleAnimationFinished();
-
 private:
-    QBoxLayout *main_layout;
-    QList<AnimatedIconButton *> button_list;
-    QIcon ballIcons[BallColor::colors_num];
+    QGridLayout *grid_layout;
 
 };
-#endif // MAINWINDOW_H
+#endif // MAINWINDOW_GRID_LAYOUT_TEST_H

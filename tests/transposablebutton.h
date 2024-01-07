@@ -20,27 +20,24 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#ifndef SWAPPABLELAYOUT_H
-#define SWAPPABLELAYOUT_H
+#ifndef TRANSPOSABLEBUTTON_H
+#define TRANSPOSABLEBUTTON_H
 
-#include <QSize>
+#include <QToolButton>
+#include "../swappablelayout.h"
 
-class SwappableLayout
+class TransposableButton : public QToolButton, public SwappableLayout
 {
+    Q_OBJECT
 public:
-    enum Orientation {Horizontal, Vertical};
-    //static const Qt::Alignment default_policy[];
+    explicit TransposableButton(QWidget *parent = nullptr);
 
-    SwappableLayout(Orientation o = Vertical)
-        : orientation(o) {};
+    QSize getMinimumSize() const override {
+        return minimumSize();
+    }
 
-    Orientation getOrientation() const   { return orientation; };
-    virtual void setOrientation(Orientation o) { orientation = o; };
-    virtual QSize getMinimumSize() const = 0;
-
-protected:
-    Orientation orientation;
+    QSize sizeHint() const override;
 
 };
 
-#endif // SWAPPABLELAYOUT_H
+#endif // TRANSPOSABLEBUTTON_H

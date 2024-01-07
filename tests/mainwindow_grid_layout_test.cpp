@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2020 Volodymyr Kryachko
+Copyright (C) 2024 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -22,95 +22,38 @@ along with ColorLines; see the file COPYING.  If not, see
 
 #include <QtWidgets>
 #include <QDebug>
+#include <QSize>
 
 #include "mainwindow_grid_layout_test.h"
-#include "../basic_defs.hpp"
-#include "../fixedaspectratioitem.h"
-#include "testwidgetitem.h"
+#include "transposablebutton.h"
 
-int getColor(const AnimatedIconButton *btn)
-{
-    return btn->getColumn();
-}
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
-    , main_layout(new QBoxLayout(QBoxLayout::LeftToRight, this))
+    , grid_layout(new QGridLayout())
 {
-    for (BallColor::type c=BallColor::first;
-        c<=BallColor::last;
-        ++c)
-    {
-        ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
-    }
-
     QSizePolicy sp1(QSizePolicy::Expanding, QSizePolicy::Minimum);
     sp1.setHeightForWidth(true);
     sp1.setWidthForHeight(true);
     sp1.setHorizontalStretch(1);
     sp1.setVerticalStretch(1);
-//    const QSizePolicy sp2(QSizePolicy::Minimum, QSizePolicy::Minimum);
-//    const QSizePolicy sp1(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    QSizePolicy sp2(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    sp2.setHeightForWidth(true);
-    sp2.setWidthForHeight(true);
-    sp2.setHorizontalStretch(10);
-    sp2.setVerticalStretch(10);
-    for (BallColor::type color=BallColor::first; color < BallColor::first+3; ++color) {
-        AnimatedIconButton *btn = new AnimatedIconButton(0,color,ballIcons,this);
-        btn->setColor(color);
-        if (color == BallColor::red) {
-            btn->setSizePolicy(sp2);
-        } else {
-            btn->setSizePolicy(sp2);
-        }
-        connect(btn, &AnimatedIconButton::clicked, this, &MainWindow::handleButtonClick);
-        button_list.append(btn);
+    TransposableButton *btn;
+    for (int i = 0; i < 3; ++i) {
+        btn = new TransposableButton(this);
+        btn->setText(QString::number(i+1));
+        grid_layout->addWidget(btn, (i+1)/2, (i+1)%2);
     }
-
-    QGridLayout *box = new QGridLayout(this);
-
-    box->addItem(new FixedAspectRatioItem(button_list[0]), 1, 0);
-    TestWidgetItem *item = new TestWidgetItem(box);
-    item->setCentralWidget(button_list[1]);
-    box->addItem(item->getCentralItem(), 0, 1, 3, 3);
-    box->addItem(new FixedAspectRatioItem(button_list[2]), 1, 4);
+    QToolButton *central = new QToolButton();
+    central->setMaximumSize(QSize(420,420));
+    grid_layout->addWidget(central, 1, 1);
 
     //setupLayout(QBoxLayout::LeftToRight);
-    main_layout->addItem(item);
-    setLayout(main_layout);
-}
-
-void MainWindow::handleButtonClick()
-{
-    AnimatedIconButton *clickedButton = qobject_cast<AnimatedIconButton *>(sender());
-    if (clickedButton->isAnimating()) {
-        clickedButton->stopAnimation();
-    } else if (clickedButton->getState()==AnimatedIconButton::UNOCCUPIED) {
-        int st = getColor(clickedButton);
-        clickedButton->setupAnimation("opacity", 0, 1, 600);
-        clickedButton->startAnimation(st, st);
-        connect(clickedButton, &AnimatedIconButton::animation_finished,
-                this, &MainWindow::handleAnimationFinished);
-    } else {
-        int anim_st = clickedButton->getState();
-        clickedButton->setupAnimation("iconSize", clickedButton->size(), QSize(5,5), 600);
-        clickedButton->startAnimation(anim_st, AnimatedIconButton::UNOCCUPIED);
-        connect(clickedButton, &AnimatedIconButton::animation_finished,
-                this, &MainWindow::handleAnimationFinished);
-    }
-}
-
-void MainWindow::handleAnimationFinished()
-{
-    //AnimatedIconButton *senderButton = qobject_cast<AnimatedIconButton *>(sender());
+    setLayout(grid_layout);
 }
 
 void MainWindow::resizeEvent(QResizeEvent *e)
 {
-    QBoxLayout::Direction dir = e->size().width() > e->size().height() ?
-        QBoxLayout::LeftToRight : QBoxLayout::TopToBottom;
-    setupLayout(dir);
+    setupLayout(e->size());
     QWidget::resizeEvent(e);
 }
 
@@ -118,7 +61,62 @@ MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::setupLayout(QBoxLayout::Direction dir)
+void MainWindow::setupLayout(const QSize &size)
 {
-    if (main_layout->direction() == dir) return;
+    auto secondary_size = QSize();
+    auto widgets = std::list<std::pair<QWidget*, SwappableLayout*>>();
+    while (grid_layout->count()) {
+        auto widget = grid_layout->itemAt(0)->widget();
+        SwappableLayout *item = dynamic_cast<SwappableLayout*>(widget);
+        if (item) secondary_size += item->getMinimumSize();
+        widgets.push_back(std::make_pair(widget, item));
+        grid_layout->removeWidget(widget);
+    }
+
+    auto f = (size.width() - size.height() + secondary_size.height())
+            /float(secondary_size.height() + secondary_size.width());
+    auto width = 0;
+    auto col = 0, row = 0;
+    qDebug() << "secondary_size=" << secondary_size << " factor=" << f;
+    auto is_horizontal = true;
+    for (auto item : widgets) {
+        if (!item.second) {
+            grid_layout->addWidget(item.first, 1, 1);
+            continue;
+        }
+        is_horizontal = is_horizontal &&
+            (width + item.second->getMinimumSize().width()/2.0) < f*secondary_size.width();
+        if (is_horizontal) {
+            grid_layout->addWidget(item.first, 1, col);
+            width += item.second->getMinimumSize().width();
+            qDebug() << "Adding at " << "1 " << col << " width=" << width;
+            item.second->setOrientation(SwappableLayout::Horizontal);
+            col++;
+            if (col == 1) col++;
+        } else {
+            grid_layout->addWidget(item.first, row, 1);
+            qDebug() << "Adding at " << row << " 1";
+            item.second->setOrientation(SwappableLayout::Vertical);
+            row++;
+            if (row == 1) row++;
+        }
+    }
+    grid_layout->setRowStretch(0, 1);
+    grid_layout->setRowStretch(1, 10);
+    grid_layout->setRowStretch(2, 1);
+    grid_layout->setRowStretch(3, 1);
+    grid_layout->setColumnStretch(0, 1);
+    grid_layout->setColumnStretch(1, 10);
+    grid_layout->setColumnStretch(2, 1);
+    grid_layout->setColumnStretch(3, 1);
+}
+
+#include <QApplication>
+
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
+    return a.exec();
 }

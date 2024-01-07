@@ -9,25 +9,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    ../fixedaspectratioitem.cpp \
-    customtoolbutton.cpp \
-    main_testGridLayout.cpp \
     mainwindow_grid_layout_test.cpp \
-    ../cellbutton.cpp \
-    ../iconcellbutton.cpp \
-    ../animatediconbutton.cpp \
-    ../basic_defs.cpp \
-    testwidgetitem.cpp
+    transposablebutton.cpp
 
 HEADERS += \
-    ../fixedaspectratioitem.h \
-    customtoolbutton.h \
     mainwindow_grid_layout_test.h \
-    ../iconcellbutton.h \
-    ../cellbutton.h \
-    ../animatediconbutton.h \
-    ../basic_defs.hpp \
-    testwidgetitem.h
+    transposablebutton.h
 
 RESOURCES += \
     ../images.qrc

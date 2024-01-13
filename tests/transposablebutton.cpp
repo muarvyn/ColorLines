@@ -26,7 +26,7 @@ TransposableButton::TransposableButton(QWidget *parent)
     : QToolButton(parent)
 {
     setMinimumSize(QSize(40,40));
-    setMaximumSize(QSize(320,320));
+    setMaximumSize(QSize(420,420));
 }
 
 QSize TransposableButton::sizeHint() const {

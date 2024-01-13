@@ -36,6 +36,7 @@ public:
     ~MainWindow() override;
 
     void setupLayout(const QSize &size);
+    static constexpr auto center = QPoint(1,1);
 
 protected:
     void resizeEvent(QResizeEvent *e) override;

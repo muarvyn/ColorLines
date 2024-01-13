@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
         grid_layout->addWidget(btn, (i+1)/2, (i+1)%2);
     }
     QToolButton *central = new QToolButton();
-    central->setMaximumSize(QSize(420,420));
+    central->setMaximumSize(QSize(640,640));
     grid_layout->addWidget(central, 1, 1);
 
     //setupLayout(QBoxLayout::LeftToRight);
@@ -66,49 +66,65 @@ void MainWindow::setupLayout(const QSize &size)
     auto secondary_size = QSize();
     auto widgets = std::list<std::pair<QWidget*, SwappableLayout*>>();
     while (grid_layout->count()) {
-        auto widget = grid_layout->itemAt(0)->widget();
+        auto grid_item = grid_layout->takeAt(0);
+        auto widget = grid_item->widget();
         SwappableLayout *item = dynamic_cast<SwappableLayout*>(widget);
         if (item) secondary_size += item->getMinimumSize();
         widgets.push_back(std::make_pair(widget, item));
-        grid_layout->removeWidget(widget);
     }
 
     auto f = (size.width() - size.height() + secondary_size.height())
             /float(secondary_size.height() + secondary_size.width());
     auto width = 0;
-    auto col = 0, row = 0;
+    auto line_pos = 0;
+    auto grid_rect = QRect(center, QSize(1,1));
     qDebug() << "secondary_size=" << secondary_size << " factor=" << f;
     auto is_horizontal = true;
+    auto item_orientation = SwappableLayout::Vertical;
     for (auto item : widgets) {
         if (!item.second) {
-            grid_layout->addWidget(item.first, 1, 1);
+            grid_layout->addWidget(item.first, center.y(), center.x());
             continue;
         }
         is_horizontal = is_horizontal &&
             (width + item.second->getMinimumSize().width()/2.0) < f*secondary_size.width();
+
+        qDebug() << "line_pos:" << line_pos;
+        int dpos;
+        auto pos = QPoint(0,0);
         if (is_horizontal) {
-            grid_layout->addWidget(item.first, 1, col);
+            pos = QPoint(line_pos, center.y());
             width += item.second->getMinimumSize().width();
-            qDebug() << "Adding at " << "1 " << col << " width=" << width;
-            item.second->setOrientation(SwappableLayout::Horizontal);
-            col++;
-            if (col == 1) col++;
+            dpos = (pos.x()+1 == center.x()) ? 2 : 1;
+            grid_rect.setLeft(0);
+            grid_rect.setRight(std::max(line_pos, center.x()));
         } else {
-            grid_layout->addWidget(item.first, row, 1);
-            qDebug() << "Adding at " << row << " 1";
-            item.second->setOrientation(SwappableLayout::Vertical);
-            row++;
-            if (row == 1) row++;
+            if (item_orientation == SwappableLayout::Vertical) {
+                line_pos = 0;
+            }
+            pos = QPoint(center.x(), line_pos);
+            item_orientation = SwappableLayout::Horizontal;
+            dpos = (pos.y()+1 == center.y()) ? 2 : 1;
+            grid_rect.setTop(0);
+            grid_rect.setBottom(std::max(line_pos, center.y()));
         }
+        item.second->setOrientation(item_orientation);
+        qDebug() << "Adding at (" << pos.y() << ":" << pos.x() << ") width=" << width;
+        grid_layout->addWidget(item.first, pos.y(), pos.x());
+        qDebug() << "Grid extents:" << grid_rect.topLeft() << grid_rect.bottomRight();
+        line_pos += dpos;
     }
-    grid_layout->setRowStretch(0, 1);
-    grid_layout->setRowStretch(1, 10);
-    grid_layout->setRowStretch(2, 1);
-    grid_layout->setRowStretch(3, 1);
-    grid_layout->setColumnStretch(0, 1);
-    grid_layout->setColumnStretch(1, 10);
-    grid_layout->setColumnStretch(2, 1);
-    grid_layout->setColumnStretch(3, 1);
+
+    for (auto pos = 0; pos < grid_layout->count(); pos++) {
+        auto stretch = pos==center.y() ? 10 :
+                       (grid_rect.top() <= pos) && (pos <= grid_rect.bottom()) ? 1 : 0;
+        grid_layout->setRowStretch(pos, stretch);
+
+        stretch = pos==center.x() ? 10 :
+                       (grid_rect.left() <= pos) && (pos <= grid_rect.right()) ? 1 : 0;
+        grid_layout->setColumnStretch(pos, stretch);
+    }
+
 }
 
 #include <QApplication>

@@ -13,6 +13,7 @@ SOURCES += \
     transposablebutton.cpp
 
 HEADERS += \
+    ../transposable.h \
     mainwindow_grid_layout_test.h \
     transposablebutton.h
 

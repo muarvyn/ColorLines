@@ -27,6 +27,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "mainwindow_grid_layout_test.h"
 #include "transposablebutton.h"
 
+const QPoint MainWindow::center;
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
@@ -47,7 +48,6 @@ MainWindow::MainWindow(QWidget *parent)
     central->setMaximumSize(QSize(640,640));
     grid_layout->addWidget(central, 1, 1);
 
-    //setupLayout(QBoxLayout::LeftToRight);
     setLayout(grid_layout);
 }
 
@@ -64,11 +64,11 @@ MainWindow::~MainWindow()
 void MainWindow::setupLayout(const QSize &size)
 {
     auto secondary_size = QSize();
-    auto widgets = std::list<std::pair<QWidget*, SwappableLayout*>>();
+    auto widgets = std::list<std::pair<QWidget*, Transposable*>>();
     while (grid_layout->count()) {
         auto grid_item = grid_layout->takeAt(0);
         auto widget = grid_item->widget();
-        SwappableLayout *item = dynamic_cast<SwappableLayout*>(widget);
+        Transposable *item = dynamic_cast<Transposable*>(widget);
         if (item) secondary_size += item->getMinimumSize();
         widgets.push_back(std::make_pair(widget, item));
     }
@@ -80,7 +80,7 @@ void MainWindow::setupLayout(const QSize &size)
     auto grid_rect = QRect(center, QSize(1,1));
     qDebug() << "secondary_size=" << secondary_size << " factor=" << f;
     auto is_horizontal = true;
-    auto item_orientation = SwappableLayout::Vertical;
+    auto item_orientation = Transposable::Vertical;
     for (auto item : widgets) {
         if (!item.second) {
             grid_layout->addWidget(item.first, center.y(), center.x());
@@ -99,11 +99,11 @@ void MainWindow::setupLayout(const QSize &size)
             grid_rect.setLeft(0);
             grid_rect.setRight(std::max(line_pos, center.x()));
         } else {
-            if (item_orientation == SwappableLayout::Vertical) {
+            if (item_orientation == Transposable::Vertical) {
                 line_pos = 0;
             }
             pos = QPoint(center.x(), line_pos);
-            item_orientation = SwappableLayout::Horizontal;
+            item_orientation = Transposable::Horizontal;
             dpos = (pos.y()+1 == center.y()) ? 2 : 1;
             grid_rect.setTop(0);
             grid_rect.setBottom(std::max(line_pos, center.y()));

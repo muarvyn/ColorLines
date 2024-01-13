@@ -24,9 +24,9 @@ along with ColorLines; see the file COPYING.  If not, see
 #define TRANSPOSABLEBUTTON_H
 
 #include <QToolButton>
-#include "../swappablelayout.h"
+#include "../transposable.h"
 
-class TransposableButton : public QToolButton, public SwappableLayout
+class TransposableButton : public QToolButton, public Transposable
 {
     Q_OBJECT
 public:

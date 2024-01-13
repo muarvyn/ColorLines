@@ -20,18 +20,17 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#ifndef SWAPPABLELAYOUT_H
-#define SWAPPABLELAYOUT_H
+#ifndef TRANSPOSABLE_H
+#define TRANSPOSABLE_H
 
 #include <QSize>
 
-class SwappableLayout
+class Transposable
 {
 public:
     enum Orientation {Horizontal, Vertical};
-    //static const Qt::Alignment default_policy[];
 
-    SwappableLayout(Orientation o = Vertical)
+    Transposable(Orientation o = Vertical)
         : orientation(o) {};
 
     Orientation getOrientation() const   { return orientation; };
@@ -43,4 +42,4 @@ protected:
 
 };
 
-#endif // SWAPPABLELAYOUT_H
+#endif // TRANSPOSABLE_H

@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2021 Volodymyr Kryachko
+Copyright (C) 2024 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -24,13 +24,13 @@ along with ColorLines; see the file COPYING.  If not, see
 
 #include "customtoolbutton.h"
 #include "mainwindow_swapboxlayout_test.h"
-#include "../swapboxlayout.h"
+#include "../transposableboxlayout.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
+    , swap_box(new TransposableBoxLayout(Transposable::Vertical, this))
 {
     const QString str[] = {"nothing", "switch", "swap"};
-    SwapBoxLayout *swap_box = new SwapBoxLayout(SwappableLayout::Vertical, this);
     swap_box->addStretch(1);
     swap_box->setAlignment(Qt::AlignCenter);
     setLayout(swap_box);
@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::swapLayout()
 {
-    dynamic_cast<SwappableLayout*>(layout())->setOrientation(SwappableLayout::Swapped);
+    swap_box->setOrientation(Transposable::transpose(swap_box->getOrientation()));
 }
 
 MainWindow::~MainWindow()

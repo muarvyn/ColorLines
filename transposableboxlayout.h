@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2021 Volodymyr Kryachko
+Copyright (C) 2024 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -20,36 +20,37 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#ifndef FLIPBOXLAYOUT_H
-#define FLIPBOXLAYOUT_H
+#ifndef TRANSPOSABLEBOXLAYOUT_H
+#define TRANSPOSABLEBOXLAYOUT_H
 
-#include "swappablelayout.h"
+#include "transposable.h"
 
 #include <QBoxLayout>
 
 
-class SwapBoxLayout : public QBoxLayout, public SwappableLayout
+class TransposableBoxLayout : public QBoxLayout, public Transposable
 {
     Q_OBJECT
 public:
     static const Qt::Alignment default_policy[];
 
-    SwapBoxLayout(Orientation o = Vertical, QWidget *parent = nullptr);
+    TransposableBoxLayout(Transposable::Orientation o = Vertical, QWidget *parent = nullptr);
+
+    QSize getMinimumSize() const override {
+        return minimumSize();
+    }
 
     using QBoxLayout::addWidget;
     using QBoxLayout::addLayout;
     using QBoxLayout::sizeHint;
 
-    void addSwappable(QLayout *item);
-
     void setOrientation(Orientation) override;
-    QSize sizeHint(Orientation) const override;
+    QSize sizeHint() const override;
 
 protected:
     const Qt::Alignment *alignment_policy;
-    QList<SwappableLayout*> swappables;
 
 };
 
 
-#endif // FLIPBOXLAYOUT_H
+#endif // TRANSPOSABLEBOXLAYOUT_H

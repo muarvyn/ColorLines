@@ -9,12 +9,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    ../swapboxlayout.cpp \
+    ../transposableboxlayout.cpp \
     customtoolbutton.cpp \
     mainwindow_swapboxlayout_test.cpp
 
 HEADERS += \
-    ../swapboxlayout.h \
+    ../transposable.h \
+    ../transposableboxlayout.h \
     customtoolbutton.h \
     mainwindow_swapboxlayout_test.h
 

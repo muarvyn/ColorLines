@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2021 Volodymyr Kryachko
+Copyright (C) 2024 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -21,40 +21,33 @@ along with ColorLines; see the file COPYING.  If not, see
 */
 
 #include <QDebug>
-#include "swapboxlayout.h"
+#include "transposableboxlayout.h"
 
-const Qt::Alignment SwapBoxLayout::default_policy[]=
+const Qt::Alignment TransposableBoxLayout::default_policy[]=
 {
     Qt::AlignRight|Qt::AlignBottom,
     Qt::AlignCenter,
     Qt::AlignLeft|Qt::AlignTop
 };
 
-SwapBoxLayout::SwapBoxLayout(Orientation o, QWidget *parent)
+TransposableBoxLayout::TransposableBoxLayout(Orientation o, QWidget *parent)
     : QBoxLayout(o == Vertical ? QBoxLayout::TopToBottom : QBoxLayout::LeftToRight, parent)
-    , SwappableLayout(o)
+    , Transposable(o)
     , alignment_policy(default_policy)
 {
 
 }
 
-void SwapBoxLayout::addSwappable(QLayout *item)
+void TransposableBoxLayout::setOrientation(Orientation o)
 {
-    if (SwappableLayout *swap = dynamic_cast<SwappableLayout *>(item)) {
-        swappables.append(swap);
-    }
-    QBoxLayout::addLayout(item);
-}
-
-void SwapBoxLayout::setOrientation(Orientation o)
-{
-    if (ori == o) return;
+    if (orientation == o) return;
 
     setEnabled(false);
-    ori = ori == Vertical ? Horizontal : Vertical;
+    orientation = o;
 
+    /*
     Qt::Alignment local_mask, ext_mask;
-    if (ori == Vertical) {
+    if (orientation == Vertical) {
         local_mask = Qt::AlignVertical_Mask;
         ext_mask = Qt::AlignHorizontal_Mask;
     } else {
@@ -65,7 +58,7 @@ void SwapBoxLayout::setOrientation(Orientation o)
     bool dbg = !objectName().isEmpty();
 
     if (dbg) qDebug() << "SwapBoxLayout::setOrientation. " << objectName()
-                      << ": ori = " << ori
+                      << ": ori = " << orientation
                       << "; Local alignment: ";
     for (int i=0; i<count(); ++i) {
         Qt::Alignment loca = alignment_policy[qMin(i, qMax(1,i-count()+3))] & local_mask;
@@ -74,11 +67,17 @@ void SwapBoxLayout::setOrientation(Orientation o)
         if (dbg) qDebug() << QString("%1: %2").arg(i, 2, 10).
                              arg(loca | (alignment() & ext_mask), 10, 2);
     }
-
-    setDirection(ori == Vertical ? QBoxLayout::TopToBottom : QBoxLayout::LeftToRight);
-    for (int i=0; i<swappables.count(); ++i) {
-        SwappableLayout *l = swappables[i];
-        l->setOrientation(o);
+*/
+    setDirection(orientation == Vertical ? QBoxLayout::TopToBottom : QBoxLayout::LeftToRight);
+    for (int i = 0; i < count(); ++i) {
+        auto item = itemAt(i);
+        Transposable *l = dynamic_cast<Transposable *>(item);
+        if (l) {
+            l->setOrientation(orientation);
+        }/* else {
+            QWidget *w = item->widget();
+            l = dynamic_cast<Transposable *>(w);
+        }*/
         //qDebug() << "SwappableLayout::setOrientation. Item " << i << ": alignment is " <<
         //            QString("%1").arg(l->alignment(), 10, 2);
     }
@@ -86,7 +85,7 @@ void SwapBoxLayout::setOrientation(Orientation o)
     setEnabled(true);
 }
 
-QSize SwapBoxLayout::sizeHint(SwappableLayout::Orientation o) const
+QSize TransposableBoxLayout::sizeHint() const
 {
-    return QBoxLayout::sizeHint();
+    return QBoxLayout::sizeHint(); //TODO: ??
 }

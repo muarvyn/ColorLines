@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2021 Volodymyr Kryachko
+Copyright (C) 2024 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -25,6 +25,8 @@ along with ColorLines; see the file COPYING.  If not, see
 
 #include <QWidget>
 
+class TransposableBoxLayout;
+
 class MainWindow : public QWidget
 {
     Q_OBJECT
@@ -35,6 +37,9 @@ public:
 
 public slots:
     void swapLayout();
+
+private:
+    TransposableBoxLayout *swap_box;
 
 };
 #endif // MAINWINDOW_SWAPBOXLAYOUT_TEST_H

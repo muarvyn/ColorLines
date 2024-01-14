@@ -34,8 +34,12 @@ public:
         : orientation(o) {};
 
     Orientation getOrientation() const   { return orientation; };
-    virtual void setOrientation(Orientation o) { orientation = o; };
+    virtual void setOrientation(const Orientation o) { orientation = o; };
     virtual QSize getMinimumSize() const = 0;
+
+    static Orientation transpose(const Orientation o) {
+        return o == Vertical ? Horizontal : Vertical;
+    };
 
 protected:
     Orientation orientation;

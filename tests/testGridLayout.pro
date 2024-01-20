@@ -9,11 +9,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    ../layout/util.cpp \
     mainwindow_grid_layout_test.cpp \
     transposablebutton.cpp
 
 HEADERS += \
-    ../transposable.h \
+    ../layout/transposable.h \
     mainwindow_grid_layout_test.h \
     transposablebutton.h
 

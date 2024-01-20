@@ -24,7 +24,7 @@ along with ColorLines; see the file COPYING.  If not, see
 
 #include "customtoolbutton.h"
 #include "mainwindow_swapboxlayout_test.h"
-#include "../transposableboxlayout.h"
+#include "../layout/transposableboxlayout.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)

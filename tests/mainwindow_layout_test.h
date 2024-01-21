@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2020-2021 Volodymyr Kryachko
+Copyright (C) 2020-2024 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -26,11 +26,8 @@ along with ColorLines; see the file COPYING.  If not, see
 #include <QWidget>
 
 class CustomToolButton;
-class SwapBoxLayout;
-template <typename T>
-class TradeForSizeLayout;
-template <typename T>
-class TradeForSizeRoot;
+class TransposableBoxLayout;
+class QGridLayout;
 
 class MainWindow : public QWidget
 {
@@ -40,14 +37,14 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
-public slots:
-    void handleButtonClick();
-
 protected:
-    QList<CustomToolButton *> toolbutton_list;
-    SwapBoxLayout *first_item;
-    TradeForSizeLayout<SwapBoxLayout> *last_item;
-    TradeForSizeRoot<SwapBoxLayout> *main_layout;
+    void setupButtons(TransposableBoxLayout &swap_box);
+    void resizeEvent(QResizeEvent *e) override;
+
+private:
+    QGridLayout *grid_layout;
+    TransposableBoxLayout *first_item;
+    TransposableBoxLayout *last_item;
 
 };
 #endif // MAINWINDOW_LAYOUT_TEST_H

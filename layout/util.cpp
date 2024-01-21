@@ -27,13 +27,20 @@ along with ColorLines; see the file COPYING.  If not, see
 void setupCenterLayout(QGridLayout &grid_layout, const QPoint center, const QSize &size)
 {
     auto secondary_size = QSize();
-    auto widgets = std::list<std::pair<QWidget*, Transposable*>>();
+    auto items = std::list<std::tuple<QWidget*, QLayout*, Transposable*>>();
     while (grid_layout.count()) {
+        Transposable *transposable;
         auto grid_item = grid_layout.takeAt(0);
+        Q_ASSERT(!grid_item->isEmpty());
         auto widget = grid_item->widget();
-        Transposable *item = dynamic_cast<Transposable*>(widget);
-        if (item) secondary_size += item->getMinimumSize();
-        widgets.push_back(std::make_pair(widget, item));
+        auto layout = grid_item->layout();
+        if(widget == nullptr) {
+            transposable = dynamic_cast<Transposable*>(layout);
+        } else {
+            transposable = dynamic_cast<Transposable*>(widget);
+        }
+        if (transposable) secondary_size += transposable->getMinimumSize();
+        items.push_back(std::make_tuple(widget, layout, transposable));
     }
 
     auto f = (size.width() - size.height() + secondary_size.height())
@@ -44,38 +51,41 @@ void setupCenterLayout(QGridLayout &grid_layout, const QPoint center, const QSiz
     qDebug() << "secondary_size=" << secondary_size << " factor=" << f;
     auto is_horizontal = true;
     auto item_orientation = Transposable::Vertical;
-    for (auto item : widgets) {
-        if (!item.second) {
-            grid_layout.addWidget(item.first, center.y(), center.x());
-            continue;
-        }
-        is_horizontal = is_horizontal &&
-            (width + item.second->getMinimumSize().width()/2.0) < f*secondary_size.width();
-
-        qDebug() << "line_pos:" << line_pos;
-        int dpos;
-        auto pos = QPoint(0,0);
-        if (is_horizontal) {
-            pos = QPoint(line_pos, center.y());
-            width += item.second->getMinimumSize().width();
-            dpos = (pos.x()+1 == center.x()) ? 2 : 1;
-            grid_rect.setLeft(0);
-            grid_rect.setRight(std::max(line_pos, center.x()));
-        } else {
-            if (item_orientation == Transposable::Vertical) {
-                line_pos = 0;
+    for (auto item : items) {
+        auto transposable = std::get<2>(item);
+        auto pos = center;
+        if (transposable) {
+            is_horizontal = is_horizontal &&
+                (width + transposable->getMinimumSize().width()/2.0) < f*secondary_size.width();
+    
+            qDebug() << "line_pos:" << line_pos;
+            int dpos;
+            if (is_horizontal) {
+                pos = QPoint(line_pos, center.y());
+                width += transposable->getMinimumSize().width();
+                dpos = (pos.x()+1 == center.x()) ? 2 : 1;
+                grid_rect.setLeft(0);
+                grid_rect.setRight(std::max(line_pos, center.x()));
+            } else {
+                if (item_orientation == Transposable::Vertical) {
+                    line_pos = 0;
+                }
+                pos = QPoint(center.x(), line_pos);
+                item_orientation = Transposable::Horizontal;
+                dpos = (pos.y()+1 == center.y()) ? 2 : 1;
+                grid_rect.setTop(0);
+                grid_rect.setBottom(std::max(line_pos, center.y()));
             }
-            pos = QPoint(center.x(), line_pos);
-            item_orientation = Transposable::Horizontal;
-            dpos = (pos.y()+1 == center.y()) ? 2 : 1;
-            grid_rect.setTop(0);
-            grid_rect.setBottom(std::max(line_pos, center.y()));
+            transposable->setOrientation(item_orientation);
+            qDebug() << "Grid extents:" << grid_rect.topLeft() << grid_rect.bottomRight();
+            line_pos += dpos;
         }
-        item.second->setOrientation(item_orientation);
-        qDebug() << "Adding at (" << pos.y() << ":" << pos.x() << ") width=" << width;
-        grid_layout.addWidget(item.first, pos.y(), pos.x());
-        qDebug() << "Grid extents:" << grid_rect.topLeft() << grid_rect.bottomRight();
-        line_pos += dpos;
+        qDebug() << "Adding at (" << pos.y() << ":" << pos.x() << ")";
+        if (std::get<0>(item)) {
+            grid_layout.addWidget(std::get<0>(item), pos.y(), pos.x());
+        } else {
+            grid_layout.addLayout(std::get<1>(item), pos.y(), pos.x());
+        }
     }
 
     for (auto pos = 0; pos < grid_layout.count(); pos++) {

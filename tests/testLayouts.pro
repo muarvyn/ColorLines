@@ -9,19 +9,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    ../aspectratioitem.cpp \
-    ../swapboxlayout.cpp \
-    ../tradeforsizeitem.cpp \
+    ../layout/transposableboxlayout.cpp \
+    ../layout/util.cpp \
     customtoolbutton.cpp \
     mainwindow_layout_test.cpp
 
 HEADERS += \
-    ../aspectratioitem.h \
-    ../intermediateitemlayout.h \
-    ../swapboxlayout.h \
-    ../swappablelayout.h \
-    ../tradeforsizeitem.h \
-    ../tradeforsizeroot.h \
+    ../layout/transposable.h \
+    ../layout/transposableboxlayout.h \
     customtoolbutton.h \
     mainwindow_layout_test.h
 

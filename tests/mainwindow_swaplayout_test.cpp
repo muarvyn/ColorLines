@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::handleButtonClick()
 {
-    swap_grid->setOrientation(SwapLayout::Swapped);
+    swap_grid->setOrientation(SwapLayout::transpose(swap_grid->getOrientation()));
 }
 
 MainWindow::~MainWindow()

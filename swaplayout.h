@@ -23,12 +23,12 @@ along with ColorLines; see the file COPYING.  If not, see
 #ifndef SWAPLAYOUT_H
 #define SWAPLAYOUT_H
 
-#include "swappablelayout.h"
+#include "layout/transposable.h"
 
 #include <QGridLayout>
 
 
-class SwapLayout : public QGridLayout, public SwappableLayout
+class SwapLayout : public QGridLayout, public Transposable
 {
     Q_OBJECT
 public:
@@ -41,11 +41,13 @@ public:
     void addLayout(QLayout *item);
 
     void setOrientation(Orientation) override;
-    QSize sizeHint(Orientation) const override;
+    QSize getMinimumSize() const override {
+        return minimumSize();
+    }
 
 protected:
     const Qt::Alignment *alignment_policy;
-    QList<SwappableLayout*> swappables;
+    QList<Transposable*> swappables;
 
 private:
     QPair<int, int> nextPosition();

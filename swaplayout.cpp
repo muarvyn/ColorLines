@@ -33,14 +33,14 @@ const Qt::Alignment SwapLayout::default_policy[]=
 
 SwapLayout::SwapLayout(Orientation o, QWidget *parent)
     : QGridLayout(parent)
-    , SwappableLayout(o)
+    , Transposable(o)
     , alignment_policy(default_policy)
 {
 
 }
 
 QPair<int, int> SwapLayout::nextPosition() {
-    int inc_r = int(ori == Vertical), inc_c = int(ori == Horizontal);
+    int inc_r = int(orientation == Vertical), inc_c = int(orientation == Horizontal);
     return qMakePair( inc_r*count(), inc_c*count());
 }
 
@@ -58,7 +58,7 @@ void SwapLayout::addWidget(QWidget *w, Qt::Alignment a)
 
 void SwapLayout::addLayout(QLayout *item)
 {
-    if (SwappableLayout *swap = dynamic_cast<SwappableLayout *>(item)) {
+    if (Transposable *swap = dynamic_cast<Transposable *>(item)) {
         swappables.append(swap);
     }
     auto rc = nextPosition();
@@ -67,12 +67,12 @@ void SwapLayout::addLayout(QLayout *item)
 
 void SwapLayout::setOrientation(Orientation o)
 {
-    if (ori == o) return;
+    if (orientation == o) return;
 
     setEnabled(false);
-    ori = ori == Vertical ? Horizontal : Vertical;
+    orientation = o;
     Qt::Alignment local_mask, ext_mask;
-    if (ori == Vertical) {
+    if (orientation == Vertical) {
         local_mask = Qt::AlignVertical_Mask;
         ext_mask = Qt::AlignHorizontal_Mask;
     } else {
@@ -89,7 +89,7 @@ void SwapLayout::setOrientation(Orientation o)
         list.append(item);
     }
 
-    int r=0, c=0, inc_r = int(ori == Vertical), inc_c = int(ori == Horizontal);
+    int r=0, c=0, inc_r = int(orientation == Vertical), inc_c = int(orientation == Horizontal);
     for (int i=0; i<list.count(); ++i) {
         item = list[i];
         r+=inc_r; c+=inc_c;
@@ -99,15 +99,10 @@ void SwapLayout::setOrientation(Orientation o)
     }
 
     for (int i=0; i<swappables.count(); ++i) {
-        SwappableLayout *l = swappables[i];
+        Transposable *l = swappables[i];
         l->setOrientation(o);
         //qDebug() << "SwappableLayout::setOrientation. Item " << i << ": alignment is " <<
         //            QString("%1").arg(l->alignment(), 10, 2);
     }
     setEnabled(true);
-}
-
-QSize SwapLayout::sizeHint(SwappableLayout::Orientation o) const
-{
-    return QGridLayout::sizeHint();
 }

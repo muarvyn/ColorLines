@@ -32,6 +32,9 @@ public:
     explicit CustomToolButton(QWidget *parent = nullptr);
 
     QSize sizeHint() const override;
+    void setSizeHint(const QSize s) {
+        hintSize = s;
+    };
 
 protected:
     void resizeEvent(QResizeEvent * event) override;

@@ -34,18 +34,27 @@ MainWindow::MainWindow(QWidget *parent)
     , first_item(new TransposableBoxLayout(Transposable::Horizontal))
     , last_item(new TransposableBoxLayout(Transposable::Horizontal))
 {
+    auto space = new QWidget();
+    space->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+    grid_layout->addWidget(space);
     first_item->addStretch(1);
-    first_item->addWidget(new QLabel("Hello"));
-    first_item->addWidget(new QLabel("World"));
+    auto lab = new QLabel("Hello");
+    lab->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+    first_item->addWidget(lab);
+    lab = new QLabel("World");
+    lab->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+    first_item->addWidget(lab);
     first_item->addStretch(1);
-    grid_layout->addLayout(first_item, 0, 0);
+    grid_layout->addLayout(first_item, 1, 0);
 
     setupButtons(*last_item);
-    grid_layout->addLayout(last_item, 0, 1);
-    QToolButton *btn = new CustomToolButton(this);
+    grid_layout->addLayout(last_item, 1, 1);
+    CustomToolButton *btn = new CustomToolButton(this);
     btn->setText("Center");
+    btn->setSizeHint(QSize(300,300));
     btn->setMaximumSize(QSize(620,620));
     grid_layout->addWidget(btn);
+    grid_layout->addWidget(new QWidget());
 
     setLayout(grid_layout);
 }

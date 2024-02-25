@@ -32,13 +32,15 @@ MainWindow::MainWindow(QWidget *parent)
 {
     swap_grid = new SwapLayout(SwapLayout::Vertical, this);
     setLayout(swap_grid);
+    swap_grid->addWidget(new QWidget());
     CustomToolButton *btn;
     for (int i = 0; i < 3; ++i) {
         btn = new CustomToolButton(this);
         btn->setText(QString::number(i+1));
-        btn->setMaximumSize(QSize(80,80));
+        btn->setMaximumSize(QSize(180,180));
         swap_grid->addWidget(btn);
     }
+    swap_grid->addWidget(new QWidget());
     connect(btn, &CustomToolButton::clicked, this, &MainWindow::handleButtonClick);
 }
 

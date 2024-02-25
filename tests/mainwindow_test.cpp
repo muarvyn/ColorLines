@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2020 Volodymyr Kryachko
+Copyright (C) 2020-2024 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -25,19 +25,13 @@ along with ColorLines; see the file COPYING.  If not, see
 
 #include "mainwindow_test.h"
 #include "../basic_defs.hpp"
-#include "../swapboxlayout.h"
-#include "../tradeforsizeroot.h"
+#include "../layout/transposable.h"
+#include "../layout/transposableboxlayout.h"
 #include "../aspectratioitem.h"
 
 int getColor(const AnimatedIconButton *btn)
 {
     return btn->getColumn();
-}
-
-TradeForSizeItem *newItem(QLayoutItem *i, TradeForSizeItem::InvalidateFunc invalidate_func)
-{
-    TradeForSizeItem* tfsi = new AspectRatioItem(i, invalidate_func, 1.0);
-    return tfsi;
 }
 
 AnimatedIconButton *newButton(int r, int c, QIcon *ic, QWidget *parent)
@@ -48,7 +42,8 @@ AnimatedIconButton *newButton(int r, int c, QIcon *ic, QWidget *parent)
 }
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+    : QWidget(parent)
+    , main_layout(new QGridLayout())
 {
     for (BallColor::type c=BallColor::first;
         c<=BallColor::last;
@@ -57,20 +52,7 @@ MainWindow::MainWindow(QWidget *parent)
         ballIcons[c] = QIcon(QString(":/images/ball")+QString::number(c)+".gif");
     }
 
-    setCentralWidget(new QWidget(this));
-    QMenuBar *menubar = new QMenuBar(this);
-    menubar->setGeometry(QRect(0, 0, 615, 22));
-    QMenu *menuDo = new QMenu(tr("&Do"), menubar);
-    setMenuBar(menubar);
-
-    menubar->addAction(menuDo->menuAction());
-    QAction *actionSwap = new QAction(tr("&Swap"),this);
-    menuDo->addAction(actionSwap);
-    connect(actionSwap, &QAction::triggered, this, &MainWindow::swap);
-
-    main_layout = new TradeForSizeRoot<SwapBoxLayout>(SwappableLayout::Vertical);
-
-    TradeForSizeLayout<QHBoxLayout> *labels_layout = new TradeForSizeLayout<QHBoxLayout>();
+    TransposableBoxLayout *labels_layout = new TransposableBoxLayout(Transposable::Vertical);
     labels_layout->addStretch(1);
     for (int i = 3; i; --i) {
         QLabel *nextLab = new QLabel();
@@ -80,50 +62,43 @@ MainWindow::MainWindow(QWidget *parent)
         nextLab->setMaximumSize(QSize(80,80));
         QIcon *ic = &ballIcons[BallColor::last-i];
         nextLab->setPixmap(ic->pixmap(ic->availableSizes()[0]));
-        labels_layout->addWidget<TradeForSizeItem::InvalidateFunc>(
-                    nextLab,
-                    newItem,
-                    [this]() { main_layout->invalidateGeom(); }
-        );
+        labels_layout->addWidget(nextLab);
     }
     labels_layout->addStretch(1);
 
     QGridLayout *grid = new QGridLayout();
-    grid->addWidget(newButton(0, 0, ballIcons, centralWidget()), 0,0);
-    grid->addWidget(newButton(0, 1, ballIcons+1, centralWidget()), 0,1);
-    grid->addWidget(newButton(1, 0, ballIcons+2, centralWidget()), 1,0);
-    grid->addWidget(newButton(1, 1, ballIcons+3, centralWidget()), 1,1);
+    grid->addWidget(newButton(0, 0, ballIcons, nullptr), 0,0);
+    grid->addWidget(newButton(0, 1, ballIcons+1, nullptr), 0,1);
+    grid->addWidget(newButton(1, 0, ballIcons+2, nullptr), 1,0);
+    grid->addWidget(newButton(1, 1, ballIcons+3, nullptr), 1,1);
 
-    TradeForSizeLayout<SwapBoxLayout> *toolbar =
-            new TradeForSizeLayout<SwapBoxLayout>(SwappableLayout::Horizontal);
+    TransposableBoxLayout *toolbar = new TransposableBoxLayout(Transposable::Horizontal);
 
     toolbar->addStretch(1);
     for (BallColor::type color=BallColor::first; color < BallColor::first+3; ++color) {
-        AnimatedIconButton *btn = new AnimatedIconButton(0,color,ballIcons,centralWidget());
+        AnimatedIconButton *btn = new AnimatedIconButton(0, color, ballIcons, nullptr);
         btn->setMaximumSize(QSize(80,80));
         btn->setColor(color);
         connect(btn, &AnimatedIconButton::clicked, this, &MainWindow::handleButtonClick);
         button_list.append(btn);
-        toolbar->addWidget<TradeForSizeItem::InvalidateFunc>(
-                    btn,
-                    newItem,
-                    [this]() { main_layout->invalidateGeom(); });
+        toolbar->addWidget(btn);
     }
     toolbar->addStretch(1);
 
-    main_layout->addLayout(labels_layout);
+    main_layout->addLayout(labels_layout, 0, 0);
     main_layout->setAlignment(labels_layout, Qt::AlignCenter);
-    main_layout->addItem(new AspectRatioItem(
-                             grid,
-                             [this](){ main_layout->invalidateGeom(); },
-                             1.0f));
-    main_layout->addSwappable(toolbar);
-    centralWidget()->setLayout(main_layout);
+    main_layout->addLayout(grid, 0, 1);
+    main_layout->addLayout(toolbar, 1, 0);
+    setLayout(main_layout);
 }
 
-void MainWindow::swap()
+// teke it from layout/util.cpp
+void setupCenterLayout(QGridLayout &grid_layout, const QPoint center, const QSize &size);
+
+void MainWindow::resizeEvent(QResizeEvent *e)
 {
-    main_layout->setOrientation(SwappableLayout::Swapped);
+    setupCenterLayout(*main_layout, QPoint(1,1), e->size());
+    QWidget::resizeEvent(e);
 }
 
 void MainWindow::handleButtonClick()

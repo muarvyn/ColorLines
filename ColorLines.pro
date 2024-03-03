@@ -42,7 +42,6 @@ SOURCES += \
     iconcellbutton.cpp \
     animatediconbutton.cpp \
     gamecontrol.cpp \
-    fixedaspectratioitem.cpp \
     boardinfo.cpp \
     boardcontrol.cpp \
     basic_defs.cpp \
@@ -65,7 +64,6 @@ HEADERS += \
     iconcellbutton.h \
     animatediconbutton.h \
     gamecontrol.h \
-    fixedaspectratioitem.h \
     boardinfo.h \
     boardcontrol.h \
     editmodecontrol.h \

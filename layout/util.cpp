@@ -122,3 +122,78 @@ void setupCenterLayout(QGridLayout &grid_layout, const QPoint c, const QSize &si
     }
 */
 }
+
+void setupCenterLayoutItems(QGridLayout &grid_layout, const QPoint c, const QSize &size)
+{
+    auto secondary_size = QSize();
+    auto items = std::list<std::tuple<Transposable*, QLayoutItem*>>();
+    while (grid_layout.count()) {
+        Transposable *transposable;
+        auto grid_item = grid_layout.takeAt(0);
+        Q_ASSERT(!grid_item->isEmpty());
+        auto widget = grid_item->widget();
+        auto layout = grid_item->layout();
+        if(layout) {
+            transposable = dynamic_cast<Transposable*>(layout);
+        } else {
+            transposable = dynamic_cast<Transposable*>(widget);
+        }
+        if (transposable) secondary_size += transposable->getMinimumSize();
+        items.push_back(std::make_tuple(transposable, grid_item));
+    }
+
+    auto f = (size.width() - size.height() + secondary_size.height())
+            /float(secondary_size.height() + secondary_size.width());
+    auto width = 0;
+    auto line_pos = 1;
+    const auto center = c + QPoint(1,1);
+    qDebug() << "secondary_size=" << secondary_size << " factor=" << f;
+    auto is_horizontal = true;
+    auto is_vertical = true;
+    auto item_orientation = Transposable::Vertical;
+    auto is_space = true;
+    for (auto item : items) {
+        auto transposable = std::get<0>(item);
+        auto pos = center;
+        if (transposable) {
+            is_space = false;
+            is_horizontal = is_horizontal &&
+                (width + transposable->getMinimumSize().width()/2.0) < f*secondary_size.width();
+
+            //qDebug() << "line_pos:" << line_pos;
+            int dpos;
+            if (is_horizontal) {
+                is_vertical = false;
+                pos = QPoint(line_pos, center.y());
+                width += transposable->getMinimumSize().width();
+                dpos = (pos.x()+1 == center.x()) ? 2 : 1;
+            } else {
+                if (item_orientation == Transposable::Vertical) {
+                    line_pos = 1;
+                }
+                pos = QPoint(center.x(), line_pos);
+                item_orientation = Transposable::Horizontal;
+                dpos = (pos.y()+1 == center.y()) ? 2 : 1;
+
+            }
+            transposable->setOrientation(item_orientation);
+            line_pos += dpos;
+        } else {
+            if (is_space) {
+                delete std::get<1>(item);
+                continue;
+            } else {
+                is_space = true;
+            }
+        }
+        qDebug() << "Adding item at (" << pos.y() << ":" << pos.x() << ")";
+        grid_layout.addItem(std::get<1>(item), pos.y(), pos.x());
+    }
+    if (is_horizontal) {
+        grid_layout.addWidget(new QWidget(), center.y(), 0);
+        grid_layout.addWidget(new QWidget(), center.y(), line_pos);
+    } else if (is_vertical) {
+        grid_layout.addWidget(new QWidget(), 0, center.x());
+        grid_layout.addWidget(new QWidget(), line_pos, center.x());
+    }
+}

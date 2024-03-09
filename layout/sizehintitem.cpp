@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2020-2024 Volodymyr Kryachko
+Copyright (C) 2024 Volodymyr Kryachko
 
 This file is part of ColorLines.
 
@@ -20,34 +20,13 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#ifndef MAINWINDOW_LAYOUT_TEST_H
-#define MAINWINDOW_LAYOUT_TEST_H
+#define QT_NO_DEBUG_OUTPUT
 
 #include <QWidget>
+#include "sizehintitem.h"
 
-class CustomToolButton;
-class TransposableBoxLayout;
-class QGridLayout;
-class SizeHintItem;
-
-class MainWindow : public QWidget
+SizeHintItem::SizeHintItem(QWidget *widget)
+    : QWidgetItem(widget)
 {
-    Q_OBJECT
-
-public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow() override;
-
-protected:
-    void setupButtons(TransposableBoxLayout &swap_box);
-    void resizeEvent(QResizeEvent *e) override;
-
-private:
-    QGridLayout *grid_layout;
-    TransposableBoxLayout *first_item;
-    TransposableBoxLayout *last_item;
-    CustomToolButton *center;
-    SizeHintItem *center_item;
-
-};
-#endif // MAINWINDOW_LAYOUT_TEST_H
+    hintSize = widget->sizeHint();
+}

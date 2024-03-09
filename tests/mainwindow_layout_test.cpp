@@ -26,6 +26,7 @@ along with ColorLines; see the file COPYING.  If not, see
 #include "mainwindow_layout_test.h"
 #include "../layout/transposable.h"
 #include "../layout/transposableboxlayout.h"
+#include "../layout/sizehintitem.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -33,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
     , grid_layout(new QGridLayout())
     , first_item(new TransposableBoxLayout(Transposable::Horizontal))
     , last_item(new TransposableBoxLayout(Transposable::Horizontal))
+    , center(new CustomToolButton(this))
 {
     auto space = new QWidget();
     space->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -49,11 +51,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     setupButtons(*last_item);
     grid_layout->addLayout(last_item, 1, 1);
-    CustomToolButton *btn = new CustomToolButton(this);
-    btn->setText("Center");
-    btn->setSizeHint(QSize(300,300));
-    btn->setMaximumSize(QSize(620,620));
-    grid_layout->addWidget(btn);
+
+    center->setText("Center");
+    center->setSizeHint(QSize(400,400));
+    center->setMaximumSize(QSize(620,620));
+    center_item = new SizeHintItem(center);
+    center_item ->setAlignment(Qt::AlignCenter);
+
+    grid_layout->addItem(center_item, 0, 1);
     grid_layout->addWidget(new QWidget());
 
     setLayout(grid_layout);
@@ -63,7 +68,7 @@ void MainWindow::setupButtons(TransposableBoxLayout &swap_box) {
     const QString str[] = {"nothing", "switch", "swap"};
     swap_box.addStretch(1);
     swap_box.setAlignment(Qt::AlignCenter);
-    CustomToolButton *btn;
+    QToolButton *btn;
     for (int i = 0; i < 3; ++i) {
         btn = new CustomToolButton(this);
         btn->setText(str[i]);
@@ -78,11 +83,14 @@ MainWindow::~MainWindow()
 }
 
 // teke it from layout/util.cpp
-void setupCenterLayout(QGridLayout &grid_layout, const QPoint center, const QSize &size);
+void setupCenterLayoutItems(QGridLayout &grid_layout, const QPoint c, const QSize &size);
 
 void MainWindow::resizeEvent(QResizeEvent *e)
 {
-    setupCenterLayout(*grid_layout, QPoint(1,1), e->size());
+    auto m = std::min(e->size().width(), e->size().height());
+    Q_ASSERT(grid_layout->indexOf(center_item) != -1);
+    center_item->setSizeHint(QSize(m,m).boundedTo(center_item->maximumSize()));
+    setupCenterLayoutItems(*grid_layout, QPoint(1,1), e->size());
     QWidget::resizeEvent(e);
 }
 

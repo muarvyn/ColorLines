@@ -20,24 +20,24 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#include <QtWidgets>
-#include <QDebug>
-
 #include "mainwindow_test.h"
-#include "../basic_defs.hpp"
+#include "../animatediconbutton.h"
 #include "../layout/transposable.h"
 #include "../layout/transposableboxlayout.h"
-#include "../aspectratioitem.h"
 
+static
 int getColor(const AnimatedIconButton *btn)
 {
     return btn->getColumn();
 }
 
+static
 AnimatedIconButton *newButton(int r, int c, QIcon *ic, QWidget *parent)
 {
     AnimatedIconButton *btn = new AnimatedIconButton(r, c, ic, parent);
-    btn->setMaximumSize(120,120);
+    btn->setMaximumSize(320,320);
+    btn->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+    btn->setColor(BallColor::green);
     return btn;
 }
 
@@ -60,13 +60,13 @@ MainWindow::MainWindow(QWidget *parent)
         nextLab->setScaledContents(true);
         nextLab->setMinimumSize(QSize(40,40));
         nextLab->setMaximumSize(QSize(80,80));
-        QIcon *ic = &ballIcons[BallColor::last-i];
+        QIcon *ic = &ballIcons[BallColor::colors_num-i];
         nextLab->setPixmap(ic->pixmap(ic->availableSizes()[0]));
         labels_layout->addWidget(nextLab);
     }
     labels_layout->addStretch(1);
 
-    QGridLayout *grid = new QGridLayout();
+    grid = new SizeHintGridLayout();
     grid->addWidget(newButton(0, 0, ballIcons, nullptr), 0,0);
     grid->addWidget(newButton(0, 1, ballIcons+1, nullptr), 0,1);
     grid->addWidget(newButton(1, 0, ballIcons+2, nullptr), 1,0);
@@ -92,12 +92,17 @@ MainWindow::MainWindow(QWidget *parent)
     setLayout(main_layout);
 }
 
-// teke it from layout/util.cpp
-void setupCenterLayout(QGridLayout &grid_layout, const QPoint center, const QSize &size);
+// take it from layout/util.cpp
+void setupCenterLayoutItems(QGridLayout &grid_layout, const QPoint c, const QSize &size);
 
 void MainWindow::resizeEvent(QResizeEvent *e)
 {
-    setupCenterLayout(*main_layout, QPoint(1,1), e->size());
+    auto m = std::min(e->size().width(), e->size().height());
+    auto s = QSize(m,m).boundedTo(grid->maximumSize());
+    qDebug() << "new hint size=" << s;
+    grid->setSizeHint(s);
+
+    setupCenterLayoutItems(*main_layout, QPoint(1,1), e->size());
     QWidget::resizeEvent(e);
 }
 

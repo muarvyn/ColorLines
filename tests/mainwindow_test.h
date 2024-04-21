@@ -20,17 +20,40 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef MAINWINDOW_TEST_H
+#define MAINWINDOW_TEST_H
 
+#define QT_NO_DEBUG_OUTPUT
+
+#include <QDebug>
 #include <QWidget>
 #include <QList>
-#include <QBoxLayout>
+#include <QGridLayout>
 #include <QIcon>
 
 #include "../basic_defs.hpp"
-#include "../animatediconbutton.h"
 
+class AnimatedIconButton;
+
+class SizeHintGridLayout: public QGridLayout
+{
+    Q_OBJECT
+public:
+    SizeHintGridLayout() : QGridLayout() {};
+    ~SizeHintGridLayout() {};
+
+    QSize sizeHint() const override {
+        qDebug() << "SizeHintGridLayout::sizeHint: " << hintSize <<
+                    "\nSizeHintGridLayout::geometry=" << geometry();
+        return hintSize.isEmpty() ? QGridLayout::sizeHint() : hintSize;
+    };
+    void setSizeHint(const QSize s) {
+        hintSize = s;
+    };
+
+private:
+    QSize hintSize;
+};
 
 class MainWindow : public QWidget
 {
@@ -49,8 +72,11 @@ public slots:
 
 private:
     QGridLayout *main_layout;
+    SizeHintGridLayout *grid;
+
     QList<AnimatedIconButton *> button_list;
     QIcon ballIcons[BallColor::colors_num];
 
 };
-#endif // MAINWINDOW_H
+
+#endif // MAINWINDOW_TEST_H

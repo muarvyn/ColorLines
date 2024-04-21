@@ -20,13 +20,15 @@ along with ColorLines; see the file COPYING.  If not, see
 
 */
 
-#define QT_NO_DEBUG_OUTPUT
-
-#include <QWidget>
+//#define QT_NO_DEBUG_OUTPUT
 #include "sizehintitem.h"
+
+#include <QDebug>
+#include <QWidget>
 
 SizeHintItem::SizeHintItem(QWidget *widget)
     : QWidgetItem(widget)
 {
+    qDebug() << "CustomToolButton::sizeHint: " << hintSize;
     hintSize = widget->sizeHint();
 }

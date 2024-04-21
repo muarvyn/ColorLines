@@ -36,9 +36,6 @@ MainWindow::MainWindow(QWidget *parent)
     , last_item(new TransposableBoxLayout(Transposable::Horizontal))
     , center(new CustomToolButton(this))
 {
-    auto space = new QWidget();
-    space->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    grid_layout->addWidget(space);
     first_item->addStretch(1);
     auto lab = new QLabel("Hello");
     lab->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -59,7 +56,6 @@ MainWindow::MainWindow(QWidget *parent)
     center_item ->setAlignment(Qt::AlignCenter);
 
     grid_layout->addItem(center_item, 0, 1);
-    grid_layout->addWidget(new QWidget());
 
     setLayout(grid_layout);
 }

@@ -53,12 +53,11 @@ void setupCenterLayout(QGridLayout &grid_layout, const QPoint c, const QSize &si
     auto is_horizontal = true;
     auto is_vertical = true;
     auto item_orientation = Transposable::Vertical;
-    auto is_space = true;
+    auto is_space = false;
     for (auto item : items) {
         auto transposable = std::get<2>(item);
         auto pos = center;
         if (transposable) {
-            is_space = false;
             is_horizontal = is_horizontal &&
                 (width + transposable->getMinimumSize().width()/2.0) < f*secondary_size.width();
 
@@ -151,12 +150,11 @@ void setupCenterLayoutItems(QGridLayout &grid_layout, const QPoint c, const QSiz
     auto is_horizontal = true;
     auto is_vertical = true;
     auto item_orientation = Transposable::Vertical;
-    auto is_space = true;
+    auto is_space = false;
     for (auto item : items) {
         auto transposable = std::get<0>(item);
         auto pos = center;
         if (transposable) {
-            is_space = false;
             is_horizontal = is_horizontal &&
                 (width + transposable->getMinimumSize().width()/2.0) < f*secondary_size.width();
 
@@ -179,7 +177,7 @@ void setupCenterLayoutItems(QGridLayout &grid_layout, const QPoint c, const QSiz
             transposable->setOrientation(item_orientation);
             line_pos += dpos;
         } else {
-            if (is_space) {
+            if (is_space) { // Delete space item
                 delete std::get<1>(item);
                 continue;
             } else {
@@ -187,8 +185,10 @@ void setupCenterLayoutItems(QGridLayout &grid_layout, const QPoint c, const QSiz
             }
         }
         qDebug() << "Adding item at (" << pos.y() << ":" << pos.x() << ")";
+        qDebug() << "expandingDirections=" << std::get<1>(item)->expandingDirections();
         grid_layout.addItem(std::get<1>(item), pos.y(), pos.x());
     }
+    // Add space items, if need
     if (is_horizontal) {
         grid_layout.addWidget(new QWidget(), center.y(), 0);
         grid_layout.addWidget(new QWidget(), center.y(), line_pos);
